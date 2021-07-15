@@ -105,20 +105,25 @@ async function getItemsAsync(filter, { reject }) {
 
 const itemToString = (i) => (i ? i.name : '');
 
-interface FieldOption {
+export interface FieldOption {
   text: string;
   type: 'INTEGER' | 'BOOLEAN' | 'STRING';
   value: string;
   isArray: boolean;
 }
 
-const fieldOptions: FieldOption[] = [
+export const fieldOptions: FieldOption[] = [
   { text: 'Image', isArray: false, type: 'STRING', value: 'image' },
   { text: 'Category', isArray: false, type: 'STRING', value: 'category' },
   { text: 'onSale', isArray: false, type: 'BOOLEAN', value: 'onSlae' },
 ];
 
-interface Operation {
+export interface Operation {
+  text: string;
+  value: string;
+}
+
+export interface ValueOption {
   text: string;
   value: string;
 }
@@ -128,7 +133,7 @@ const operationOptions: Operation[] = [
   { text: 'consist', value: '~' },
 ];
 
-type Item =
+export type Item =
   | {
       type: 'field';
       value: string;
@@ -142,14 +147,14 @@ type Item =
   | {
       type: 'value';
       value: string;
-      options?: string[];
+      options?: ValueOption[];
       component: 'text' | 'select';
     };
 
 const items: Item[] = [
-  { type: 'field', value: '', options: fieldOptions },
-  { type: 'operation', value: 'equal', options: operationOptions },
-  { type: 'value', value: '', component: 'text' },
+  { type: 'field', value: 'image', options: fieldOptions },
+  { type: 'operation', value: 'equals', options: operationOptions },
+  { type: 'value', value: 'television', component: 'text' },
 ];
 
 const menuStyles = {
