@@ -7,6 +7,8 @@ import {
   Item,
   fieldOptions,
   operationOptions,
+  booleanOptions,
+  operationMapping,
 } from './shared';
 import {
   Container,
@@ -15,6 +17,7 @@ import {
   Dropdown,
   Input,
   Pill,
+  Pre,
 } from './styled';
 
 const ItemRender = ({
@@ -28,7 +31,6 @@ const ItemRender = ({
   onChange: (item: Item) => void;
   onRemove: () => void;
 }) => {
-  const selectRef = useRef<HTMLSelectElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -37,8 +39,12 @@ const ItemRender = ({
     }
   }, [shouldFocus]);
 
-  if (item.type === 'field' || item.type === 'operation') {
+  if (item.type === 'field') {
     return <span>{item.value}</span>;
+  }
+
+  if (item.type === 'operation') {
+    return <span>{operationMapping[item.value]}</span>;
   }
 
   if (item.type === 'value') {
@@ -59,16 +65,8 @@ const ItemRender = ({
       );
     }
 
-    if (item.component === 'select') {
-      return (
-        <select ref={selectRef} value={item.value}>
-          {item.options?.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.text}
-            </option>
-          ))}
-        </select>
-      );
+    if (item.component === 'boolean') {
+      return <span>{item.value}</span>;
     }
   }
 
@@ -83,6 +81,8 @@ function DropdownMultipleCombobox() {
     items[2],
   ]);
 
+  const [hoverIndexes, setHoverIndexes] = useState<number[]>([]);
+
   const addSelectedItem = (item) => {
     setSelectedItems((prev) => [...prev, item]);
   };
@@ -93,14 +93,19 @@ function DropdownMultipleCombobox() {
     );
 
   const type = selectedItems[selectedItems.length - 1]?.type;
+  const endFieldOption = fieldOptions.find(
+    (o) => o.value === selectedItems[selectedItems.length - 2]?.value,
+  );
+  const endItem = selectedItems[selectedItems.length - 1];
+
   const suggestions =
     type === undefined || type === 'value'
       ? fieldOptions
       : type === 'field'
       ? operationOptions
+      : endFieldOption?.type === 'BOOLEAN'
+      ? booleanOptions
       : [];
-
-  const endItem = selectedItems[selectedItems.length - 1];
 
   const {
     isOpen,
@@ -110,6 +115,7 @@ function DropdownMultipleCombobox() {
     highlightedIndex,
     getItemProps,
     selectItem,
+    selectedItem,
     openMenu,
     setHighlightedIndex,
   } = useCombobox({
@@ -128,18 +134,29 @@ function DropdownMultipleCombobox() {
           if (selectedItem) {
             if (!endItem || endItem?.type === 'value') {
               // @ts-ignore
-              addSelectedItem({ type: 'field', value: selectedItem.value });
+              addSelectedItem({
+                type: 'field',
+                // @ts-ignore
+                value: selectedItem.value,
+                // @ts-ignore
+                fieldType: selectedItem.type,
+              });
               openMenu();
             } else if (endItem?.type === 'field') {
               // @ts-ignore
-              addSelectedItem({ type: 'operation', value: selectedItem.text });
-            } else if (endItem?.type === 'operation') {
+              addSelectedItem({ type: 'operation', value: selectedItem.value });
+              openMenu();
+            } else if (
+              endItem?.type === 'operation' &&
+              endFieldOption?.type === 'BOOLEAN'
+            ) {
               openMenu();
               // @ts-ignore
               addSelectedItem({
                 type: 'value',
-                value: inputValue,
-                component: 'text',
+                // @ts-ignore
+                value: selectedItem.value,
+                component: 'boolean',
               });
             }
             setInputValue('');
@@ -174,115 +191,151 @@ function DropdownMultipleCombobox() {
   }, [isOpen]);
 
   return (
-    <Container>
-      <Wrapper>
-        {selectedItems.map((selectedItem, index) => {
-          return (
-            <Pill key={`selected-item-${index}`}>
-              <ItemRender
-                item={selectedItem}
-                shouldFocus={focusIndex === index}
-                onChange={changeItem(index)}
-                onRemove={() => {
-                  setFocusIndex(index - 1);
-                  openMenu();
-                  setLastItem(selectedItems[selectedItems.length - 2]);
-                  setSelectedItems((prev) =>
-                    prev.filter(
-                      (_, i) =>
-                        i !== selectedItems.length - 1 &&
-                        i !== selectedItems.length - 2,
-                    ),
-                  );
+    <div>
+      <Container>
+        <Wrapper>
+          {selectedItems.map((selectedItem, index) => {
+            return (
+              <Pill
+                key={`selected-item-${index}`}
+                isBegin={selectedItem.type === 'field' && index !== 0}
+                onMouseEnter={() => {
+                  const p = index + 1;
+                  if (p % 3 === 0) {
+                    setHoverIndexes([index, index - 1, index - 2]);
+                  } else if (p % 3 === 2) {
+                    setHoverIndexes([index - 1, index, index + 1]);
+                  } else {
+                    setHoverIndexes([index, index + 1, index + 2]);
+                  }
                 }}
-              />
-              {selectedItem.type === 'value' && (
-                <span
-                  style={selectedItemIconStyles}
-                  onClick={() => {
-                    const selectedIndex = selectedItems.indexOf(selectedItem);
-                    const newItems = [...selectedItems];
-                    setSelectedItems(
-                      newItems.filter((_, index) => {
-                        return (
-                          index !== selectedIndex - 2 &&
-                          index !== selectedIndex - 1 &&
-                          index !== selectedIndex
-                        );
-                      }),
+                active={hoverIndexes.includes(index)}
+                onMouseLeave={() => {
+                  setHoverIndexes([]);
+                }}
+              >
+                <ItemRender
+                  item={selectedItem}
+                  shouldFocus={focusIndex === index}
+                  onChange={changeItem(index)}
+                  onRemove={() => {
+                    setFocusIndex(index - 1);
+                    openMenu();
+                    setLastItem(selectedItems[selectedItems.length - 2]);
+                    setSelectedItems((prev) =>
+                      prev.filter(
+                        (_, i) =>
+                          i !== selectedItems.length - 1 &&
+                          i !== selectedItems.length - 2,
+                      ),
                     );
                   }}
-                >
-                  &#10005;
-                </span>
-              )}
-            </Pill>
-          );
-        })}
-        <InputContainer {...getComboboxProps()}>
-          <Input
-            {...getInputProps({
-              ref: inputRef,
-              onFocus: () => {
-                openMenu();
-              },
-              onKeyDown: (e) => {
-                if (e.key === 'Backspace' && inputValue === '') {
-                  if (
-                    endItem?.type === 'value' &&
-                    endItem?.component === 'text'
-                  ) {
-                  } else if (selectedItems.length > 0) {
-                    setSelectedItems((prev) =>
-                      prev.filter((_, i) => i !== prev.length - 1),
-                    );
-                  }
-                  setFocusIndex(selectedItems.length - 1);
-                  setTimeout(() => {
-                    setFocusIndex(-1);
-                  }, 500);
-                }
-
-                if (
-                  e.key === 'Enter' &&
-                  inputValue !== '' &&
-                  endItem?.type === 'operation'
-                ) {
+                />
+                {selectedItem.type === 'value' && (
+                  <span
+                    style={selectedItemIconStyles}
+                    onClick={() => {
+                      const selectedIndex = selectedItems.indexOf(selectedItem);
+                      const newItems = [...selectedItems];
+                      setSelectedItems(
+                        newItems.filter((_, index) => {
+                          return (
+                            index !== selectedIndex - 2 &&
+                            index !== selectedIndex - 1 &&
+                            index !== selectedIndex
+                          );
+                        }),
+                      );
+                    }}
+                  >
+                    &#10005;
+                  </span>
+                )}
+              </Pill>
+            );
+          })}
+          <InputContainer {...getComboboxProps()}>
+            <Input
+              {...getInputProps({
+                ref: inputRef,
+                onFocus: () => {
                   openMenu();
-                  // @ts-ignore
-                  addSelectedItem({
-                    type: 'value',
-                    value: inputValue,
-                    component: 'text',
-                  });
-                  setInputValue('');
-                }
-              },
-            })}
-          />
-          {isOpen && suggestions.length > 0 && (
-            <Dropdown {...getMenuProps()}>
-              {getFilteredItems(suggestions).map((item, index) => (
-                <li
-                  style={
-                    highlightedIndex === index
-                      ? { backgroundColor: '#bde4ff' }
-                      : {}
+                },
+                onKeyDown: (e) => {
+                  if (e.key === 'Backspace' && inputValue === '') {
+                    if (
+                      endItem?.type === 'value' &&
+                      endItem?.component === 'text'
+                    ) {
+                    } else if (selectedItems.length > 0) {
+                      setSelectedItems((prev) =>
+                        prev.filter((_, i) => i !== prev.length - 1),
+                      );
+                    }
+                    setFocusIndex(selectedItems.length - 1);
+                    setTimeout(() => {
+                      setFocusIndex(-1);
+                    }, 500);
                   }
-                  key={`${item.value}${index}`}
-                  {...getItemProps({
-                    item,
-                    index,
-                  })}
-                >
-                  {item.text}
-                </li>
-              ))}
-            </Dropdown>
-          )}
-        </InputContainer>
-      </Wrapper>
-    </Container>
+
+                  if (
+                    e.key === 'Enter' &&
+                    endItem?.type === 'operation' &&
+                    inputValue !== ''
+                  ) {
+                    openMenu();
+                    // @ts-ignore
+                    addSelectedItem({
+                      type: 'value',
+                      value: inputValue,
+                      component: 'text',
+                    });
+                    setInputValue('');
+                  }
+                },
+              })}
+            />
+            {isOpen && suggestions.length > 0 && (
+              <Dropdown {...getMenuProps()}>
+                {getFilteredItems(suggestions).map((item, index) => (
+                  <li
+                    style={
+                      highlightedIndex === index
+                        ? { backgroundColor: '#bde4ff' }
+                        : {}
+                    }
+                    key={`${item.value}${index}`}
+                    {...getItemProps({
+                      item,
+                      index,
+                    })}
+                  >
+                    {item.text}
+                  </li>
+                ))}
+              </Dropdown>
+            )}
+          </InputContainer>
+        </Wrapper>
+      </Container>
+
+      <Container>
+        <Pre>
+          {selectedItems
+            .map((item, index) => {
+              if (item.type === 'field') {
+                return index === 0 ? item.value : `AND ${item.value}`;
+              }
+              if (item.type === 'value') {
+                return `'${item.value}'`;
+              }
+
+              return item.value;
+            })
+            .join(' ')}
+        </Pre>
+      </Container>
+    </div>
   );
 }
 

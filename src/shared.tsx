@@ -81,23 +81,37 @@ export interface FieldOption {
 }
 
 export const fieldOptions: FieldOption[] = [
-  { text: 'Image', isArray: false, type: 'STRING', value: 'image' },
-  { text: 'Category', isArray: false, type: 'STRING', value: 'category' },
+  { text: 'image', isArray: false, type: 'STRING', value: 'image' },
+  { text: 'category', isArray: false, type: 'STRING', value: 'category' },
   { text: 'onSale', isArray: false, type: 'BOOLEAN', value: 'onSale' },
 ];
 
+export const operationMapping = {
+  '=': 'is',
+  '~': 'contains',
+  '!=': 'is not',
+  '!~': 'does not contain',
+  $: 'ends with',
+  '^': 'begins with',
+};
+
 export const operationOptions: Operation[] = [
-  { text: 'is', value: '=' },
-  { text: 'contains', value: '~' },
-  { text: 'is not', value: '!=' },
-  { text: 'does not contain', value: '!~' },
-  { text: 'ends with', value: '$' },
-  { text: 'begins with', value: '^' },
+  { value: '=', text: 'is' },
+  { value: '~', text: 'contains' },
+  { value: '!=', text: 'is not' },
+  { value: '!~', text: 'does not contain' },
+  { value: '$', text: 'ends with' },
+  { value: '^', text: 'begins with' },
+];
+
+export const booleanOptions = [
+  { text: 'TRUE', value: 'TRUE' },
+  { text: 'FALSE', value: 'FALSE' },
 ];
 
 export interface Operation {
   text: string;
-  value: string;
+  value: keyof typeof operationMapping;
 }
 
 export interface ValueOption {
@@ -109,6 +123,7 @@ export type Item =
   | {
       type: 'field';
       value: string;
+      fieldType: FieldOption['type'];
     }
   | {
       type: 'operation';
@@ -118,12 +133,12 @@ export type Item =
       type: 'value';
       value: string;
       options?: ValueOption[];
-      component: 'text' | 'select';
+      component: 'text' | 'boolean';
     };
 
 const items: Item[] = [
-  { type: 'field', value: 'image' },
-  { type: 'operation', value: 'is' },
+  { type: 'field', value: 'image', fieldType: 'STRING' },
+  { type: 'operation', value: '=' },
   { type: 'value', value: 'television', component: 'text' },
 ];
 
@@ -137,7 +152,11 @@ const menuStyles = {
   position: 'relative',
 };
 
-const selectedItemIconStyles = { cursor: 'pointer' };
+const selectedItemIconStyles = {
+  cursor: 'pointer',
+  marginLeft: '10px',
+  display: 'inline-flex',
+};
 
 const comboboxStyles = { display: 'inline-block', marginLeft: '5px' };
 
