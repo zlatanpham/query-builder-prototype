@@ -25,38 +25,6 @@ const Menu = React.forwardRef((props, ref) => {
   return <BaseMenu ref={ref} {...props} />;
 });
 
-const ControllerButton = styled('button')({
-  backgroundColor: 'transparent',
-  border: 'none',
-  position: 'absolute',
-  right: 0,
-  top: 0,
-  cursor: 'pointer',
-  width: 47,
-  display: 'flex',
-  flexDirection: 'column',
-  height: '100%',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-
-// @ts-ignore
-function ArrowIcon({ isOpen }) {
-  return (
-    <svg
-      viewBox="0 0 20 20"
-      preserveAspectRatio="none"
-      width={16}
-      fill="transparent"
-      stroke="#979797"
-      strokeWidth="1.1px"
-      transform={isOpen ? 'rotate(180)' : undefined}
-    >
-      <path d="M1,6 L10,15 L19,6" />
-    </svg>
-  );
-}
-
 function XIcon() {
   return (
     <svg
@@ -115,7 +83,16 @@ export interface FieldOption {
 export const fieldOptions: FieldOption[] = [
   { text: 'Image', isArray: false, type: 'STRING', value: 'image' },
   { text: 'Category', isArray: false, type: 'STRING', value: 'category' },
-  { text: 'onSale', isArray: false, type: 'BOOLEAN', value: 'onSlae' },
+  { text: 'onSale', isArray: false, type: 'BOOLEAN', value: 'onSale' },
+];
+
+export const operationOptions: Operation[] = [
+  { text: 'is', value: '=' },
+  { text: 'contains', value: '~' },
+  { text: 'is not', value: '!=' },
+  { text: 'does not contain', value: '!~' },
+  { text: 'ends with', value: '$' },
+  { text: 'begins with', value: '^' },
 ];
 
 export interface Operation {
@@ -128,21 +105,14 @@ export interface ValueOption {
   value: string;
 }
 
-const operationOptions: Operation[] = [
-  { text: 'equal', value: '=' },
-  { text: 'consist', value: '~' },
-];
-
 export type Item =
   | {
       type: 'field';
       value: string;
-      options: FieldOption[];
     }
   | {
       type: 'operation';
       value: string;
-      options: Operation[];
     }
   | {
       type: 'value';
@@ -152,8 +122,8 @@ export type Item =
     };
 
 const items: Item[] = [
-  { type: 'field', value: 'image', options: fieldOptions },
-  { type: 'operation', value: 'equals', options: operationOptions },
+  { type: 'field', value: 'image' },
+  { type: 'operation', value: 'is' },
   { type: 'value', value: 'television', component: 'text' },
 ];
 
@@ -167,12 +137,6 @@ const menuStyles = {
   position: 'relative',
 };
 
-const selectedItemStyles = {
-  marginLeft: '5px',
-  backgroundColor: 'aliceblue',
-  borderRadius: '10px',
-};
-
 const selectedItemIconStyles = { cursor: 'pointer' };
 
 const comboboxStyles = { display: 'inline-block', marginLeft: '5px' };
@@ -182,10 +146,7 @@ export {
   menuStyles,
   comboboxStyles,
   selectedItemIconStyles,
-  selectedItemStyles,
   Menu,
-  ControllerButton,
-  ArrowIcon,
   XIcon,
   Label,
   css,

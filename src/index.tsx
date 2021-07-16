@@ -1,13 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { render } from 'react-dom';
-import { useCombobox, useMultipleSelection } from 'downshift';
+import { useCombobox } from 'downshift';
 import {
   items,
-  selectedItemStyles,
   selectedItemIconStyles,
   Item,
+  fieldOptions,
+  operationOptions,
 } from './shared';
-import { Container, Wrapper, InputContainer, Dropdown, Input } from './styled';
+import {
+  Container,
+  Wrapper,
+  InputContainer,
+  Dropdown,
+  Input,
+  Pill,
+} from './styled';
 
 const ItemRender = ({
   item,
@@ -29,28 +37,8 @@ const ItemRender = ({
     }
   }, [shouldFocus]);
 
-  if (item.type === 'field') {
-    return (
-      <select ref={selectRef} value={item.value}>
-        {item.options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.text}
-          </option>
-        ))}
-      </select>
-    );
-  }
-
-  if (item.type === 'operation') {
-    return (
-      <select ref={selectRef} value={item.value}>
-        {item.options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.text}
-          </option>
-        ))}
-      </select>
-    );
+  if (item.type === 'field' || item.type === 'operation') {
+    return <span>{item.value}</span>;
   }
 
   if (item.type === 'value') {
@@ -94,12 +82,26 @@ function DropdownMultipleCombobox() {
     items[1],
     items[2],
   ]);
+
+  const addSelectedItem = (item) => {
+    setSelectedItems((prev) => [...prev, item]);
+  };
+
   const getFilteredItems = (items) =>
-    items.filter(
-      (item) =>
-        selectedItems.indexOf(item) < 0 &&
-        item.value.toLowerCase().startsWith(inputValue.toLowerCase()),
+    items.filter((item) =>
+      item?.text?.toLowerCase().startsWith(inputValue.toLowerCase()),
     );
+
+  const type = selectedItems[selectedItems.length - 1]?.type;
+  const suggestions =
+    type === undefined || type === 'value'
+      ? fieldOptions
+      : type === 'field'
+      ? operationOptions
+      : [];
+
+  const endItem = selectedItems[selectedItems.length - 1];
+
   const {
     isOpen,
     getMenuProps,
@@ -108,22 +110,39 @@ function DropdownMultipleCombobox() {
     highlightedIndex,
     getItemProps,
     selectItem,
+    openMenu,
+    setHighlightedIndex,
   } = useCombobox({
     inputValue,
-    items: getFilteredItems(items),
+    items: getFilteredItems(suggestions),
     onStateChange: ({ inputValue, type, selectedItem }) => {
       switch (type) {
         case useCombobox.stateChangeTypes.InputChange:
           // @ts-ignore
           setInputValue(inputValue);
           break;
+
         case useCombobox.stateChangeTypes.InputKeyDownEnter:
         case useCombobox.stateChangeTypes.ItemClick:
         case useCombobox.stateChangeTypes.InputBlur:
           if (selectedItem) {
+            if (!endItem || endItem?.type === 'value') {
+              // @ts-ignore
+              addSelectedItem({ type: 'field', value: selectedItem.value });
+              openMenu();
+            } else if (endItem?.type === 'field') {
+              // @ts-ignore
+              addSelectedItem({ type: 'operation', value: selectedItem.text });
+            } else if (endItem?.type === 'operation') {
+              openMenu();
+              // @ts-ignore
+              addSelectedItem({
+                type: 'value',
+                value: inputValue,
+                component: 'text',
+              });
+            }
             setInputValue('');
-            // @ts-ignore
-            addSelectedItem(selectedItem);
             selectItem(null);
           }
 
@@ -135,14 +154,13 @@ function DropdownMultipleCombobox() {
   });
   const [focusIndex, setFocusIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
-  const lastItem = useMemo(
-    () => selectedItems[selectedItems.length - 1],
-    [selectedItems.length],
-  );
+  const [lastItem, setLastItem] = useState<null | Item>(null);
 
   useEffect(() => {
-    setInputValue(lastItem.value.substring(0, lastItem.value.length - 2));
-    inputRef.current?.focus();
+    if (lastItem) {
+      setInputValue(lastItem.value.substring(0, lastItem.value.length - 1));
+      inputRef.current?.focus();
+    }
   }, [lastItem]);
 
   const changeItem = (index: number) => (item: Item) => {
@@ -151,21 +169,30 @@ function DropdownMultipleCombobox() {
     });
   };
 
+  useEffect(() => {
+    setHighlightedIndex(-1);
+  }, [isOpen]);
+
   return (
     <Container>
       <Wrapper>
         {selectedItems.map((selectedItem, index) => {
           return (
-            <div style={selectedItemStyles} key={`selected-item-${index}`}>
+            <Pill key={`selected-item-${index}`}>
               <ItemRender
                 item={selectedItem}
                 shouldFocus={focusIndex === index}
                 onChange={changeItem(index)}
                 onRemove={() => {
                   setFocusIndex(index - 1);
-
+                  openMenu();
+                  setLastItem(selectedItems[selectedItems.length - 2]);
                   setSelectedItems((prev) =>
-                    prev.filter((_, i) => i !== selectedItems.length - 1),
+                    prev.filter(
+                      (_, i) =>
+                        i !== selectedItems.length - 1 &&
+                        i !== selectedItems.length - 2,
+                    ),
                   );
                 }}
               />
@@ -189,39 +216,68 @@ function DropdownMultipleCombobox() {
                   &#10005;
                 </span>
               )}
-            </div>
+            </Pill>
           );
         })}
         <InputContainer {...getComboboxProps()}>
           <Input
             {...getInputProps({
               ref: inputRef,
+              onFocus: () => {
+                openMenu();
+              },
               onKeyDown: (e) => {
                 if (e.key === 'Backspace' && inputValue === '') {
-                  setFocusIndex(items.length - 1);
+                  if (
+                    endItem?.type === 'value' &&
+                    endItem?.component === 'text'
+                  ) {
+                  } else if (selectedItems.length > 0) {
+                    setSelectedItems((prev) =>
+                      prev.filter((_, i) => i !== prev.length - 1),
+                    );
+                  }
+                  setFocusIndex(selectedItems.length - 1);
                   setTimeout(() => {
                     setFocusIndex(-1);
                   }, 500);
                 }
+
+                if (
+                  e.key === 'Enter' &&
+                  inputValue !== '' &&
+                  endItem?.type === 'operation'
+                ) {
+                  openMenu();
+                  // @ts-ignore
+                  addSelectedItem({
+                    type: 'value',
+                    value: inputValue,
+                    component: 'text',
+                  });
+                  setInputValue('');
+                }
               },
             })}
           />
-          {isOpen && (
+          {isOpen && suggestions.length > 0 && (
             <Dropdown {...getMenuProps()}>
-              {isOpen &&
-                getFilteredItems(items).map((item, index) => (
-                  <li
-                    style={
-                      highlightedIndex === index
-                        ? { backgroundColor: '#bde4ff' }
-                        : {}
-                    }
-                    key={`${item.value}${index}`}
-                    {...getItemProps({ item, index })}
-                  >
-                    {item.value}
-                  </li>
-                ))}
+              {getFilteredItems(suggestions).map((item, index) => (
+                <li
+                  style={
+                    highlightedIndex === index
+                      ? { backgroundColor: '#bde4ff' }
+                      : {}
+                  }
+                  key={`${item.value}${index}`}
+                  {...getItemProps({
+                    item,
+                    index,
+                  })}
+                >
+                  {item.text}
+                </li>
+              ))}
             </Dropdown>
           )}
         </InputContainer>
