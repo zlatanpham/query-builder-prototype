@@ -1,13 +1,6 @@
 import React from 'react';
 import { css as emoCSS } from '@emotion/css';
 import styled from '@emotion/styled';
-import starWarsNames from 'starwars-names';
-import { matchSorter } from 'match-sorter';
-
-const allItems = starWarsNames.all.map((s) => ({
-  name: s,
-  id: s.toLowerCase(),
-}));
 
 // @ts-ignore
 const css = (...args) => ({ className: emoCSS(...args) });
@@ -24,54 +17,6 @@ const Menu = React.forwardRef((props, ref) => {
   // @ts-ignore
   return <BaseMenu ref={ref} {...props} />;
 });
-
-function XIcon() {
-  return (
-    <svg
-      viewBox="0 0 20 20"
-      preserveAspectRatio="none"
-      width={12}
-      fill="transparent"
-      stroke="#979797"
-      strokeWidth="1.1px"
-    >
-      <path d="M1,1 L19,19" />
-      <path d="M19,1 L1,19" />
-    </svg>
-  );
-}
-
-// @ts-ignore
-function getItems(filter) {
-  return filter
-    ? matchSorter(allItems, filter, {
-        keys: ['name'],
-      })
-    : allItems;
-}
-
-function getStringItems(filter) {
-  return getItems(filter).map(({ name }) => name);
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
-async function getItemsAsync(filter, { reject }) {
-  await sleep(Math.random() * 2000);
-  if (reject) {
-    // this is just so we can have examples that show what happens
-    // when there's a request failure.
-    // @ts-ignore
-    throw new Error({ error: 'request rejected' });
-  }
-  return getItems(filter);
-}
-
-const itemToString = (i) => (i ? i.name : '');
 
 export interface FieldOption {
   text: string;
@@ -137,7 +82,7 @@ export type Item =
     };
 
 const items: Item[] = [
-  { type: 'field', value: 'image', fieldType: 'STRING' },
+  { type: 'field', value: 'category', fieldType: 'STRING' },
   { type: 'operation', value: '=' },
   { type: 'value', value: 'television', component: 'text' },
 ];
@@ -152,25 +97,6 @@ const menuStyles = {
   position: 'relative',
 };
 
-const selectedItemIconStyles = {
-  cursor: 'pointer',
-  marginLeft: '10px',
-  display: 'inline-flex',
-};
-
 const comboboxStyles = { display: 'inline-block', marginLeft: '5px' };
 
-export {
-  items,
-  menuStyles,
-  comboboxStyles,
-  selectedItemIconStyles,
-  Menu,
-  XIcon,
-  Label,
-  css,
-  itemToString,
-  getItems,
-  getStringItems,
-  getItemsAsync,
-};
+export { items, menuStyles, comboboxStyles, Menu, Label, css };

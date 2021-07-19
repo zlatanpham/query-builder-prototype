@@ -71,13 +71,3 @@ export const Pill = styled.div<{ isBegin: boolean; active: boolean }>`
   align-items: center;
   margin-left: ${(props) => (props.isBegin ? '5px' : '1px')};
 `;
-
-export const Pre = styled.pre`
-  margin-top: 30px;
-  background-color: #ddd;
-  font-size: 18px;
-  font-family: 'Courier New', Courier, monospace;
-  padding: 30px;
-  border-radius: 10px;
-  white-space: pre-wrap;
-`;

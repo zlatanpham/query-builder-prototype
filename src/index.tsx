@@ -3,22 +3,15 @@ import { render } from 'react-dom';
 import { useCombobox } from 'downshift';
 import {
   items,
-  selectedItemIconStyles,
   Item,
   fieldOptions,
   operationOptions,
   booleanOptions,
   operationMapping,
 } from './shared';
-import {
-  Container,
-  Wrapper,
-  InputContainer,
-  Dropdown,
-  Input,
-  Pill,
-  Pre,
-} from './styled';
+import { Container, Wrapper, InputContainer, Dropdown, Input } from './styled';
+import './index.css';
+import { Code, Box, IconButton } from '@sajari-ui/core';
 
 const ItemRender = ({
   item,
@@ -40,11 +33,11 @@ const ItemRender = ({
   }, [shouldFocus]);
 
   if (item.type === 'field') {
-    return <span>{item.value}</span>;
+    return <Box as="span">{item.value}</Box>;
   }
 
   if (item.type === 'operation') {
-    return <span>{operationMapping[item.value]}</span>;
+    return <Box as="span">{operationMapping[item.value]}</Box>;
   }
 
   if (item.type === 'value') {
@@ -66,7 +59,7 @@ const ItemRender = ({
     }
 
     if (item.component === 'boolean') {
-      return <span>{item.value}</span>;
+      return <Box as="span">{item.value}</Box>;
     }
   }
 
@@ -196,9 +189,10 @@ function DropdownMultipleCombobox() {
         <Wrapper>
           {selectedItems.map((selectedItem, index) => {
             return (
-              <Pill
+              <Box
                 key={`selected-item-${index}`}
-                isBegin={selectedItem.type === 'field' && index !== 0}
+                margin={['mr-0.5']}
+                // isBegin={selectedItem.type === 'field' && index !== 0}
                 onMouseEnter={() => {
                   const p = index + 1;
                   if (p % 3 === 0) {
@@ -209,7 +203,11 @@ function DropdownMultipleCombobox() {
                     setHoverIndexes([index, index + 1, index + 2]);
                   }
                 }}
-                active={hoverIndexes.includes(index)}
+                transitionProperty="transition"
+                transitionDuration="duration-200"
+                backgroundColor={
+                  hoverIndexes.includes(index) ? 'bg-gray-300' : 'bg-gray-200'
+                }
                 onMouseLeave={() => {
                   setHoverIndexes([]);
                 }}
@@ -232,8 +230,11 @@ function DropdownMultipleCombobox() {
                   }}
                 />
                 {selectedItem.type === 'value' && (
-                  <span
-                    style={selectedItemIconStyles}
+                  <IconButton
+                    icon="close"
+                    margin="ml-2.5"
+                    size="sm"
+                    label="Remove"
                     onClick={() => {
                       const selectedIndex = selectedItems.indexOf(selectedItem);
                       const newItems = [...selectedItems];
@@ -247,11 +248,9 @@ function DropdownMultipleCombobox() {
                         }),
                       );
                     }}
-                  >
-                    &#10005;
-                  </span>
+                  />
                 )}
-              </Pill>
+              </Box>
             );
           })}
           <InputContainer {...getComboboxProps()}>
@@ -320,8 +319,10 @@ function DropdownMultipleCombobox() {
       </Container>
 
       <Container>
-        <Pre>
-          {selectedItems
+        <Code
+          theme="dark"
+          language="bash"
+          value={selectedItems
             .map((item, index) => {
               if (item.type === 'field') {
                 return index === 0 ? item.value : `AND ${item.value}`;
@@ -333,7 +334,9 @@ function DropdownMultipleCombobox() {
               return item.value;
             })
             .join(' ')}
-        </Pre>
+          showCopyButton={false}
+          flex="flex-1"
+        />
       </Container>
     </div>
   );
