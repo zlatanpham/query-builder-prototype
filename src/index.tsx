@@ -5,13 +5,19 @@ import {
   items,
   Item,
   fieldOptions,
-  operationOptions,
+  operatorOptions,
   booleanOptions,
-  operationMapping,
+  operatorMapping,
 } from './shared';
-import { Container, Wrapper, InputContainer, Dropdown, Input } from './styled';
 import './index.css';
-import { Code, Box, IconButton } from '@sajari-ui/core';
+import {
+  Code,
+  Box,
+  IconButton,
+  TextInput,
+  usePopper,
+  Portal,
+} from '@sajari-ui/core';
 
 const ItemRender = ({
   item,
@@ -33,19 +39,27 @@ const ItemRender = ({
   }, [shouldFocus]);
 
   if (item.type === 'field') {
-    return <Box as="span">{item.value}</Box>;
+    return (
+      <Box as="span" textColor="text-gray-500">
+        {item.value}
+      </Box>
+    );
   }
 
-  if (item.type === 'operation') {
-    return <Box as="span">{operationMapping[item.value]}</Box>;
+  if (item.type === 'operator') {
+    return <Box as="span">{operatorMapping[item.value]}</Box>;
   }
 
   if (item.type === 'value') {
     if (item.component === 'text') {
       return (
-        <input
+        <TextInput
           ref={inputRef}
           value={item.value}
+          padding="py-0"
+          borderWidth="border-0"
+          width="w-max-content"
+          backgroundColor={['bg-transparent', 'focus:bg-white']}
           onChange={(e) => {
             onChange({ ...item, value: e.target.value });
           }}
@@ -75,19 +89,21 @@ function DropdownMultipleCombobox() {
   ]);
 
   const [hoverIndexes, setHoverIndexes] = useState<number[]>([]);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   const addSelectedItem = (item) => {
     setSelectedItems((prev) => [...prev, item]);
   };
 
-  const getFilteredItems = (items) =>
-    items.filter((item) =>
+  const getFilteredItems = (items) => {
+    return items.filter((item) =>
       item?.text?.toLowerCase().startsWith(inputValue.toLowerCase()),
     );
+  };
 
   const type = selectedItems[selectedItems.length - 1]?.type;
   const endFieldOption = fieldOptions.find(
-    (o) => o.value === selectedItems[selectedItems.length - 2]?.value,
+    (o) => o.text === selectedItems[selectedItems.length - 2]?.value,
   );
   const endItem = selectedItems[selectedItems.length - 1];
 
@@ -95,10 +111,12 @@ function DropdownMultipleCombobox() {
     type === undefined || type === 'value'
       ? fieldOptions
       : type === 'field'
-      ? operationOptions
+      ? operatorOptions
       : endFieldOption?.type === 'BOOLEAN'
       ? booleanOptions
       : [];
+
+  const filteredSuggestions = getFilteredItems(suggestions);
 
   const {
     isOpen,
@@ -108,12 +126,11 @@ function DropdownMultipleCombobox() {
     highlightedIndex,
     getItemProps,
     selectItem,
-    selectedItem,
     openMenu,
     setHighlightedIndex,
   } = useCombobox({
     inputValue,
-    items: getFilteredItems(suggestions),
+    items: filteredSuggestions,
     onStateChange: ({ inputValue, type, selectedItem }) => {
       switch (type) {
         case useCombobox.stateChangeTypes.InputChange:
@@ -137,10 +154,10 @@ function DropdownMultipleCombobox() {
               openMenu();
             } else if (endItem?.type === 'field') {
               // @ts-ignore
-              addSelectedItem({ type: 'operation', value: selectedItem.value });
+              addSelectedItem({ type: 'operator', value: selectedItem.value });
               openMenu();
             } else if (
-              endItem?.type === 'operation' &&
+              endItem?.type === 'operator' &&
               endFieldOption?.type === 'BOOLEAN'
             ) {
               openMenu();
@@ -173,26 +190,46 @@ function DropdownMultipleCombobox() {
     }
   }, [lastItem]);
 
+  useEffect(() => {
+    wrapperRef.current?.scroll({ left: wrapperRef.current.clientWidth });
+  }, [selectedItems.length]);
+
   const changeItem = (index: number) => (item: Item) => {
     setSelectedItems((prev) => {
       return prev.map((eItem, eIndex) => (eIndex === index ? item : eItem));
     });
   };
 
+  const { popper, update, reference } = usePopper({
+    forceUpdate: isOpen,
+    gutter: 8,
+    placement: 'bottom',
+  });
+
   useEffect(() => {
     setHighlightedIndex(-1);
-  }, [isOpen]);
+    update();
+  }, [isOpen, update, setHighlightedIndex]);
 
   return (
-    <div>
-      <Container>
-        <Wrapper>
+    <>
+      <Box padding="p-10" maxWidth="max-w-7xl" margin="mx-auto">
+        <Box
+          ref={wrapperRef}
+          borderWidth="border"
+          borderColor="border-gray-300"
+          borderRadius="rounded-md"
+          padding={['py-1', 'px-3']}
+          overflow="overflow-auto"
+          width="w-auto"
+          display="flex"
+          flexWrap="flex-no-wrap"
+        >
           {selectedItems.map((selectedItem, index) => {
             return (
               <Box
+                height="h-8"
                 key={`selected-item-${index}`}
-                margin={['mr-0.5']}
-                // isBegin={selectedItem.type === 'field' && index !== 0}
                 onMouseEnter={() => {
                   const p = index + 1;
                   if (p % 3 === 0) {
@@ -203,10 +240,24 @@ function DropdownMultipleCombobox() {
                     setHoverIndexes([index, index + 1, index + 2]);
                   }
                 }}
+                margin={
+                  selectedItem.type === 'field' && index !== 0
+                    ? 'ml-2'
+                    : 'ml-0.5'
+                }
+                padding={[
+                  selectedItem.type === 'value' ? 'pl-2' : 'px-2',
+                  'py-0.5',
+                ]}
+                whitespace="whitespace-no-wrap"
+                borderRadius="rounded-md"
+                display="inline-flex"
+                justifyContent="justify-center"
+                alignItems="items-center"
                 transitionProperty="transition"
                 transitionDuration="duration-200"
                 backgroundColor={
-                  hoverIndexes.includes(index) ? 'bg-gray-300' : 'bg-gray-200'
+                  hoverIndexes.includes(index) ? 'bg-gray-300' : 'bg-gray-100'
                 }
                 onMouseLeave={() => {
                   setHoverIndexes([]);
@@ -232,8 +283,14 @@ function DropdownMultipleCombobox() {
                 {selectedItem.type === 'value' && (
                   <IconButton
                     icon="close"
-                    margin="ml-2.5"
                     size="sm"
+                    padding="px-2"
+                    margin="ml-0.5"
+                    display="flex"
+                    alignItems="items-center"
+                    justifyContent="justify-center"
+                    appearance="none"
+                    iconSize="sm"
                     label="Remove"
                     onClick={() => {
                       const selectedIndex = selectedItems.indexOf(selectedItem);
@@ -253,8 +310,18 @@ function DropdownMultipleCombobox() {
               </Box>
             );
           })}
-          <InputContainer {...getComboboxProps()}>
-            <Input
+          <Box
+            flex="flex-1"
+            display="inline-flex"
+            margin="ml-1"
+            // @ts-ignore
+            {...getComboboxProps({ ref: reference.ref })}
+          >
+            <Box
+              height="h-8"
+              as="input"
+              outline="outline-none"
+              padding="p-0"
               {...getInputProps({
                 ref: inputRef,
                 onFocus: () => {
@@ -279,7 +346,7 @@ function DropdownMultipleCombobox() {
 
                   if (
                     e.key === 'Enter' &&
-                    endItem?.type === 'operation' &&
+                    endItem?.type === 'operator' &&
                     inputValue !== ''
                   ) {
                     openMenu();
@@ -294,31 +361,51 @@ function DropdownMultipleCombobox() {
                 },
               })}
             />
-            {isOpen && suggestions.length > 0 && (
-              <Dropdown {...getMenuProps()}>
-                {getFilteredItems(suggestions).map((item, index) => (
-                  <li
-                    style={
-                      highlightedIndex === index
-                        ? { backgroundColor: '#bde4ff' }
-                        : {}
-                    }
-                    key={`${item.value}${index}`}
-                    {...getItemProps({
-                      item,
-                      index,
-                    })}
-                  >
-                    {item.text}
-                  </li>
-                ))}
-              </Dropdown>
+            {isOpen && filteredSuggestions.length > 0 && (
+              <Portal>
+                <Box
+                  style={{ ...popper.style }}
+                  ref={popper.ref}
+                  backgroundColor="bg-white"
+                  borderRadius="rounded-lg"
+                  padding="p-2"
+                  zIndex="z-50"
+                  borderWidth="border"
+                  borderColor="border-gray-200"
+                  boxShadow="shadow-menu"
+                  as="ul"
+                  {...getMenuProps()}
+                >
+                  {filteredSuggestions.map((item, index) => (
+                    <Box
+                      as="li"
+                      padding={['px-3', 'py-1']}
+                      borderRadius="rounded-md"
+                      backgroundColor={
+                        highlightedIndex === index ? 'bg-blue-500' : 'bg-white'
+                      }
+                      textColor={
+                        highlightedIndex === index
+                          ? 'text-white'
+                          : 'text-gray-500'
+                      }
+                      key={`${item.value}${index}`}
+                      {...getItemProps({
+                        item,
+                        index,
+                      })}
+                    >
+                      {item.text}
+                    </Box>
+                  ))}
+                </Box>
+              </Portal>
             )}
-          </InputContainer>
-        </Wrapper>
-      </Container>
+          </Box>
+        </Box>
+      </Box>
 
-      <Container>
+      <Box padding="p-10" maxWidth="max-w-7xl" margin="mx-auto">
         <Code
           theme="dark"
           language="bash"
@@ -337,8 +424,8 @@ function DropdownMultipleCombobox() {
           showCopyButton={false}
           flex="flex-1"
         />
-      </Container>
-    </div>
+      </Box>
+    </>
   );
 }
 

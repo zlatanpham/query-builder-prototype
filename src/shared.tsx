@@ -1,46 +1,29 @@
-import React from 'react';
-import { css as emoCSS } from '@emotion/css';
-import styled from '@emotion/styled';
-
-// @ts-ignore
-const css = (...args) => ({ className: emoCSS(...args) });
-
-const Label = styled('label')({
-  fontWeight: 'bold',
-  display: 'block',
-  marginBottom: 10,
-});
-
-const BaseMenu = styled.ul``;
-
-const Menu = React.forwardRef((props, ref) => {
-  // @ts-ignore
-  return <BaseMenu ref={ref} {...props} />;
-});
-
 export interface FieldOption {
   text: string;
-  type: 'INTEGER' | 'BOOLEAN' | 'STRING';
   value: string;
+  type: 'INTEGER' | 'BOOLEAN' | 'STRING' | 'FLOAT';
   isArray: boolean;
 }
 
 export const fieldOptions: FieldOption[] = [
-  { text: 'image', isArray: false, type: 'STRING', value: 'image' },
-  { text: 'category', isArray: false, type: 'STRING', value: 'category' },
-  { text: 'onSale', isArray: false, type: 'BOOLEAN', value: 'onSale' },
+  { text: 'image', value: 'image', isArray: false, type: 'STRING' },
+  { text: 'category', value: 'category', isArray: false, type: 'STRING' },
+  { text: 'price', value: 'price', isArray: false, type: 'FLOAT' },
+  { text: 'onSale', value: 'onSale', isArray: false, type: 'BOOLEAN' },
 ];
 
-export const operationMapping = {
+export const operatorMapping = {
   '=': 'is',
   '~': 'contains',
   '!=': 'is not',
   '!~': 'does not contain',
   $: 'ends with',
   '^': 'begins with',
+  '>': 'greater than',
+  '<': 'less than',
 };
 
-export const operationOptions: Operation[] = [
+export const operatorOptions: OperatorOption[] = [
   { value: '=', text: 'is' },
   { value: '~', text: 'contains' },
   { value: '!=', text: 'is not' },
@@ -54,9 +37,9 @@ export const booleanOptions = [
   { text: 'FALSE', value: 'FALSE' },
 ];
 
-export interface Operation {
+export interface OperatorOption {
   text: string;
-  value: keyof typeof operationMapping;
+  value: keyof typeof operatorMapping;
 }
 
 export interface ValueOption {
@@ -64,39 +47,28 @@ export interface ValueOption {
   value: string;
 }
 
-export type Item =
-  | {
-      type: 'field';
-      value: string;
-      fieldType: FieldOption['type'];
-    }
-  | {
-      type: 'operation';
-      value: string;
-    }
-  | {
-      type: 'value';
-      value: string;
-      options?: ValueOption[];
-      component: 'text' | 'boolean';
-    };
+interface Field {
+  type: 'field';
+  value: string;
+  fieldType: FieldOption['type'];
+}
+interface Operator {
+  type: 'operator';
+  value: string;
+}
+
+interface Value {
+  type: 'value';
+  value: string;
+  component: 'text' | 'boolean';
+}
+
+export type Item = Field | Operator | Value;
 
 const items: Item[] = [
   { type: 'field', value: 'category', fieldType: 'STRING' },
-  { type: 'operation', value: '=' },
+  { type: 'operator', value: '=' },
   { type: 'value', value: 'television', component: 'text' },
 ];
 
-const menuStyles = {
-  maxHeight: 80,
-  maxWidth: 300,
-  overflowY: 'scroll',
-  backgroundColor: '#eee',
-  padding: 0,
-  listStyle: 'none',
-  position: 'relative',
-};
-
-const comboboxStyles = { display: 'inline-block', marginLeft: '5px' };
-
-export { items, menuStyles, comboboxStyles, Menu, Label, css };
+export { items };
