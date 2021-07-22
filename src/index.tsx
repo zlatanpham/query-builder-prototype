@@ -37,8 +37,12 @@ function DropdownMultipleCombobox() {
   };
 
   const getFilteredItems = (items) => {
-    return items.filter((item) =>
-      item?.text?.toLowerCase().startsWith(inputValue.toLowerCase()),
+    return items.filter(
+      (item) =>
+        item?.text?.toLowerCase().startsWith(inputValue.toLowerCase()) &&
+        (endItem?.type !== 'field' ||
+          (endItem?.type === 'field' &&
+            item?.types.includes(endItem.fieldType))),
     );
   };
 
