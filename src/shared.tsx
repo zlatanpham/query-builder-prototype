@@ -1,7 +1,8 @@
+type FieldType = 'INTEGER' | 'BOOLEAN' | 'STRING' | 'FLOAT';
 export interface FieldOption {
   text: string;
   value: string;
-  type: 'INTEGER' | 'BOOLEAN' | 'STRING' | 'FLOAT';
+  type: FieldType;
   isArray: boolean;
 }
 
@@ -24,14 +25,42 @@ export const operatorMapping = {
 };
 
 export const operatorOptions: OperatorOption[] = [
-  { value: '=', text: 'is' },
-  { value: '~', text: 'contains' },
-  { value: '!=', text: 'is not' },
-  { value: '!~', text: 'does not contain' },
-  { value: '$', text: 'ends with' },
-  { value: '^', text: 'begins with' },
-  { value: '>', text: 'greater than' },
-  { value: '<', text: 'less than' },
+  { value: '=', text: 'is', types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER'] },
+  {
+    value: '~',
+    text: 'contains',
+    types: ['STRING'],
+  },
+  {
+    value: '!=',
+    text: 'is not',
+    types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER'],
+  },
+  {
+    value: '!~',
+    text: 'does not contain',
+    types: ['STRING'],
+  },
+  {
+    value: '$',
+    text: 'ends with',
+    types: ['STRING'],
+  },
+  {
+    value: '^',
+    text: 'begins with',
+    types: ['STRING'],
+  },
+  {
+    value: '>',
+    text: 'greater than',
+    types: ['FLOAT', 'INTEGER'],
+  },
+  {
+    value: '<',
+    text: 'less than',
+    types: ['FLOAT', 'INTEGER'],
+  },
 ];
 
 export const booleanOptions = [
@@ -42,6 +71,7 @@ export const booleanOptions = [
 export interface OperatorOption {
   text: string;
   value: keyof typeof operatorMapping;
+  types: FieldType[];
 }
 
 export interface ValueOption {
@@ -57,20 +87,30 @@ interface Field {
 interface Operator {
   type: 'operator';
   value: string;
+  field: string;
+  fieldType: FieldOption['type'];
 }
 
 interface Value {
   type: 'value';
   value: string;
   component: 'text' | 'boolean';
+  field: string;
+  fieldType: FieldOption['type'];
 }
 
 export type Item = Field | Operator | Value;
 
 const items: Item[] = [
   { type: 'field', value: 'category', fieldType: 'STRING' },
-  { type: 'operator', value: '=' },
-  { type: 'value', value: 'television', component: 'text' },
+  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
+  {
+    type: 'value',
+    value: 'television',
+    component: 'text',
+    fieldType: 'STRING',
+    field: 'category',
+  },
 ];
 
 export { items };

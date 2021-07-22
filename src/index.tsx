@@ -27,10 +27,12 @@ function DropdownMultipleCombobox() {
     items[2],
   ]);
 
+  const [inputFocus, setInputFocus] = useState(false);
+
   const [hoverIndexes, setHoverIndexes] = useState<number[]>([]);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const addSelectedItem = (item) => {
+  const addSelectedItem = (item: Item) => {
     setSelectedItems((prev) => [...prev, item]);
   };
 
@@ -67,15 +69,13 @@ function DropdownMultipleCombobox() {
     selectItem,
     openMenu,
     setHighlightedIndex,
-  } = useCombobox({
+  } = useCombobox<Item>({
     inputValue,
     items: filteredSuggestions,
     onStateChange: ({ inputValue, type, selectedItem }) => {
-      console.log({ type });
       switch (type) {
         case useCombobox.stateChangeTypes.InputChange:
-          // @ts-ignore
-          setInputValue(inputValue);
+          setInputValue(inputValue || '');
           break;
 
         case useCombobox.stateChangeTypes.InputKeyDownEnter:
@@ -84,33 +84,36 @@ function DropdownMultipleCombobox() {
         case useCombobox.stateChangeTypes.InputBlur:
           if (selectedItem) {
             if (!endItem || endItem?.type === 'value') {
-              // @ts-ignore
               addSelectedItem({
                 type: 'field',
-                // @ts-ignore
                 value: selectedItem.value,
                 // @ts-ignore
                 fieldType: selectedItem.type,
               });
               openMenu();
             } else if (endItem?.type === 'field') {
-              // @ts-ignore
-              addSelectedItem({ type: 'operator', value: selectedItem.value });
+              addSelectedItem({
+                type: 'operator',
+                value: selectedItem.value,
+                field: endItem.value,
+                fieldType: endItem.fieldType,
+              });
               openMenu();
             } else if (
               endItem?.type === 'operator' &&
               endFieldOption?.type === 'BOOLEAN'
             ) {
               openMenu();
-              // @ts-ignore
               addSelectedItem({
                 type: 'value',
-                // @ts-ignore
                 value: selectedItem.value,
                 component: 'boolean',
+                field: endItem.field,
+                fieldType: endItem.fieldType,
               });
             }
             setInputValue('');
+            // @ts-ignore
             selectItem(null);
           }
 
@@ -167,6 +170,7 @@ function DropdownMultipleCombobox() {
           width="w-auto"
           display="flex"
           flexWrap="flex-no-wrap"
+          boxShadow={inputFocus ? 'shadow-outline-blue' : undefined}
         >
           {selectedItems.map((selectedItem, index) => {
             return (
@@ -256,6 +260,9 @@ function DropdownMultipleCombobox() {
           <Box
             flex="flex-1"
             width="w-full"
+            onClick={() => {
+              inputRef.current?.focus();
+            }}
             display="inline-flex"
             margin="pl-1"
             {...getComboboxProps()}
@@ -274,6 +281,10 @@ function DropdownMultipleCombobox() {
                 },
                 onFocus: () => {
                   openMenu();
+                  setInputFocus(true);
+                },
+                onBlur: () => {
+                  setInputFocus(false);
                 },
                 onKeyDown: (e) => {
                   if (e.key === 'Backspace' && inputValue === '') {
@@ -294,11 +305,12 @@ function DropdownMultipleCombobox() {
                     inputValue !== ''
                   ) {
                     openMenu();
-                    // @ts-ignore
                     addSelectedItem({
                       type: 'value',
                       value: inputValue,
                       component: 'text',
+                      field: endItem.field,
+                      fieldType: endItem.fieldType,
                     });
                     setInputValue('');
                   }
@@ -347,20 +359,18 @@ function DropdownMultipleCombobox() {
                         onClick: () => {
                           if (endItem) {
                             if (!endItem || endItem?.type === 'value') {
-                              // @ts-ignore
                               addSelectedItem({
                                 type: 'field',
-                                // @ts-ignore
                                 value: item.value,
-                                // @ts-ignore
-                                fieldType: endItem.type,
+                                fieldType: item.type,
                               });
                               openMenu();
                             } else if (endItem?.type === 'field') {
-                              // @ts-ignore
                               addSelectedItem({
                                 type: 'operator',
                                 value: item.value,
+                                field: endItem.value,
+                                fieldType: endItem.fieldType,
                               });
                               openMenu();
                             } else if (
@@ -368,15 +378,16 @@ function DropdownMultipleCombobox() {
                               endFieldOption?.type === 'BOOLEAN'
                             ) {
                               openMenu();
-                              // @ts-ignore
                               addSelectedItem({
                                 type: 'value',
-                                // @ts-ignore
                                 value: item.value,
                                 component: 'boolean',
+                                field: endItem.value,
+                                fieldType: endItem.fieldType,
                               });
                             }
                             setInputValue('');
+                            // @ts-ignore
                             selectItem(null);
                           }
                         },
@@ -420,6 +431,7 @@ function DropdownMultipleCombobox() {
             .join(' ')}
           showCopyButton={false}
           flex="flex-1"
+          whitespace="whitespace-normal"
         />
       </Box>
     </>
