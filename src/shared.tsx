@@ -30,6 +30,8 @@ export const operatorOptions: OperatorOption[] = [
   { value: '!~', text: 'does not contain' },
   { value: '$', text: 'ends with' },
   { value: '^', text: 'begins with' },
+  { value: '>', text: 'greater than' },
+  { value: '<', text: 'less than' },
 ];
 
 export const booleanOptions = [

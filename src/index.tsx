@@ -1,87 +1,26 @@
-import { useEffect, useRef, useState } from "react";
-import { render } from "react-dom";
-import { useCombobox } from "downshift";
+import { useEffect, useRef, useState } from 'react';
+import { render } from 'react-dom';
+import { useCombobox } from 'downshift';
 import {
   items,
   Item,
   fieldOptions,
   operatorOptions,
   booleanOptions,
-  operatorMapping,
-} from "./shared";
-import "./index.css";
+} from './shared';
+import './index.css';
 import {
   Code,
   Box,
   IconButton,
-  TextInput,
   usePopper,
   Portal,
-} from "@sajari-ui/core";
-
-const ItemRender = ({
-  item,
-  shouldFocus,
-  onChange,
-  onRemove,
-}: {
-  item: Item;
-  shouldFocus: boolean;
-  onChange: (item: Item) => void;
-  onRemove: () => void;
-}) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (shouldFocus) {
-      inputRef.current?.focus();
-    }
-  }, [shouldFocus]);
-
-  if (item.type === "field") {
-    return (
-      <Box as="span" textColor="text-gray-500">
-        {item.value}
-      </Box>
-    );
-  }
-
-  if (item.type === "operator") {
-    return <Box as="span">{operatorMapping[item.value]}</Box>;
-  }
-
-  if (item.type === "value") {
-    if (item.component === "text") {
-      return (
-        <TextInput
-          ref={inputRef}
-          value={item.value}
-          padding="py-0"
-          borderWidth="border-0"
-          width="w-max-content"
-          backgroundColor={["bg-transparent", "focus:bg-white"]}
-          onChange={(e) => {
-            onChange({ ...item, value: e.target.value });
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Backspace" && item.value === "") {
-              onRemove();
-            }
-          }}
-        />
-      );
-    }
-
-    if (item.component === "boolean") {
-      return <Box as="span">{item.value}</Box>;
-    }
-  }
-
-  return null;
-};
+  Flex,
+} from '@sajari-ui/core';
+import { ItemRender } from './components';
 
 function DropdownMultipleCombobox() {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const [selectedItems, setSelectedItems] = useState<Item[]>([
     items[0],
     items[1],
@@ -97,22 +36,22 @@ function DropdownMultipleCombobox() {
 
   const getFilteredItems = (items) => {
     return items.filter((item) =>
-      item?.text?.toLowerCase().startsWith(inputValue.toLowerCase())
+      item?.text?.toLowerCase().startsWith(inputValue.toLowerCase()),
     );
   };
 
   const type = selectedItems[selectedItems.length - 1]?.type;
   const endFieldOption = fieldOptions.find(
-    (o) => o.text === selectedItems[selectedItems.length - 2]?.value
+    (o) => o.text === selectedItems[selectedItems.length - 2]?.value,
   );
   const endItem = selectedItems[selectedItems.length - 1];
 
   const suggestions =
-    type === undefined || type === "value"
+    type === undefined || type === 'value'
       ? fieldOptions
-      : type === "field"
+      : type === 'field'
       ? operatorOptions
-      : endFieldOption?.type === "BOOLEAN"
+      : endFieldOption?.type === 'BOOLEAN'
       ? booleanOptions
       : [];
 
@@ -132,6 +71,7 @@ function DropdownMultipleCombobox() {
     inputValue,
     items: filteredSuggestions,
     onStateChange: ({ inputValue, type, selectedItem }) => {
+      console.log({ type });
       switch (type) {
         case useCombobox.stateChangeTypes.InputChange:
           // @ts-ignore
@@ -139,37 +79,38 @@ function DropdownMultipleCombobox() {
           break;
 
         case useCombobox.stateChangeTypes.InputKeyDownEnter:
+        case useCombobox.stateChangeTypes.FunctionSelectItem:
         case useCombobox.stateChangeTypes.ItemClick:
         case useCombobox.stateChangeTypes.InputBlur:
           if (selectedItem) {
-            if (!endItem || endItem?.type === "value") {
+            if (!endItem || endItem?.type === 'value') {
               // @ts-ignore
               addSelectedItem({
-                type: "field",
+                type: 'field',
                 // @ts-ignore
                 value: selectedItem.value,
                 // @ts-ignore
                 fieldType: selectedItem.type,
               });
               openMenu();
-            } else if (endItem?.type === "field") {
+            } else if (endItem?.type === 'field') {
               // @ts-ignore
-              addSelectedItem({ type: "operator", value: selectedItem.value });
+              addSelectedItem({ type: 'operator', value: selectedItem.value });
               openMenu();
             } else if (
-              endItem?.type === "operator" &&
-              endFieldOption?.type === "BOOLEAN"
+              endItem?.type === 'operator' &&
+              endFieldOption?.type === 'BOOLEAN'
             ) {
               openMenu();
               // @ts-ignore
               addSelectedItem({
-                type: "value",
+                type: 'value',
                 // @ts-ignore
                 value: selectedItem.value,
-                component: "boolean",
+                component: 'boolean',
               });
             }
-            setInputValue("");
+            setInputValue('');
             selectItem(null);
           }
 
@@ -205,7 +146,7 @@ function DropdownMultipleCombobox() {
   const { popper, update, reference } = usePopper({
     forceUpdate: isOpen,
     gutter: 8,
-    placement: "bottom",
+    placement: 'bottom',
   });
 
   useEffect(() => {
@@ -221,7 +162,7 @@ function DropdownMultipleCombobox() {
           borderWidth="border"
           borderColor="border-gray-300"
           borderRadius="rounded-md"
-          padding={["py-1", "px-3"]}
+          padding={['py-1', 'px-3']}
           overflow="overflow-auto"
           width="w-auto"
           display="flex"
@@ -243,13 +184,13 @@ function DropdownMultipleCombobox() {
                   }
                 }}
                 margin={
-                  selectedItem.type === "field" && index !== 0
-                    ? "ml-2"
-                    : "ml-0.5"
+                  selectedItem.type === 'field' && index !== 0
+                    ? 'ml-2'
+                    : 'ml-0.5'
                 }
                 padding={[
-                  selectedItem.type === "value" ? "pl-2" : "px-2",
-                  "py-0.5",
+                  selectedItem.type === 'value' ? 'pl-2' : 'px-2',
+                  'py-0.5',
                 ]}
                 whitespace="whitespace-no-wrap"
                 borderRadius="rounded-md"
@@ -259,7 +200,7 @@ function DropdownMultipleCombobox() {
                 transitionProperty="transition"
                 transitionDuration="duration-200"
                 backgroundColor={
-                  hoverIndexes.includes(index) ? "bg-gray-300" : "bg-gray-100"
+                  hoverIndexes.includes(index) ? 'bg-gray-300' : 'bg-gray-100'
                 }
                 onMouseLeave={() => {
                   setHoverIndexes([]);
@@ -277,12 +218,12 @@ function DropdownMultipleCombobox() {
                       prev.filter(
                         (_, i) =>
                           i !== selectedItems.length - 1 &&
-                          i !== selectedItems.length - 2
-                      )
+                          i !== selectedItems.length - 2,
+                      ),
                     );
                   }}
                 />
-                {selectedItem.type === "value" && (
+                {selectedItem.type === 'value' && (
                   <IconButton
                     icon="close"
                     size="sm"
@@ -304,7 +245,7 @@ function DropdownMultipleCombobox() {
                             index !== selectedIndex - 1 &&
                             index !== selectedIndex
                           );
-                        })
+                        }),
                       );
                     }}
                   />
@@ -314,14 +255,12 @@ function DropdownMultipleCombobox() {
           })}
           <Box
             flex="flex-1"
+            width="w-full"
             display="inline-flex"
-            margin="ml-1"
-            backgroundColor="bg-green-500"
-            // @ts-ignore
+            margin="pl-1"
             {...getComboboxProps()}
           >
             <Box
-              backgroundColor={"bg-red-500"}
               height="h-8"
               as="input"
               outline="outline-none"
@@ -337,14 +276,10 @@ function DropdownMultipleCombobox() {
                   openMenu();
                 },
                 onKeyDown: (e) => {
-                  if (e.key === "Backspace" && inputValue === "") {
-                    if (
-                      endItem?.type === "value" &&
-                      endItem?.component === "text"
-                    ) {
-                    } else if (selectedItems.length > 0) {
+                  if (e.key === 'Backspace' && inputValue === '') {
+                    if (selectedItems.length > 0) {
                       setSelectedItems((prev) =>
-                        prev.filter((_, i) => i !== prev.length - 1)
+                        prev.filter((_, i) => i !== prev.length - 1),
                       );
                     }
                     setFocusIndex(selectedItems.length - 1);
@@ -354,61 +289,111 @@ function DropdownMultipleCombobox() {
                   }
 
                   if (
-                    e.key === "Enter" &&
-                    endItem?.type === "operator" &&
-                    inputValue !== ""
+                    e.key === 'Enter' &&
+                    endItem?.type === 'operator' &&
+                    inputValue !== ''
                   ) {
                     openMenu();
                     // @ts-ignore
                     addSelectedItem({
-                      type: "value",
+                      type: 'value',
                       value: inputValue,
-                      component: "text",
+                      component: 'text',
                     });
-                    setInputValue("");
+                    setInputValue('');
                   }
                 },
               })}
             />
             <Portal>
               <Box
-                style={
-                  isOpen && filteredSuggestions.length > 0
-                    ? popper.style
-                    : { display: "none" }
-                }
+                style={popper.style}
                 ref={popper.ref}
+                display={
+                  isOpen && filteredSuggestions.length > 0
+                    ? undefined
+                    : 'hidden'
+                }
                 backgroundColor="bg-white"
                 borderRadius="rounded-lg"
                 padding="p-2"
                 zIndex="z-50"
                 borderWidth="border"
+                width="w-52"
                 borderColor="border-gray-200"
                 boxShadow="shadow-menu"
                 as="ul"
               >
                 <Box {...getMenuProps()}>
                   {filteredSuggestions.map((item, index) => (
-                    <Box
+                    <Flex
+                      justifyContent="justify-between"
+                      alignItems="items-center"
                       as="li"
-                      padding={["px-3", "py-1"]}
+                      padding={['px-3', 'py-1']}
                       borderRadius="rounded-md"
                       backgroundColor={
-                        highlightedIndex === index ? "bg-blue-500" : "bg-white"
+                        highlightedIndex === index ? 'bg-blue-500' : 'bg-white'
                       }
                       textColor={
                         highlightedIndex === index
-                          ? "text-white"
-                          : "text-gray-500"
+                          ? 'text-white'
+                          : 'text-gray-500'
                       }
                       key={`${item.value}${index}`}
                       {...getItemProps({
                         item,
                         index,
+                        onClick: () => {
+                          if (endItem) {
+                            if (!endItem || endItem?.type === 'value') {
+                              // @ts-ignore
+                              addSelectedItem({
+                                type: 'field',
+                                // @ts-ignore
+                                value: item.value,
+                                // @ts-ignore
+                                fieldType: endItem.type,
+                              });
+                              openMenu();
+                            } else if (endItem?.type === 'field') {
+                              // @ts-ignore
+                              addSelectedItem({
+                                type: 'operator',
+                                value: item.value,
+                              });
+                              openMenu();
+                            } else if (
+                              endItem?.type === 'operator' &&
+                              endFieldOption?.type === 'BOOLEAN'
+                            ) {
+                              openMenu();
+                              // @ts-ignore
+                              addSelectedItem({
+                                type: 'value',
+                                // @ts-ignore
+                                value: item.value,
+                                component: 'boolean',
+                              });
+                            }
+                            setInputValue('');
+                            selectItem(null);
+                          }
+                        },
                       })}
                     >
-                      {item.text}
-                    </Box>
+                      {endItem?.type === 'field' && (
+                        <Box as="span">{item.value}</Box>
+                      )}
+                      <Box
+                        as="span"
+                        fontSize={
+                          endItem?.type === 'field' ? 'text-sm' : 'text-base'
+                        }
+                      >
+                        {item.text}
+                      </Box>
+                    </Flex>
                   ))}
                 </Box>
               </Box>
@@ -423,16 +408,16 @@ function DropdownMultipleCombobox() {
           language="bash"
           value={selectedItems
             .map((item, index) => {
-              if (item.type === "field") {
+              if (item.type === 'field') {
                 return index === 0 ? item.value : `AND ${item.value}`;
               }
-              if (item.type === "value") {
+              if (item.type === 'value') {
                 return `'${item.value}'`;
               }
 
               return item.value;
             })
-            .join(" ")}
+            .join(' ')}
           showCopyButton={false}
           flex="flex-1"
         />
@@ -441,4 +426,4 @@ function DropdownMultipleCombobox() {
   );
 }
 
-render(<DropdownMultipleCombobox />, document.getElementById("root"));
+render(<DropdownMultipleCombobox />, document.getElementById('root'));
