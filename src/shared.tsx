@@ -101,7 +101,88 @@ interface Value {
 
 export type Item = Field | Operator | Value;
 
-const items: Item[] = [
+const defaultItems: Item[] = [
+  { type: 'field', value: 'category', fieldType: 'STRING' },
+  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
+  {
+    type: 'value',
+    value: 'television',
+    component: 'text',
+    fieldType: 'STRING',
+    field: 'category',
+  },
+  { type: 'field', value: 'category', fieldType: 'STRING' },
+  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
+  {
+    type: 'value',
+    value: 'television',
+    component: 'text',
+    fieldType: 'STRING',
+    field: 'category',
+  },
+  { type: 'field', value: 'category', fieldType: 'STRING' },
+  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
+  {
+    type: 'value',
+    value: 'television',
+    component: 'text',
+    fieldType: 'STRING',
+    field: 'category',
+  },
+  { type: 'field', value: 'category', fieldType: 'STRING' },
+  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
+  {
+    type: 'value',
+    value: 'television',
+    component: 'text',
+    fieldType: 'STRING',
+    field: 'category',
+  },
+  { type: 'field', value: 'category', fieldType: 'STRING' },
+  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
+  {
+    type: 'value',
+    value: 'television',
+    component: 'text',
+    fieldType: 'STRING',
+    field: 'category',
+  },
+  { type: 'field', value: 'category', fieldType: 'STRING' },
+  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
+  {
+    type: 'value',
+    value: 'television',
+    component: 'text',
+    fieldType: 'STRING',
+    field: 'category',
+  },
+  { type: 'field', value: 'category', fieldType: 'STRING' },
+  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
+  {
+    type: 'value',
+    value: 'television',
+    component: 'text',
+    fieldType: 'STRING',
+    field: 'category',
+  },
+  { type: 'field', value: 'category', fieldType: 'STRING' },
+  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
+  {
+    type: 'value',
+    value: 'television',
+    component: 'text',
+    fieldType: 'STRING',
+    field: 'category',
+  },
+  { type: 'field', value: 'category', fieldType: 'STRING' },
+  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
+  {
+    type: 'value',
+    value: 'television',
+    component: 'text',
+    fieldType: 'STRING',
+    field: 'category',
+  },
   { type: 'field', value: 'category', fieldType: 'STRING' },
   { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
   {
@@ -113,4 +194,4 @@ const items: Item[] = [
   },
 ];
 
-export { items };
+export { defaultItems };
