@@ -138,6 +138,8 @@ function DropdownMultipleCombobox() {
     if (wrapperRef.current) {
       wrapperRef.current.scrollLeft = wrapperRef.current?.scrollWidth;
     }
+
+    console.log(selectedItems);
   }, [selectedItems.length]);
 
   const changeItem = (index: number) => (item: Item) => {
@@ -197,7 +199,17 @@ function DropdownMultipleCombobox() {
                   'py-0.5',
                 ]}
                 whitespace="whitespace-no-wrap"
-                borderRadius="rounded-md"
+                borderRadius={
+                  // selectedItems.length === 1 ||
+                  // (index === selectedItems.length - 1 && index % 3 === 0)
+                  //   ? 'rounded-md'
+                  //   :
+                  index % 3 === 0
+                    ? 'rounded-l-md'
+                    : index % 3 === 2
+                    ? 'rounded-r-md'
+                    : 'rounded-none'
+                }
                 display="inline-flex"
                 justifyContent="justify-center"
                 alignItems="items-center"
