@@ -10,6 +10,7 @@ import {
   usePopper,
   Portal,
   Flex,
+  Text,
 } from '@sajari-ui/core';
 import { ContextProvider, useContextProvider } from './ContextProvider';
 import { Pill } from './components/Pill';
@@ -348,7 +349,7 @@ function DropdownMultipleCombobox() {
             .join(' ')}
           showCopyButton={false}
           flex="flex-1"
-          whitespace="whitespace-normal"
+          wrap={true}
         />
       </Box>
     </>
