@@ -11,37 +11,35 @@ import {
   Portal,
   Flex,
 } from '@sajari-ui/core';
-import { ItemRender } from './components';
 import { ContextProvider, useContextProvider } from './ContextProvider';
+import { Pill } from './components/Pill';
 
 function DropdownMultipleCombobox() {
   const [inputValue, setInputValue] = useState('');
-  const { items, setItems } = useContextProvider();
+  const { items, setItems, removeLast, addItem } = useContextProvider();
+  const lastItem = items[items.length - 1];
 
   const [inputFocus, setInputFocus] = useState(false);
 
-  const [hoverIndexes, setHoverIndexes] = useState<number[]>([]);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const addSelectedItem = (item: Item) => {
-    setItems((prev) => [...prev, item]);
-  };
-
-  const getFilteredItems = (items) => {
-    return items.filter(
-      (item) =>
+  // TODO: cannot infer because the type of the suggetions is different from the type of items
+  const getFilteredSuggestions = (items: any[]) => {
+    return items.filter((item) => {
+      return (
         item?.text?.toLowerCase().startsWith(inputValue.toLowerCase()) &&
-        (endItem?.type !== 'field' ||
-          (endItem?.type === 'field' &&
-            item?.types.includes(endItem.fieldType))),
-    );
+        (lastItem?.type !== 'field' ||
+          (lastItem?.type === 'field' &&
+            'types' in item &&
+            item?.types.includes(lastItem.fieldType)))
+      );
+    });
   };
 
   const type = items[items.length - 1]?.type;
   const endFieldOption = fieldOptions.find(
     (o) => o.text === items[items.length - 2]?.value,
   );
-  const endItem = items[items.length - 1];
 
   const suggestions =
     type === undefined || type === 'value'
@@ -52,7 +50,7 @@ function DropdownMultipleCombobox() {
       ? booleanOptions
       : [];
 
-  const filteredSuggestions = getFilteredItems(suggestions);
+  const filteredSuggestions = getFilteredSuggestions(suggestions);
 
   const {
     isOpen,
@@ -66,6 +64,7 @@ function DropdownMultipleCombobox() {
     setHighlightedIndex,
   } = useCombobox<Item>({
     inputValue,
+
     items: filteredSuggestions,
     onStateChange: ({ inputValue, type, selectedItem }) => {
       switch (type) {
@@ -78,33 +77,33 @@ function DropdownMultipleCombobox() {
         case useCombobox.stateChangeTypes.ItemClick:
         case useCombobox.stateChangeTypes.InputBlur:
           if (selectedItem) {
-            if (!endItem || endItem?.type === 'value') {
-              addSelectedItem({
+            if (!lastItem || lastItem?.type === 'value') {
+              addItem({
                 type: 'field',
                 value: selectedItem.value,
                 // @ts-ignore
                 fieldType: selectedItem.type,
               });
               openMenu();
-            } else if (endItem?.type === 'field') {
-              addSelectedItem({
+            } else if (lastItem?.type === 'field') {
+              addItem({
                 type: 'operator',
                 value: selectedItem.value,
-                field: endItem.value,
-                fieldType: endItem.fieldType,
+                field: lastItem.value,
+                fieldType: lastItem.fieldType,
               });
               openMenu();
             } else if (
-              endItem?.type === 'operator' &&
+              lastItem?.type === 'operator' &&
               endFieldOption?.type === 'BOOLEAN'
             ) {
               openMenu();
-              addSelectedItem({
+              addItem({
                 type: 'value',
                 value: selectedItem.value,
                 component: 'boolean',
-                field: endItem.field,
-                fieldType: endItem.fieldType,
+                field: lastItem.field,
+                fieldType: lastItem.fieldType,
               });
             }
             setInputValue('');
@@ -127,12 +126,6 @@ function DropdownMultipleCombobox() {
 
     console.log(items);
   }, [items]);
-
-  const changeItem = (index: number) => (item: Item) => {
-    setItems((prev) => {
-      return prev.map((eItem, eIndex) => (eIndex === index ? item : eItem));
-    });
-  };
 
   const { popper, update, reference } = usePopper({
     forceUpdate: isOpen,
@@ -166,98 +159,9 @@ function DropdownMultipleCombobox() {
             display="flex"
             flexWrap="flex-no-wrap"
           >
-            {items.map((selectedItem, index) => {
-              return (
-                <Box
-                  height="h-8"
-                  key={`selected-item-${index}`}
-                  onMouseEnter={() => {
-                    const p = index + 1;
-                    if (p % 3 === 0) {
-                      setHoverIndexes([index, index - 1, index - 2]);
-                    } else if (p % 3 === 2) {
-                      setHoverIndexes([index - 1, index, index + 1]);
-                    } else {
-                      setHoverIndexes([index, index + 1, index + 2]);
-                    }
-                  }}
-                  margin={
-                    selectedItem.type === 'field' && index !== 0
-                      ? 'ml-2'
-                      : 'ml-0.5'
-                  }
-                  padding={[
-                    selectedItem.type === 'value' ? 'pl-2' : 'px-2',
-                    'py-0.5',
-                  ]}
-                  whitespace="whitespace-no-wrap"
-                  borderRadius={
-                    // items.length === 1 ||
-                    // (index === items.length - 1 && index % 3 === 0)
-                    //   ? 'rounded-md'
-                    //   :
-                    index % 3 === 0
-                      ? 'rounded-l-md'
-                      : index % 3 === 2
-                      ? 'rounded-r-md'
-                      : 'rounded-none'
-                  }
-                  display="inline-flex"
-                  justifyContent="justify-center"
-                  alignItems="items-center"
-                  transitionProperty="transition"
-                  transitionDuration="duration-200"
-                  backgroundColor={
-                    hoverIndexes.includes(index) ? 'bg-gray-300' : 'bg-gray-100'
-                  }
-                  onMouseLeave={() => {
-                    setHoverIndexes([]);
-                  }}
-                >
-                  <ItemRender
-                    item={selectedItem}
-                    onChange={changeItem(index)}
-                    onRemove={() => {
-                      openMenu();
-                      setItems((prev) =>
-                        prev.filter(
-                          (_, i) =>
-                            i !== items.length - 1 && i !== items.length - 2,
-                        ),
-                      );
-                    }}
-                  />
-                  {selectedItem.type === 'value' && (
-                    <IconButton
-                      icon="close"
-                      size="sm"
-                      padding="px-2"
-                      margin="ml-0.5"
-                      display="flex"
-                      alignItems="items-center"
-                      justifyContent="justify-center"
-                      appearance="none"
-                      textColor="text-gray-700"
-                      iconSize="sm"
-                      label="Remove"
-                      onClick={() => {
-                        const selectedIndex = items.indexOf(selectedItem);
-                        const newItems = [...items];
-                        setItems(
-                          newItems.filter((_, index) => {
-                            return (
-                              index !== selectedIndex - 2 &&
-                              index !== selectedIndex - 1 &&
-                              index !== selectedIndex
-                            );
-                          }),
-                        );
-                      }}
-                    />
-                  )}
-                </Box>
-              );
-            })}
+            {items.map((item, index) => (
+              <Pill key={index} item={item} index={index} />
+            ))}
             <Box
               flex="flex-1"
               width="w-full"
@@ -290,26 +194,21 @@ function DropdownMultipleCombobox() {
                   },
                   onKeyDown: (e) => {
                     if (e.key === 'Backspace' && inputValue === '') {
-                      if (items.length > 0) {
-                        // setInputValue(endItem?.value);
-                        setItems((prev) =>
-                          prev.filter((_, i) => i !== prev.length - 1),
-                        );
-                      }
+                      removeLast();
                     }
 
                     if (
                       e.key === 'Enter' &&
-                      endItem?.type === 'operator' &&
+                      lastItem?.type === 'operator' &&
                       inputValue !== ''
                     ) {
                       openMenu();
-                      addSelectedItem({
+                      addItem({
                         type: 'value',
                         value: inputValue,
                         component: 'text',
-                        field: endItem.field,
-                        fieldType: endItem.fieldType,
+                        field: lastItem.field,
+                        fieldType: lastItem.fieldType,
                       });
                       setInputValue('');
                     }
@@ -358,38 +257,37 @@ function DropdownMultipleCombobox() {
                           item,
                           index,
                           onClick: () => {
-                            if (endItem) {
-                              if (endItem?.type === 'value') {
-                                addSelectedItem({
+                            if (lastItem) {
+                              if (lastItem?.type === 'value') {
+                                addItem({
                                   type: 'field',
                                   value: item.value,
                                   fieldType: item.type,
                                 });
                                 openMenu();
-                              } else if (endItem?.type === 'field') {
-                                addSelectedItem({
+                              } else if (lastItem?.type === 'field') {
+                                addItem({
                                   type: 'operator',
                                   value: item.value,
-                                  field: endItem.value,
-                                  fieldType: endItem.fieldType,
+                                  field: lastItem.value,
+                                  fieldType: lastItem.fieldType,
                                 });
                                 openMenu();
                               } else if (
-                                endItem?.type === 'operator' &&
+                                lastItem?.type === 'operator' &&
                                 endFieldOption?.type === 'BOOLEAN'
                               ) {
                                 openMenu();
-                                addSelectedItem({
+                                addItem({
                                   type: 'value',
                                   value: item.value,
                                   component: 'boolean',
-                                  field: endItem.value,
-                                  fieldType: endItem.fieldType,
+                                  field: lastItem.value,
+                                  fieldType: lastItem.fieldType,
                                 });
                               }
                             } else {
-                              console.log(123);
-                              addSelectedItem({
+                              addItem({
                                 type: 'field',
                                 value: item.value,
                                 fieldType: item.type,
@@ -402,13 +300,13 @@ function DropdownMultipleCombobox() {
                           },
                         })}
                       >
-                        {endItem?.type === 'field' && (
+                        {lastItem?.type === 'field' && (
                           <Box as="span">{item.value}</Box>
                         )}
                         <Box
                           as="span"
                           fontSize={
-                            endItem?.type === 'field' ? 'text-sm' : 'text-base'
+                            lastItem?.type === 'field' ? 'text-sm' : 'text-base'
                           }
                         >
                           {item.text}

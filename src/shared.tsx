@@ -62,22 +62,23 @@ export const operatorOptions: OperatorOption[] = [
     types: ['FLOAT', 'INTEGER'],
   },
 ];
-
-export const booleanOptions = [
-  { text: 'TRUE', value: 'TRUE' },
-  { text: 'FALSE', value: 'FALSE' },
-];
-
 export interface OperatorOption {
   text: string;
   value: keyof typeof operatorMapping;
   types: FieldType[];
 }
 
-export interface ValueOption {
+export interface Option {
   text: string;
   value: string;
 }
+
+export type Suggestion = Option | OperatorOption;
+
+export const booleanOptions = [
+  { text: 'TRUE', value: 'TRUE' },
+  { text: 'FALSE', value: 'FALSE' },
+];
 
 interface Field {
   type: 'field';
@@ -101,88 +102,7 @@ interface Value {
 
 export type Item = Field | Operator | Value;
 
-const defaultItems: Item[] = [
-  { type: 'field', value: 'category', fieldType: 'STRING' },
-  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
-  {
-    type: 'value',
-    value: 'television',
-    component: 'text',
-    fieldType: 'STRING',
-    field: 'category',
-  },
-  { type: 'field', value: 'category', fieldType: 'STRING' },
-  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
-  {
-    type: 'value',
-    value: 'television',
-    component: 'text',
-    fieldType: 'STRING',
-    field: 'category',
-  },
-  { type: 'field', value: 'category', fieldType: 'STRING' },
-  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
-  {
-    type: 'value',
-    value: 'television',
-    component: 'text',
-    fieldType: 'STRING',
-    field: 'category',
-  },
-  { type: 'field', value: 'category', fieldType: 'STRING' },
-  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
-  {
-    type: 'value',
-    value: 'television',
-    component: 'text',
-    fieldType: 'STRING',
-    field: 'category',
-  },
-  { type: 'field', value: 'category', fieldType: 'STRING' },
-  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
-  {
-    type: 'value',
-    value: 'television',
-    component: 'text',
-    fieldType: 'STRING',
-    field: 'category',
-  },
-  { type: 'field', value: 'category', fieldType: 'STRING' },
-  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
-  {
-    type: 'value',
-    value: 'television',
-    component: 'text',
-    fieldType: 'STRING',
-    field: 'category',
-  },
-  { type: 'field', value: 'category', fieldType: 'STRING' },
-  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
-  {
-    type: 'value',
-    value: 'television',
-    component: 'text',
-    fieldType: 'STRING',
-    field: 'category',
-  },
-  { type: 'field', value: 'category', fieldType: 'STRING' },
-  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
-  {
-    type: 'value',
-    value: 'television',
-    component: 'text',
-    fieldType: 'STRING',
-    field: 'category',
-  },
-  { type: 'field', value: 'category', fieldType: 'STRING' },
-  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
-  {
-    type: 'value',
-    value: 'television',
-    component: 'text',
-    fieldType: 'STRING',
-    field: 'category',
-  },
+export const defaultItems: Item[] = [
   { type: 'field', value: 'category', fieldType: 'STRING' },
   { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
   {
@@ -193,5 +113,3 @@ const defaultItems: Item[] = [
     field: 'category',
   },
 ];
-
-export { defaultItems };

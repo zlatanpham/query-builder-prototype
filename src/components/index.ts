@@ -1,1 +1,1 @@
-export * from './ItemRender';
+export * from './Pill';
