@@ -10,14 +10,14 @@ import {
   usePopper,
   Portal,
   Flex,
-  Text,
 } from '@sajari-ui/core';
 import { ContextProvider, useContextProvider } from './ContextProvider';
 import { Pill } from './components/Pill';
 
 function DropdownMultipleCombobox() {
   const [inputValue, setInputValue] = useState('');
-  const { items, setItems, removeLast, addItem } = useContextProvider();
+  const { items, setItems, removeLast, addItem, setSelectedItem } =
+    useContextProvider();
   const lastItem: Item | undefined = items[items.length - 1];
   const [inputFocus, setInputFocus] = useState(false);
   const previousLength = useRef(items.length);
@@ -189,6 +189,7 @@ function DropdownMultipleCombobox() {
                   onFocus: () => {
                     openMenu();
                     setInputFocus(true);
+                    setSelectedItem(null);
                   },
                   onBlur: () => {
                     setInputFocus(false);

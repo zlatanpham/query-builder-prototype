@@ -1,4 +1,4 @@
-import { Box, IconButton } from '@sajari-ui/core';
+import { Box, Button, ButtonGroup, IconButton } from '@sajari-ui/core';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useContextProvider } from '../ContextProvider';
 import { Item } from '../shared';
@@ -46,6 +46,8 @@ export const Pill = ({ index, item }: Props) => {
   useEffect(() => {
     if (selectedItem?.type === 'value' && selectedItem.fieldType === 'STRING') {
       inputRef.current?.focus();
+    }
+    if (selectedItem) {
       setTempValue(selectedItem.value);
     }
   }, [selectedItem]);
@@ -93,9 +95,48 @@ export const Pill = ({ index, item }: Props) => {
           padding="px-2"
           textColor="text-transparent"
           userSelect="select-none"
+          whitespace="whitespace-no-wrap"
         >
           {tempValue}
         </Box>
+      </Box>
+    );
+  }
+
+  if (item === selectedItem && selectedItem.fieldType === 'BOOLEAN') {
+    return (
+      <Box
+        margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
+        position="relative"
+      >
+        <ButtonGroup attached>
+          <Button
+            size="sm"
+            appearance={tempValue === 'TRUE' ? 'primary' : undefined}
+            onClick={() => {
+              if (tempValue !== 'TRUE') {
+                replaceItem(index, { ...item, value: 'TRUE' });
+              }
+              setSelectedItem(null);
+              setTempValue('');
+            }}
+          >
+            TRUE
+          </Button>
+          <Button
+            size="sm"
+            appearance={tempValue === 'FALSE' ? 'primary' : undefined}
+            onClick={() => {
+              if (tempValue !== 'FALSE') {
+                replaceItem(index, { ...item, value: 'FALSE' });
+              }
+              setSelectedItem(null);
+              setTempValue('');
+            }}
+          >
+            FALSE
+          </Button>
+        </ButtonGroup>
       </Box>
     );
   }

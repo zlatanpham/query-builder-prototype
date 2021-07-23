@@ -107,7 +107,7 @@ export const defaultItems: Item[] = [
   { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
   {
     type: 'value',
-    value: 'television',
+    value: 'application',
     component: 'text',
     fieldType: 'STRING',
     field: 'category',
