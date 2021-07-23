@@ -11,12 +11,15 @@ interface ContextValues {
   replaceItem: (index: number, newItem: Item) => void;
   hoverIndexes: number[];
   setHoverIndexes: React.Dispatch<React.SetStateAction<number[]>>;
+  selectedItem: Item | null;
+  setSelectedItem: (item: Item | null) => void;
 }
 
 const [Provider, useContextProvider] = createContext<ContextValues>();
 
 export const ContextProvider: React.FC<any> = ({ children }) => {
   const [items, setItems] = useState([...defaultItems]);
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [hoverIndexes, setHoverIndexes] = useState<number[]>([]);
 
   const removeBlock = useCallback((index: number) => {
@@ -65,6 +68,8 @@ export const ContextProvider: React.FC<any> = ({ children }) => {
         replaceItem,
         hoverIndexes,
         setHoverIndexes,
+        selectedItem,
+        setSelectedItem,
       }}
     >
       {children}

@@ -17,7 +17,7 @@ import { Pill } from './components/Pill';
 function DropdownMultipleCombobox() {
   const [inputValue, setInputValue] = useState('');
   const { items, setItems, removeLast, addItem } = useContextProvider();
-  const lastItem = items[items.length - 1];
+  const lastItem: Item | undefined = items[items.length - 1];
 
   const [inputFocus, setInputFocus] = useState(false);
 
@@ -205,7 +205,7 @@ function DropdownMultipleCombobox() {
                       openMenu();
                       addItem({
                         type: 'value',
-                        value: inputValue,
+                        value: inputValue.trim(),
                         component: 'text',
                         field: lastItem.field,
                         fieldType: lastItem.fieldType,
