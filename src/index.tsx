@@ -18,8 +18,8 @@ function DropdownMultipleCombobox() {
   const [inputValue, setInputValue] = useState('');
   const { items, setItems, removeLast, addItem } = useContextProvider();
   const lastItem: Item | undefined = items[items.length - 1];
-
   const [inputFocus, setInputFocus] = useState(false);
+  const previousLength = useRef(items.length);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -120,12 +120,12 @@ function DropdownMultipleCombobox() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (wrapperRef.current) {
+    if (wrapperRef.current && items.length > previousLength.current) {
       wrapperRef.current.scrollLeft = wrapperRef.current?.scrollWidth;
     }
 
-    console.log(items);
-  }, [items]);
+    previousLength.current = items.length;
+  }, [items.length]);
 
   const { popper, update, reference } = usePopper({
     forceUpdate: isOpen,
@@ -157,6 +157,7 @@ function DropdownMultipleCombobox() {
             overflow="overflow-auto"
             width="w-auto"
             display="flex"
+            flex="flex-1"
             flexWrap="flex-no-wrap"
           >
             {items.map((item, index) => (
@@ -165,12 +166,11 @@ function DropdownMultipleCombobox() {
             <Box
               flex="flex-1"
               width="w-full"
-              padding="pr-20"
+              display="inline-flex"
+              margin="pl-1"
               onClick={() => {
                 inputRef.current?.focus();
               }}
-              display="inline-flex"
-              margin="pl-1"
               {...getComboboxProps()}
             >
               <Box

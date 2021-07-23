@@ -50,7 +50,7 @@ export const Pill = ({ index, item }: Props) => {
     }
   }, [selectedItem]);
 
-  if (item === selectedItem) {
+  if (item === selectedItem && selectedItem.fieldType !== 'BOOLEAN') {
     return (
       <Box
         margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
