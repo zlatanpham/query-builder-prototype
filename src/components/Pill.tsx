@@ -53,32 +53,50 @@ export const Pill = ({ index, item }: Props) => {
   if (item === selectedItem) {
     return (
       <Box
-        ref={inputRef}
-        onBlur={() => {
-          if (tempValue !== '') {
-            replaceItem(index, { ...item, value: tempValue });
-            setTempValue('');
-          }
-          setSelectedItem(null);
-        }}
-        as="input"
-        outline="outline-none"
-        value={tempValue}
-        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-          setTempValue(e.target.value)
-        }
-        onKeyDown={(e) => {
-          if (e.key !== 'Enter') {
-            return;
-          }
-          if (tempValue !== '') {
-            replaceItem(index, { ...item, value: tempValue.trim() });
-            setTempValue('');
-          }
-          setSelectedItem(null);
-        }}
         margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
-      />
+        position="relative"
+      >
+        <Box
+          position="absolute"
+          width="w-full"
+          backgroundColor="bg-transparent"
+          maxWidth="max-w-full"
+          inset="inset-0"
+          padding="px-1"
+          ref={inputRef}
+          onBlur={() => {
+            if (tempValue !== '') {
+              replaceItem(index, { ...item, value: tempValue });
+              setTempValue('');
+            }
+            setSelectedItem(null);
+          }}
+          as="input"
+          outline="outline-none"
+          value={tempValue}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setTempValue(e.target.value)
+          }
+          onKeyDown={(e) => {
+            if (e.key !== 'Enter') {
+              return;
+            }
+            if (tempValue !== '') {
+              replaceItem(index, { ...item, value: tempValue.trim() });
+              setTempValue('');
+            }
+            setSelectedItem(null);
+          }}
+        />
+        <Box
+          style={{ minWidth: 50 }}
+          padding="px-2"
+          textColor="text-transparent"
+          userSelect="select-none"
+        >
+          {tempValue}
+        </Box>
+      </Box>
     );
   }
 
