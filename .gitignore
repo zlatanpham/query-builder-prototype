@@ -24,3 +24,5 @@ yarn-error.log*
 /src/index.css
 .yalc
 yalc.lock
+# Local Netlify folder
+.netlify

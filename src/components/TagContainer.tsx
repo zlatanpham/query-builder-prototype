@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { FlexProps, TagInput } from '@sajari-ui/core';
 import { useContextProvider } from '../ContextProvider';
 import { Item, Operator, Value } from '../shared';
@@ -17,6 +17,7 @@ export const TagContainer = ({ index, item }: TagContainerProps) => {
   const ref: React.RefObject<HTMLInputElement> = React.createRef();
   const { items, replaceItem, addItem, setSelectedItem } = useContextProvider();
   const lastItem: Item | undefined = items[items.length - 1];
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const styleProps: FlexProps = {
     overflow: undefined,
@@ -29,6 +30,9 @@ export const TagContainer = ({ index, item }: TagContainerProps) => {
     }
 
     const listener = (event) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
       if (!ref.current || ref.current.contains(event.target)) {
         return;
       }
@@ -45,6 +49,12 @@ export const TagContainer = ({ index, item }: TagContainerProps) => {
     };
   }, [index, item, ref, replaceItem, setSelectedItem, tags]);
 
+  useEffect(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+  }, [tags]);
+
   return (
     <TagInput
       ref={ref}
@@ -52,6 +62,14 @@ export const TagContainer = ({ index, item }: TagContainerProps) => {
       onChange={setTags}
       editable={false}
       size="sm"
+      onBlur={() => {
+        if (!index) {
+          return;
+        }
+        timeoutRef.current = setTimeout(() => {
+          setSelectedItem(null);
+        }, 500);
+      }}
       styleProps={styleProps}
       onEnterPress={(tags) => {
         if (!item) {

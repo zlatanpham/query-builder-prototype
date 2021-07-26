@@ -215,7 +215,11 @@ function DropdownMultipleCombobox() {
                       if (lastItem.isAdvanced) {
                         addItem({
                           type: 'value',
-                          value: inputValue.trim().split(','),
+                          value: inputValue
+                            .trim()
+                            .split(',')
+                            .filter(Boolean)
+                            .map((v) => v.trim()),
                           component: 'tags',
                           field: lastItem.field,
                           fieldType: lastItem.fieldType,
