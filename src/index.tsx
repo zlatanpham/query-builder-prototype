@@ -1,18 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { render } from 'react-dom';
 import { useCombobox } from 'downshift';
-import { Item, fieldOptions, operatorOptions, booleanOptions } from './shared';
-import './index.css';
 import {
-  Code,
-  Box,
-  IconButton,
-  usePopper,
-  Portal,
-  Flex,
-} from '@sajari-ui/core';
+  Item,
+  fieldOptions,
+  operatorOptions,
+  booleanOptions,
+  Operator,
+} from './shared';
+import './index.css';
+import { Box, IconButton, usePopper, Portal, Flex } from '@sajari-ui/core';
 import { ContextProvider, useContextProvider } from './ContextProvider';
-import { Pill } from './components/Pill';
+import { Pill, Result } from './components';
 
 function DropdownMultipleCombobox() {
   const [inputValue, setInputValue] = useState('');
@@ -24,7 +23,7 @@ function DropdownMultipleCombobox() {
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // TODO: cannot infer because the type of the suggetions is different from the type of items
+  // TODO: cannot infer because the type of the suggestions is different from the type of items
   const getFilteredSuggestions = (items: any[]) => {
     return items.filter((item) => {
       return (
@@ -89,23 +88,31 @@ function DropdownMultipleCombobox() {
             } else if (lastItem?.type === 'field') {
               addItem({
                 type: 'operator',
-                value: selectedItem.value,
+                value: selectedItem.value as string,
                 field: lastItem.value,
                 fieldType: lastItem.fieldType,
+                isAdvanced: (selectedItem as Operator).isAdvanced,
               });
               openMenu();
-            } else if (
-              lastItem?.type === 'operator' &&
-              endFieldOption?.type === 'BOOLEAN'
-            ) {
-              openMenu();
-              addItem({
-                type: 'value',
-                value: selectedItem.value,
-                component: 'boolean',
-                field: lastItem.field,
-                fieldType: lastItem.fieldType,
-              });
+            } else if (lastItem?.type === 'operator') {
+              if (lastItem.isAdvanced && inputValue) {
+                addItem({
+                  type: 'value',
+                  value: [inputValue],
+                  component: 'tags',
+                  field: lastItem.field,
+                  fieldType: lastItem.fieldType,
+                });
+              } else if (endFieldOption?.type === 'BOOLEAN') {
+                openMenu();
+                addItem({
+                  type: 'value',
+                  value: selectedItem.value as string,
+                  component: 'boolean',
+                  field: lastItem.field,
+                  fieldType: lastItem.fieldType,
+                });
+              }
             }
             setInputValue('');
             // @ts-ignore
@@ -205,13 +212,23 @@ function DropdownMultipleCombobox() {
                       inputValue !== ''
                     ) {
                       openMenu();
-                      addItem({
-                        type: 'value',
-                        value: inputValue.trim(),
-                        component: 'text',
-                        field: lastItem.field,
-                        fieldType: lastItem.fieldType,
-                      });
+                      if (lastItem.isAdvanced) {
+                        addItem({
+                          type: 'value',
+                          value: inputValue.trim().split(','),
+                          component: 'tags',
+                          field: lastItem.field,
+                          fieldType: lastItem.fieldType,
+                        });
+                      } else {
+                        addItem({
+                          type: 'value',
+                          value: inputValue.trim(),
+                          component: 'text',
+                          field: lastItem.field,
+                          fieldType: lastItem.fieldType,
+                        });
+                      }
                       setInputValue('');
                     }
                   },
@@ -273,6 +290,7 @@ function DropdownMultipleCombobox() {
                                   value: item.value,
                                   field: lastItem.value,
                                   fieldType: lastItem.fieldType,
+                                  isAdvanced: (item as Operator).isAdvanced,
                                 });
                                 openMenu();
                               } else if (
@@ -282,9 +300,9 @@ function DropdownMultipleCombobox() {
                                 openMenu();
                                 addItem({
                                   type: 'value',
-                                  value: item.value,
+                                  value: item.value as string,
                                   component: 'boolean',
-                                  field: lastItem.value,
+                                  field: lastItem.field,
                                   fieldType: lastItem.fieldType,
                                 });
                               }
@@ -332,27 +350,7 @@ function DropdownMultipleCombobox() {
         </Box>
       </Box>
 
-      <Box padding="p-10" maxWidth="max-w-7xl" margin="mx-auto">
-        <Code
-          theme="dark"
-          language="bash"
-          value={items
-            .map((item, index) => {
-              if (item.type === 'field') {
-                return index === 0 ? item.value : `AND ${item.value}`;
-              }
-              if (item.type === 'value') {
-                return `'${item.value}'`;
-              }
-
-              return item.value;
-            })
-            .join(' ')}
-          showCopyButton={false}
-          flex="flex-1"
-          wrap={true}
-        />
-      </Box>
+      <Result />
     </>
   );
 }

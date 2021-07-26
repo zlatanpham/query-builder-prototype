@@ -2,6 +2,7 @@ import { Box, Button, ButtonGroup, IconButton } from '@sajari-ui/core';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useContextProvider } from '../ContextProvider';
 import { Item } from '../shared';
+import { TagContainer } from './TagContainer';
 
 interface Props {
   index: number;
@@ -38,7 +39,7 @@ export const Pill = ({ index, item }: Props) => {
   } else if (item.type === 'value') {
     innerRender = (
       <Box as="span" textColor="text-gray-700">
-        {item.value}
+        {Array.isArray(item.value) ? item.value.join(', ') : item.value}
       </Box>
     );
   }
@@ -48,9 +49,28 @@ export const Pill = ({ index, item }: Props) => {
       inputRef.current?.focus();
     }
     if (selectedItem) {
-      setTempValue(selectedItem.value);
+      if (typeof selectedItem.value === 'string') {
+        setTempValue(selectedItem.value);
+      } else if (Array.isArray(selectedItem.value)) {
+        setTempValue(selectedItem.value.join(','));
+      }
     }
   }, [selectedItem]);
+
+  if (
+    item === selectedItem &&
+    selectedItem.type === 'value' &&
+    selectedItem.component === 'tags'
+  ) {
+    return (
+      <Box
+        margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
+        position="relative"
+      >
+        <TagContainer index={index} item={item} />
+      </Box>
+    );
+  }
 
   if (item === selectedItem && selectedItem.fieldType !== 'BOOLEAN') {
     return (

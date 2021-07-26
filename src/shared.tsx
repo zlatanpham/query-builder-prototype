@@ -61,11 +61,18 @@ export const operatorOptions: OperatorOption[] = [
     text: 'less than',
     types: ['FLOAT', 'INTEGER'],
   },
+  {
+    value: '~',
+    text: 'contain any',
+    types: ['STRING'],
+    isAdvanced: true,
+  },
 ];
 export interface OperatorOption {
   text: string;
   value: keyof typeof operatorMapping;
   types: FieldType[];
+  isAdvanced?: boolean;
 }
 
 export interface Option {
@@ -80,25 +87,35 @@ export const booleanOptions = [
   { text: 'FALSE', value: 'FALSE' },
 ];
 
-interface Field {
+export interface Field {
   type: 'field';
   value: string;
   fieldType: FieldOption['type'];
 }
-interface Operator {
+
+export interface Operator {
   type: 'operator';
   value: string;
   field: string;
   fieldType: FieldOption['type'];
+  isAdvanced?: boolean;
 }
 
-interface Value {
-  type: 'value';
-  value: string;
-  component: 'text' | 'boolean';
-  field: string;
-  fieldType: FieldOption['type'];
-}
+export type Value =
+  | {
+      type: 'value';
+      value: string;
+      component: 'text' | 'boolean' | 'tags';
+      field: string;
+      fieldType: FieldOption['type'];
+    }
+  | {
+      type: 'value';
+      value: string[];
+      component: 'tags';
+      field: string;
+      fieldType: FieldOption['type'];
+    };
 
 export type Item = Field | Operator | Value;
 
