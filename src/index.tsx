@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { render } from 'react-dom';
 import { useCombobox } from 'downshift';
+import { JoinOperator } from './ContextProvider';
 import {
   Item,
   fieldOptions,
   operatorOptions,
   booleanOptions,
   Operator,
-  JoinOperator,
 } from './shared';
 import './index.css';
 import {
