@@ -2,6 +2,8 @@ import { useCallback, useState } from 'react';
 import { Item, defaultItems } from './shared';
 import { createContext } from './utils/react-helpers';
 
+export type JoinOperator = 'OR' | 'AND';
+
 interface ContextValues {
   items: Item[];
   setItems: React.Dispatch<React.SetStateAction<Item[]>>;
@@ -13,6 +15,8 @@ interface ContextValues {
   setHoverIndexes: React.Dispatch<React.SetStateAction<number[]>>;
   selectedItem: Item | null;
   setSelectedItem: (item: Item | null) => void;
+  joinOperator: JoinOperator;
+  setJoinOperator: (operator: JoinOperator) => void;
 }
 
 const [Provider, useContextProvider] = createContext<ContextValues>();
@@ -21,6 +25,7 @@ export const ContextProvider: React.FC<any> = ({ children }) => {
   const [items, setItems] = useState([...defaultItems]);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [hoverIndexes, setHoverIndexes] = useState<number[]>([]);
+  const [joinOperator, setJoinOperator] = useState<JoinOperator>('AND');
 
   const removeBlock = useCallback((index: number) => {
     setItems((prev) => {
@@ -70,6 +75,8 @@ export const ContextProvider: React.FC<any> = ({ children }) => {
         setHoverIndexes,
         selectedItem,
         setSelectedItem,
+        joinOperator,
+        setJoinOperator,
       }}
     >
       {children}

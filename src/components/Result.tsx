@@ -3,7 +3,7 @@ import { useContextProvider } from '../ContextProvider';
 import { Item } from '../shared';
 
 export const Result = () => {
-  const { items } = useContextProvider();
+  const { items, joinOperator } = useContextProvider();
 
   const getValue = () => {
     const result: string[] = [];
@@ -14,7 +14,7 @@ export const Result = () => {
       if (valueItem && Array.isArray(valueItem.value)) {
         const exp = valueItem.value
           .map((value) =>
-            [fieldItem?.value, operatorItem?.value, `'${value}'`].join(' ')
+            [fieldItem?.value, operatorItem?.value, `'${value}'`].join(' '),
           )
           .join(' OR ');
         result.push(`(${exp})`);
@@ -27,7 +27,7 @@ export const Result = () => {
         result.push(exp);
       }
     }
-    return result.join(' AND ');
+    return result.join(` ${joinOperator} `);
   };
 
   return (

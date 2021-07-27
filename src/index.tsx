@@ -7,16 +7,31 @@ import {
   operatorOptions,
   booleanOptions,
   Operator,
+  JoinOperator,
 } from './shared';
 import './index.css';
-import { Box, IconButton, usePopper, Portal, Flex } from '@sajari-ui/core';
+import {
+  Box,
+  IconButton,
+  usePopper,
+  Portal,
+  Flex,
+  Select,
+} from '@sajari-ui/core';
 import { ContextProvider, useContextProvider } from './ContextProvider';
 import { Pill, Result } from './components';
 
 function DropdownMultipleCombobox() {
   const [inputValue, setInputValue] = useState('');
-  const { items, setItems, removeLast, addItem, setSelectedItem } =
-    useContextProvider();
+  const {
+    items,
+    setItems,
+    removeLast,
+    addItem,
+    setSelectedItem,
+    joinOperator,
+    setJoinOperator,
+  } = useContextProvider();
   const lastItem: Item | undefined = items[items.length - 1];
   const [inputFocus, setInputFocus] = useState(false);
   const previousLength = useRef(items.length);
@@ -152,14 +167,25 @@ function DropdownMultipleCombobox() {
         <Box
           position="relative"
           borderWidth="border"
-          borderColor="border-gray-300"
+          borderColor="border-gray-200"
           borderRadius="rounded-md"
-          padding={['py-1', 'pl-3']}
+          padding={['py-1', 'pl-1']}
           display="flex"
           justifyContent="justify-between"
           flexWrap="flex-no-wrap"
           boxShadow={inputFocus ? 'shadow-outline-blue' : undefined}
         >
+          <Select
+            width="w-20"
+            borderWidth="border-0"
+            padding={['p-0', 'pl-3']}
+            value={joinOperator}
+            onChange={(e) => setJoinOperator(e.target.value as JoinOperator)}
+          >
+            <option value="AND">AND</option>
+            <option value="OR">OR</option>
+          </Select>
+          <Box width="w-px" backgroundColor="bg-gray-200" margin="m-1" />
           <Box
             ref={wrapperRef}
             overflow="overflow-auto"
