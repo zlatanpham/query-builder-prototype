@@ -57,6 +57,21 @@ export const Pill = ({ index, item }: Props) => {
     }
   }, [selectedItem]);
 
+  const onMouseEnter = () => {
+    const p = index + 1;
+    if (p % 3 === 0) {
+      setHoverIndexes([index, index - 1, index - 2]);
+    } else if (p % 3 === 2) {
+      setHoverIndexes([index - 1, index, index + 1]);
+    } else {
+      setHoverIndexes([index, index + 1, index + 2]);
+    }
+  };
+
+  const onMouseLeave = () => {
+    setHoverIndexes([]);
+  };
+
   if (
     item === selectedItem &&
     selectedItem.type === 'value' &&
@@ -66,8 +81,14 @@ export const Pill = ({ index, item }: Props) => {
       <Box
         margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
         position="relative"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       >
-        <TagContainer index={index} item={item} />
+        <TagContainer
+          index={index}
+          item={item}
+          hovered={hoverIndexes.includes(index)}
+        />
       </Box>
     );
   }
@@ -94,6 +115,7 @@ export const Pill = ({ index, item }: Props) => {
             setSelectedItem(null);
           }}
           as="input"
+          textColor="text-gray-600"
           outline="outline-none"
           value={tempValue}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -174,16 +196,8 @@ export const Pill = ({ index, item }: Props) => {
           setSelectedItem(items[index + 2]);
         }
       }}
-      onMouseEnter={() => {
-        const p = index + 1;
-        if (p % 3 === 0) {
-          setHoverIndexes([index, index - 1, index - 2]);
-        } else if (p % 3 === 2) {
-          setHoverIndexes([index - 1, index, index + 1]);
-        } else {
-          setHoverIndexes([index, index + 1, index + 2]);
-        }
-      }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
       padding={[item.type === 'value' ? 'pl-2' : 'px-2', 'py-0.5']}
       whitespace="whitespace-no-wrap"
@@ -202,9 +216,6 @@ export const Pill = ({ index, item }: Props) => {
       backgroundColor={
         hoverIndexes.includes(index) ? 'bg-gray-300' : 'bg-gray-100'
       }
-      onMouseLeave={() => {
-        setHoverIndexes([]);
-      }}
     >
       {innerRender}
       {item.type === 'value' && (

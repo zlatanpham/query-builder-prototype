@@ -1,15 +1,16 @@
-import React, { useRef, useState } from 'react';
-import { FlexProps, TagInput } from '@sajari-ui/core';
+import React, { ChangeEvent, useRef, useState } from 'react';
+import { Box, FlexProps, IconButton, TagInput } from '@sajari-ui/core';
 import { useContextProvider } from '../ContextProvider';
 import { Item, Operator, Value } from '../shared';
 import { useEffect } from 'react';
 
 interface TagContainerProps {
-  index?: number;
+  index: number;
   item?: Item;
+  hovered: boolean;
 }
 
-export const TagContainer = ({ index, item }: TagContainerProps) => {
+export const TagContainer = ({ index, item, hovered }: TagContainerProps) => {
   const { value = [] } = item || {};
   const [tags, setTags] = useState<string[]>(
     Array.isArray(value) ? value : [value],
@@ -25,31 +26,6 @@ export const TagContainer = ({ index, item }: TagContainerProps) => {
   };
 
   useEffect(() => {
-    if (!index || !item) {
-      return () => {};
-    }
-
-    const listener = (event) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      if (!ref.current || ref.current.contains(event.target)) {
-        return;
-      }
-      if (tags.length) {
-        replaceItem(index, { ...item, value: tags } as Value);
-      }
-      setSelectedItem(null);
-    };
-    document.addEventListener('mousedown', listener);
-    document.addEventListener('touchstart', listener);
-    return () => {
-      document.removeEventListener('mousedown', listener);
-      document.removeEventListener('touchstart', listener);
-    };
-  }, [index, item, ref, replaceItem, setSelectedItem, tags]);
-
-  useEffect(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
@@ -59,18 +35,56 @@ export const TagContainer = ({ index, item }: TagContainerProps) => {
     <TagInput
       ref={ref}
       tags={tags}
+      hasInputWrapper={false}
       onChange={setTags}
       editable={false}
-      size="sm"
-      onBlur={() => {
-        if (!index) {
-          return;
-        }
-        timeoutRef.current = setTimeout(() => {
-          setSelectedItem(null);
-        }, 500);
-      }}
+      style={{ height: 24 }}
+      tagRender={({ tag, onDelete, index }) => (
+        <Box
+          height="h-8"
+          key={`selected-item-${index}`}
+          margin="ml-0.5"
+          padding={['pl-2', 'py-0.5']}
+          whitespace="whitespace-no-wrap"
+          borderRadius={
+            index === tags.length - 1 ? 'rounded-r-md' : 'rounded-none'
+          }
+          display="inline-flex"
+          justifyContent="justify-center"
+          alignItems="items-center"
+          transitionProperty="transition"
+          transitionDuration="duration-200"
+          backgroundColor={hovered ? 'bg-gray-300' : 'bg-gray-100'}
+        >
+          {tag}
+          <IconButton
+            icon="close"
+            size="sm"
+            padding="px-2"
+            margin="ml-0.5"
+            display="flex"
+            alignItems="items-center"
+            justifyContent="justify-center"
+            appearance="none"
+            textColor="text-gray-700"
+            iconSize="sm"
+            label="Remove"
+            onClick={() => {
+              onDelete();
+            }}
+          />
+        </Box>
+      )}
       styleProps={styleProps}
+      onKeyDown={(e) => {
+        // @ts-ignore
+        if (e.code === 'Enter' && e.target.value === '') {
+          if (tags.length && index) {
+            replaceItem(index, { ...item, value: tags } as Value);
+          }
+          setSelectedItem(null);
+        }
+      }}
       onEnterPress={(tags) => {
         if (!item) {
           addItem({
