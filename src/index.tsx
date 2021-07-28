@@ -4,10 +4,12 @@ import { useCombobox } from 'downshift';
 import { JoinOperator } from './ContextProvider';
 import {
   Item,
-  fieldOptions,
-  operatorOptions,
+  groupFieldOptions,
+  groupOperatorOptions,
   booleanOptions,
   Operator,
+  GroupMenu,
+  FieldOption,
 } from './shared';
 import './index.css';
 import {
@@ -15,11 +17,47 @@ import {
   IconButton,
   usePopper,
   Portal,
-  Flex,
   Select,
+  Heading,
+  Divider,
 } from '@sajari-ui/core';
 import { ContextProvider, useContextProvider } from './ContextProvider';
-import { Pill, Result } from './components';
+import { Pill, Result, DropdownItem } from './components';
+
+// TODO: cannot infer because the type of the suggetions is different from the type of items
+const getFilteredSuggestions = (
+  items: any[],
+  inputValue: string,
+  activeItem: Item,
+) => {
+  const filterFunc = (item) =>
+    item?.text?.toLowerCase().startsWith(inputValue.toLowerCase()) &&
+    (activeItem?.type !== 'field' ||
+      (activeItem?.type === 'field' &&
+        'types' in item &&
+        item?.types.includes(activeItem.fieldType)));
+
+  // Group case
+  if (items[0]?.title) {
+    return items
+      .map((group) => {
+        return { ...group, items: group.items.filter(filterFunc) };
+      })
+      .filter(({ items }) => items.length > 0);
+  }
+
+  return items.filter(filterFunc);
+};
+
+const flattenSuggestions = (items: any[]) => {
+  if (items[0]?.items) {
+    return items.reduce((a, c) => {
+      return [...a, ...c.items];
+    }, []);
+  }
+
+  return items;
+};
 
 function DropdownMultipleCombobox() {
   const [inputValue, setInputValue] = useState('');
@@ -38,34 +76,22 @@ function DropdownMultipleCombobox() {
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // TODO: cannot infer because the type of the suggestions is different from the type of items
-  const getFilteredSuggestions = (items: any[]) => {
-    return items.filter((item) => {
-      return (
-        item?.text?.toLowerCase().startsWith(inputValue.toLowerCase()) &&
-        (lastItem?.type !== 'field' ||
-          (lastItem?.type === 'field' &&
-            'types' in item &&
-            item?.types.includes(lastItem.fieldType)))
-      );
-    });
-  };
-
   const type = items[items.length - 1]?.type;
-  const endFieldOption = fieldOptions.find(
-    (o) => o.text === items[items.length - 2]?.value,
-  );
 
   const suggestions =
     type === undefined || type === 'value'
-      ? fieldOptions
+      ? groupFieldOptions
       : type === 'field'
-      ? operatorOptions
-      : endFieldOption?.type === 'BOOLEAN'
+      ? groupOperatorOptions
+      : lastItem?.fieldType === 'BOOLEAN'
       ? booleanOptions
       : [];
 
-  const filteredSuggestions = getFilteredSuggestions(suggestions);
+  const filteredSuggestions = getFilteredSuggestions(
+    suggestions,
+    inputValue,
+    lastItem,
+  );
 
   const {
     isOpen,
@@ -79,8 +105,7 @@ function DropdownMultipleCombobox() {
     setHighlightedIndex,
   } = useCombobox<Item>({
     inputValue,
-
-    items: filteredSuggestions,
+    items: flattenSuggestions(filteredSuggestions),
     onStateChange: ({ inputValue, type, selectedItem }) => {
       switch (type) {
         case useCombobox.stateChangeTypes.InputChange:
@@ -107,6 +132,8 @@ function DropdownMultipleCombobox() {
                 field: lastItem.value,
                 fieldType: lastItem.fieldType,
                 isAdvanced: (selectedItem as Operator).isAdvanced,
+                advancedJoinOperator: (selectedItem as Operator)
+                  .advancedJoinOperator,
               });
               openMenu();
             } else if (lastItem?.type === 'operator') {
@@ -118,7 +145,7 @@ function DropdownMultipleCombobox() {
                   field: lastItem.field,
                   fieldType: lastItem.fieldType,
                 });
-              } else if (endFieldOption?.type === 'BOOLEAN') {
+              } else if (lastItem?.fieldType === 'BOOLEAN') {
                 openMenu();
                 addItem({
                   type: 'value',
@@ -285,85 +312,53 @@ function DropdownMultipleCombobox() {
                   as="ul"
                 >
                   <Box {...getMenuProps()}>
-                    {filteredSuggestions.map((item, index) => (
-                      <Flex
-                        justifyContent="justify-between"
-                        alignItems="items-center"
-                        as="li"
-                        padding={['px-3', 'py-1']}
-                        borderRadius="rounded-md"
-                        backgroundColor={
-                          highlightedIndex === index
-                            ? 'bg-blue-500'
-                            : 'bg-white'
-                        }
-                        textColor={
-                          highlightedIndex === index
-                            ? 'text-white'
-                            : 'text-gray-500'
-                        }
-                        key={`${item.value}${index}`}
-                        {...getItemProps({
-                          item,
-                          index,
-                          onClick: () => {
-                            if (lastItem) {
-                              if (lastItem?.type === 'value') {
-                                addItem({
-                                  type: 'field',
-                                  value: item.value,
-                                  fieldType: item.type,
-                                });
-                                openMenu();
-                              } else if (lastItem?.type === 'field') {
-                                addItem({
-                                  type: 'operator',
-                                  value: item.value,
-                                  field: lastItem.value,
-                                  fieldType: lastItem.fieldType,
-                                  isAdvanced: (item as Operator).isAdvanced,
-                                });
-                                openMenu();
-                              } else if (
-                                lastItem?.type === 'operator' &&
-                                endFieldOption?.type === 'BOOLEAN'
-                              ) {
-                                openMenu();
-                                addItem({
-                                  type: 'value',
-                                  value: item.value as string,
-                                  component: 'boolean',
-                                  field: lastItem.field,
-                                  fieldType: lastItem.fieldType,
-                                });
-                              }
-                            } else {
-                              addItem({
-                                type: 'field',
-                                value: item.value,
-                                fieldType: item.type,
-                              });
-                              openMenu();
-                            }
-                            setInputValue('');
-                            // @ts-ignore
-                            selectItem(null);
+                    {filteredSuggestions[0]?.title
+                      ? (
+                          filteredSuggestions as GroupMenu<FieldOption>[]
+                        ).reduce(
+                          (result, section, sectionIndex) => {
+                            result.sections.push(
+                              // @ts-ignore
+                              <Box as="li" key={sectionIndex}>
+                                {sectionIndex > 0 && <Divider />}
+                                <Heading margin={['ml-1', 'my-1']} as="h6">
+                                  {section.title}
+                                </Heading>
+                                <Box as="ul">
+                                  {section.items.map((item) => {
+                                    const index = result.itemIndex;
+                                    result.itemIndex = result.itemIndex + 1;
+                                    return (
+                                      <DropdownItem
+                                        key={`${item.value}${index}`}
+                                        item={item}
+                                        highlightedIndex={highlightedIndex}
+                                        index={index}
+                                        openMenu={openMenu}
+                                        setInputValue={setInputValue}
+                                        getItemProps={getItemProps}
+                                      />
+                                    );
+                                  })}
+                                </Box>
+                              </Box>,
+                            );
+
+                            return result;
                           },
-                        })}
-                      >
-                        {lastItem?.type === 'field' && (
-                          <Box as="span">{item.value}</Box>
-                        )}
-                        <Box
-                          as="span"
-                          fontSize={
-                            lastItem?.type === 'field' ? 'text-sm' : 'text-base'
-                          }
-                        >
-                          {item.text}
-                        </Box>
-                      </Flex>
-                    ))}
+                          { sections: [], itemIndex: 0 },
+                        ).sections
+                      : filteredSuggestions.map((item, index) => (
+                          <DropdownItem
+                            key={`${item.value}${index}`}
+                            item={item}
+                            highlightedIndex={highlightedIndex}
+                            index={index}
+                            openMenu={openMenu}
+                            setInputValue={setInputValue}
+                            getItemProps={getItemProps}
+                          />
+                        ))}
                   </Box>
                 </Box>
               </Portal>

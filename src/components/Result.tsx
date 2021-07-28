@@ -1,6 +1,6 @@
 import { Box, Code } from '@sajari-ui/core';
 import { useContextProvider } from '../ContextProvider';
-import { Item } from '../shared';
+import { Item, Operator } from '../shared';
 
 export const Result = () => {
   const { items, joinOperator } = useContextProvider();
@@ -9,14 +9,14 @@ export const Result = () => {
     const result: string[] = [];
     for (let index = 0; index < items.length; index += 3) {
       const fieldItem: Item | undefined = items[index];
-      const operatorItem: Item | undefined = items[index + 1];
+      const operatorItem: Operator | undefined = items[index + 1] as Operator;
       const valueItem: Item | undefined = items[index + 2];
       if (valueItem && Array.isArray(valueItem.value)) {
         const exp = valueItem.value
           .map((value) =>
             [fieldItem?.value, operatorItem?.value, `'${value}'`].join(' '),
           )
-          .join(' OR ');
+          .join(` ${operatorItem.advancedJoinOperator} `);
         result.push(`(${exp})`);
       } else {
         const exp = [

@@ -6,24 +6,24 @@ export interface FieldOption {
   isArray: boolean;
 }
 
-export const fieldOptions: FieldOption[] = [
-  { text: 'image', value: 'image', isArray: false, type: 'STRING' },
-  { text: 'category', value: 'category', isArray: false, type: 'STRING' },
-  { text: 'price', value: 'price', isArray: false, type: 'FLOAT' },
-  { text: 'onSale', value: 'onSale', isArray: false, type: 'BOOLEAN' },
-];
+// export const fieldOptions: FieldOption[] = [
+//   { text: 'image', value: 'image', isArray: false, type: 'STRING' },
+//   { text: 'category', value: 'category', isArray: false, type: 'STRING' },
+//   { text: 'price', value: 'price', isArray: false, type: 'FLOAT' },
+//   { text: 'onSale', value: 'onSale', isArray: false, type: 'BOOLEAN' },
+// ];
 
 export interface GroupMenu<T> {
   title: string;
   items: T[];
 }
 
-const groupFieldOptions: GroupMenu<FieldOption>[] = [
+export const groupFieldOptions: GroupMenu<FieldOption>[] = [
   {
     title: 'Params',
     items: [
       { text: 'q', value: 'q', isArray: false, type: 'STRING' },
-      { text: 'page', value: 'q', isArray: false, type: 'STRING' },
+      { text: 'page', value: 'page', isArray: false, type: 'INTEGER' },
     ],
   },
   {
@@ -48,55 +48,144 @@ export const operatorMapping = {
   '<': 'less than',
 };
 
-export const operatorOptions: OperatorOption[] = [
-  { value: '=', text: 'is', types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER'] },
+export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
   {
-    value: '~',
-    text: 'contains',
-    types: ['STRING'],
+    title: 'Basic',
+    items: [
+      {
+        value: '=',
+        text: 'is',
+        types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER'],
+      },
+      {
+        value: '~',
+        text: 'contains',
+        types: ['STRING'],
+      },
+      {
+        value: '!=',
+        text: 'is not',
+        types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER'],
+      },
+      {
+        value: '!~',
+        text: 'does not contain',
+        types: ['STRING'],
+      },
+      {
+        value: '$',
+        text: 'ends with',
+        types: ['STRING'],
+      },
+      {
+        value: '^',
+        text: 'begins with',
+        types: ['STRING'],
+      },
+      {
+        value: '>',
+        text: 'greater than',
+        types: ['FLOAT', 'INTEGER'],
+      },
+      {
+        value: '<',
+        text: 'less than',
+        types: ['FLOAT', 'INTEGER'],
+      },
+    ],
   },
   {
-    value: '!=',
-    text: 'is not',
-    types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER'],
-  },
-  {
-    value: '!~',
-    text: 'does not contain',
-    types: ['STRING'],
-  },
-  {
-    value: '$',
-    text: 'ends with',
-    types: ['STRING'],
-  },
-  {
-    value: '^',
-    text: 'begins with',
-    types: ['STRING'],
-  },
-  {
-    value: '>',
-    text: 'greater than',
-    types: ['FLOAT', 'INTEGER'],
-  },
-  {
-    value: '<',
-    text: 'less than',
-    types: ['FLOAT', 'INTEGER'],
-  },
-  {
-    value: '~',
-    text: 'contain any',
-    types: ['STRING'],
-    isAdvanced: true,
+    title: 'Advanced',
+    items: [
+      {
+        value: '~',
+        text: 'contain all',
+        types: ['STRING'],
+        isAdvanced: true,
+        advancedJoinOperator: 'AND',
+      },
+      {
+        value: '~',
+        text: 'contain any',
+        types: ['STRING'],
+        isAdvanced: true,
+        advancedJoinOperator: 'OR',
+      },
+      {
+        value: '!~',
+        text: 'contain none of',
+        types: ['STRING'],
+        isAdvanced: true,
+        advancedJoinOperator: 'OR',
+      },
+      {
+        value: '=',
+        text: 'equals any',
+        types: ['STRING'],
+        isAdvanced: true,
+        advancedJoinOperator: 'OR',
+      },
+      {
+        value: '!=',
+        text: 'missing all of',
+        types: ['STRING'],
+        isAdvanced: true,
+        advancedJoinOperator: 'AND',
+      },
+    ],
   },
 ];
+
+// export const operatorOptions: OperatorOption[] = [
+//   { value: '=', text: 'is', types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER'] },
+//   {
+//     value: '~',
+//     text: 'contains',
+//     types: ['STRING'],
+//   },
+//   {
+//     value: '!=',
+//     text: 'is not',
+//     types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER'],
+//   },
+//   {
+//     value: '!~',
+//     text: 'does not contain',
+//     types: ['STRING'],
+//   },
+//   {
+//     value: '$',
+//     text: 'ends with',
+//     types: ['STRING'],
+//   },
+//   {
+//     value: '^',
+//     text: 'begins with',
+//     types: ['STRING'],
+//   },
+//   {
+//     value: '>',
+//     text: 'greater than',
+//     types: ['FLOAT', 'INTEGER'],
+//   },
+//   {
+//     value: '<',
+//     text: 'less than',
+//     types: ['FLOAT', 'INTEGER'],
+//   },
+//   {
+//     value: '~',
+//     text: 'contain any',
+//     types: ['STRING'],
+//     isAdvanced: true,
+//   },
+// ];
 export interface OperatorOption {
   text: string;
   value: keyof typeof operatorMapping;
   types: FieldType[];
   isAdvanced?: boolean;
+  advancedJoinOperator?: 'AND' | 'OR';
 }
 
 export interface Option {
@@ -104,7 +193,7 @@ export interface Option {
   value: string;
 }
 
-export type Suggestion = Option | OperatorOption;
+export type Suggestion = Option | OperatorOption | FieldOption;
 
 export const booleanOptions = [
   { text: 'TRUE', value: 'TRUE' },
@@ -123,6 +212,7 @@ export interface Operator {
   field: string;
   fieldType: FieldOption['type'];
   isAdvanced?: boolean;
+  advancedJoinOperator?: 'OR' | 'AND';
 }
 
 export type Value =
