@@ -13,6 +13,30 @@ export const fieldOptions: FieldOption[] = [
   { text: 'onSale', value: 'onSale', isArray: false, type: 'BOOLEAN' },
 ];
 
+export interface GroupMenu<T> {
+  title: string;
+  items: T[];
+}
+
+const groupFieldOptions: GroupMenu<FieldOption>[] = [
+  {
+    title: 'Params',
+    items: [
+      { text: 'q', value: 'q', isArray: false, type: 'STRING' },
+      { text: 'page', value: 'q', isArray: false, type: 'STRING' },
+    ],
+  },
+  {
+    title: 'Fields',
+    items: [
+      { text: 'image', value: 'image', isArray: false, type: 'STRING' },
+      { text: 'category', value: 'category', isArray: false, type: 'STRING' },
+      { text: 'price', value: 'price', isArray: false, type: 'FLOAT' },
+      { text: 'onSale', value: 'onSale', isArray: false, type: 'BOOLEAN' },
+    ],
+  },
+];
+
 export const operatorMapping = {
   '=': 'is',
   '~': 'contains',
