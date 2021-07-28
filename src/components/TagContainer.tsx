@@ -85,6 +85,7 @@ export const TagContainer = ({ index, item, hovered }: TagContainerProps) => {
           setSelectedItem(null);
         }
       }}
+      placeholder="Type and press enter"
       onEnterPress={(tags) => {
         if (!item) {
           addItem({

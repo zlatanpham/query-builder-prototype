@@ -20,6 +20,8 @@ import {
   Select,
   Heading,
   Divider,
+  Text,
+  Flex,
 } from '@sajari-ui/core';
 import { ContextProvider, useContextProvider } from './ContextProvider';
 import { Pill, Result, DropdownItem } from './components';
@@ -67,6 +69,7 @@ function DropdownMultipleCombobox() {
     removeLast,
     addItem,
     setSelectedItem,
+    selectedItem,
     joinOperator,
     setJoinOperator,
   } = useContextProvider();
@@ -374,6 +377,15 @@ function DropdownMultipleCombobox() {
             />
           )}
         </Box>
+        <Flex height="h-6" alignItems="items-end">
+          {((lastItem?.type === 'operator' && lastItem?.isAdvanced) ||
+            (selectedItem?.type === 'value' &&
+              selectedItem?.component === 'tags')) && (
+            <Text fontSize="text-xs" textColor="text-gray-500">
+              Type and press enter ⏎
+            </Text>
+          )}
+        </Flex>
       </Box>
 
       <Result />
