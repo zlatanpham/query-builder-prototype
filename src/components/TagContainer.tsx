@@ -18,7 +18,6 @@ export const TagContainer = ({ index, item, hovered }: TagContainerProps) => {
   const ref: React.RefObject<HTMLInputElement> = React.createRef();
   const { items, replaceItem, addItem, setSelectedItem } = useContextProvider();
   const lastItem: Item | undefined = items[items.length - 1];
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const styleProps: FlexProps = {
     overflow: undefined,
@@ -26,10 +25,26 @@ export const TagContainer = ({ index, item, hovered }: TagContainerProps) => {
   };
 
   useEffect(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+    if (!index || !item) {
+      return () => {};
     }
-  }, [tags]);
+
+    const listener = (event) => {
+      if (!ref.current || ref.current.contains(event.target)) {
+        return;
+      }
+      if (tags.length) {
+        replaceItem(index, { ...item, value: tags } as Value);
+      }
+      setSelectedItem(null);
+    };
+    document.addEventListener('mousedown', listener);
+    document.addEventListener('touchstart', listener);
+    return () => {
+      document.removeEventListener('mousedown', listener);
+      document.removeEventListener('touchstart', listener);
+    };
+  }, [index, item, ref, replaceItem, setSelectedItem, tags]);
 
   return (
     <Flex
