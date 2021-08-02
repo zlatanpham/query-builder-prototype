@@ -1,4 +1,4 @@
-type FieldType = 'INTEGER' | 'BOOLEAN' | 'STRING' | 'FLOAT';
+type FieldType = 'INTEGER' | 'BOOLEAN' | 'STRING' | 'FLOAT' | 'TIMESTAMP';
 export interface FieldOption {
   text: string;
   value: string;
@@ -33,6 +33,12 @@ export const groupFieldOptions: GroupMenu<FieldOption>[] = [
       { text: 'category', value: 'category', isArray: false, type: 'STRING' },
       { text: 'price', value: 'price', isArray: false, type: 'FLOAT' },
       { text: 'onSale', value: 'onSale', isArray: false, type: 'BOOLEAN' },
+      {
+        text: 'createdAt',
+        value: 'createdAt',
+        isArray: false,
+        type: 'TIMESTAMP',
+      },
     ],
   },
 ];
@@ -55,7 +61,7 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
       {
         value: '=',
         text: 'is',
-        types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER'],
+        types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'TIMESTAMP'],
       },
       {
         value: '~',
@@ -65,7 +71,7 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
       {
         value: '!=',
         text: 'is not',
-        types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER'],
+        types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'TIMESTAMP'],
       },
       {
         value: '!~',
@@ -85,12 +91,12 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
       {
         value: '>',
         text: 'greater than',
-        types: ['FLOAT', 'INTEGER'],
+        types: ['FLOAT', 'INTEGER', 'TIMESTAMP'],
       },
       {
         value: '<',
         text: 'less than',
-        types: ['FLOAT', 'INTEGER'],
+        types: ['FLOAT', 'INTEGER', 'TIMESTAMP'],
       },
     ],
   },

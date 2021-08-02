@@ -1,7 +1,16 @@
-import { Box, Button, ButtonGroup, IconButton } from '@sajari-ui/core';
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  IconButton,
+  Portal,
+  usePopper,
+} from '@sajari-ui/core';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useContextProvider } from '../ContextProvider';
 import { Item } from '../shared';
+import { formatDate } from '../utils/dateUtils';
+import { DatePicker } from './DatePicker';
 import { TagContainer } from './TagContainer';
 
 interface Props {
@@ -23,6 +32,16 @@ export const Pill = ({ index, item }: Props) => {
 
   let innerRender: JSX.Element | null = null;
   let inputRef = useRef<HTMLInputElement>(null);
+
+  const hasDateContainer =
+    item.type === 'value' && item.fieldType === 'TIMESTAMP';
+  const showDateContainer = hasDateContainer && item === selectedItem;
+
+  const { popper, reference } = usePopper({
+    forceUpdate: showDateContainer,
+    gutter: 8,
+    placement: 'bottom-start',
+  });
 
   if (item.type === 'field') {
     innerRender = (
@@ -89,6 +108,85 @@ export const Pill = ({ index, item }: Props) => {
           item={item}
           hovered={hoverIndexes.includes(index)}
         />
+      </Box>
+    );
+  }
+
+  if (item === selectedItem && selectedItem.fieldType === 'TIMESTAMP') {
+    return (
+      <Box
+        margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
+        position="relative"
+      >
+        <Box
+          position="absolute"
+          width="w-full"
+          backgroundColor="bg-transparent"
+          maxWidth="max-w-full"
+          inset="inset-0"
+          padding="px-1"
+          ref={(ref) => {
+            // @ts-ignore
+            inputRef.current = ref;
+            // @ts-ignore
+            reference.ref.current = ref;
+          }}
+          onBlur={() => {
+            if (tempValue !== '') {
+              replaceItem(index, { ...item, value: tempValue });
+              setTempValue('');
+            }
+            setSelectedItem(null);
+          }}
+          as="input"
+          textColor="text-gray-600"
+          outline="outline-none"
+          value={tempValue}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setTempValue(e.target.value)
+          }
+          onKeyDown={(e) => {
+            if (e.key !== 'Enter') {
+              return;
+            }
+            if (tempValue !== '') {
+              replaceItem(index, { ...item, value: formatDate(tempValue) });
+              setTempValue('');
+            }
+            setSelectedItem(null);
+          }}
+        />
+        <Box
+          style={{ minWidth: 50 }}
+          padding="px-2"
+          textColor="text-transparent"
+          userSelect="select-none"
+          whitespace="whitespace-no-wrap"
+        >
+          {tempValue}
+        </Box>
+        <Portal>
+          <Box
+            style={popper.style}
+            ref={popper.ref}
+            display={showDateContainer ? undefined : 'hidden'}
+            backgroundColor="bg-white"
+            borderRadius="rounded-lg"
+            padding="p-2"
+            zIndex="z-50"
+            borderWidth="border"
+            borderColor="border-gray-200"
+            boxShadow="shadow-menu"
+          >
+            <DatePicker
+              inputValue={tempValue}
+              onChange={(date) => {
+                replaceItem(index, { ...item, value: formatDate(date) });
+                setTempValue('');
+              }}
+            />
+          </Box>
+        </Portal>
       </Box>
     );
   }

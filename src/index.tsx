@@ -25,8 +25,10 @@ import {
 } from '@sajari-ui/core';
 import { ContextProvider, useContextProvider } from './ContextProvider';
 import { Pill, Result, DropdownItem } from './components';
+import { DatePicker } from './components/DatePicker';
+import { formatDate } from './utils/dateUtils';
 
-// TODO: cannot infer because the type of the suggetions is different from the type of items
+// TODO: cannot infer because the type of the suggestions is different from the type of items
 const getFilteredSuggestions = (
   items: any[],
   inputValue: string,
@@ -76,6 +78,8 @@ function DropdownMultipleCombobox() {
   const lastItem: Item | undefined = items[items.length - 1];
   const [inputFocus, setInputFocus] = useState(false);
   const previousLength = useRef(items.length);
+  const showDateContainer =
+    lastItem?.type === 'operator' && lastItem?.fieldType === 'TIMESTAMP';
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -183,7 +187,7 @@ function DropdownMultipleCombobox() {
   const { popper, update, reference } = usePopper({
     forceUpdate: isOpen,
     gutter: 8,
-    placement: 'bottom',
+    placement: 'bottom-start',
   });
 
   useEffect(() => {
@@ -281,6 +285,14 @@ function DropdownMultipleCombobox() {
                           field: lastItem.field,
                           fieldType: lastItem.fieldType,
                         });
+                      } else if (lastItem.fieldType === 'TIMESTAMP') {
+                        addItem({
+                          type: 'value',
+                          value: formatDate(inputValue),
+                          component: 'text',
+                          field: lastItem.field,
+                          fieldType: lastItem.fieldType,
+                        });
                       } else {
                         addItem({
                           type: 'value',
@@ -363,6 +375,34 @@ function DropdownMultipleCombobox() {
                           />
                         ))}
                   </Box>
+                </Box>
+                <Box
+                  style={popper.style}
+                  ref={popper.ref}
+                  display={isOpen && showDateContainer ? undefined : 'hidden'}
+                  backgroundColor="bg-white"
+                  borderRadius="rounded-lg"
+                  padding="p-2"
+                  zIndex="z-50"
+                  borderWidth="border"
+                  borderColor="border-gray-200"
+                  boxShadow="shadow-menu"
+                >
+                  <DatePicker
+                    inputValue={inputValue}
+                    onChange={(date) => {
+                      openMenu();
+                      addItem({
+                        type: 'value',
+                        value: formatDate(date),
+                        component: 'text',
+                        field: (lastItem as Operator).field,
+                        fieldType: lastItem.fieldType,
+                      });
+                      setInputValue('');
+                      inputRef.current?.focus();
+                    }}
+                  />
                 </Box>
               </Portal>
             </Box>
