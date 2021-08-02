@@ -275,43 +275,13 @@ function DropdownMultipleCombobox() {
                     }
 
                     if (
-                      e.key === 'Enter' &&
+                      (e.key === 'Enter' || e.key === 'Tab') &&
                       inputValue !== '' &&
                       flatSuggestions.length > 0 &&
                       highlightedIndex === -1
                     ) {
-                      const suggestion = flatSuggestions[0];
-                      if (!lastItem || lastItem?.type === 'value') {
-                        addItem({
-                          type: 'field',
-                          value: suggestion.value,
-                          // @ts-ignore
-                          fieldType: suggestion.type,
-                        });
-                      } else if (lastItem?.type === 'field') {
-                        addItem({
-                          type: 'operator',
-                          value: suggestion.value as string,
-                          field: lastItem.value,
-                          fieldType: lastItem.fieldType,
-                          isAdvanced: (suggestion as Operator).isAdvanced,
-                          advancedJoinOperator: (suggestion as Operator)
-                            .advancedJoinOperator,
-                        });
-                      } else if (
-                        lastItem?.type === 'operator' &&
-                        lastItem?.fieldType === 'BOOLEAN'
-                      ) {
-                        addItem({
-                          type: 'value',
-                          value: suggestion.value as string,
-                          component: 'boolean',
-                          field: lastItem.field,
-                          fieldType: lastItem.fieldType,
-                        });
-                      }
-                      openMenu();
-                      setInputValue('');
+                      e.preventDefault();
+                      setHighlightedIndex(0);
                       return;
                     }
 
