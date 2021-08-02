@@ -100,6 +100,8 @@ function DropdownMultipleCombobox() {
     lastItem,
   );
 
+  const flatSuggestions = flattenSuggestions(filteredSuggestions);
+
   const {
     isOpen,
     getMenuProps,
@@ -112,7 +114,7 @@ function DropdownMultipleCombobox() {
     setHighlightedIndex,
   } = useCombobox<Item>({
     inputValue,
-    items: flattenSuggestions(filteredSuggestions),
+    items: flatSuggestions,
     onStateChange: ({ inputValue, type, selectedItem }) => {
       switch (type) {
         case useCombobox.stateChangeTypes.InputChange:
@@ -245,7 +247,7 @@ function DropdownMultipleCombobox() {
                 height="h-8"
                 as="input"
                 type={
-                  ['INTEGER', 'FLOAT', 'DOUBLE'].includes(lastItem.fieldType)
+                  ['INTEGER', 'FLOAT', 'DOUBLE'].includes(lastItem?.fieldType)
                     ? 'number'
                     : 'text'
                 }
@@ -270,6 +272,47 @@ function DropdownMultipleCombobox() {
                   onKeyDown: (e) => {
                     if (e.key === 'Backspace' && inputValue === '') {
                       removeLast();
+                    }
+
+                    if (
+                      e.key === 'Enter' &&
+                      inputValue !== '' &&
+                      flatSuggestions.length > 0 &&
+                      highlightedIndex === -1
+                    ) {
+                      const suggestion = flatSuggestions[0];
+                      if (!lastItem || lastItem?.type === 'value') {
+                        addItem({
+                          type: 'field',
+                          value: suggestion.value,
+                          // @ts-ignore
+                          fieldType: suggestion.type,
+                        });
+                      } else if (lastItem?.type === 'field') {
+                        addItem({
+                          type: 'operator',
+                          value: suggestion.value as string,
+                          field: lastItem.value,
+                          fieldType: lastItem.fieldType,
+                          isAdvanced: (suggestion as Operator).isAdvanced,
+                          advancedJoinOperator: (suggestion as Operator)
+                            .advancedJoinOperator,
+                        });
+                      } else if (
+                        lastItem?.type === 'operator' &&
+                        lastItem?.fieldType === 'BOOLEAN'
+                      ) {
+                        addItem({
+                          type: 'value',
+                          value: suggestion.value as string,
+                          component: 'boolean',
+                          field: lastItem.field,
+                          fieldType: lastItem.fieldType,
+                        });
+                      }
+                      openMenu();
+                      setInputValue('');
+                      return;
                     }
 
                     if (
