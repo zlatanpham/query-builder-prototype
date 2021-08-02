@@ -190,58 +190,6 @@ export const Pill = ({ index, item }: Props) => {
     );
   }
 
-  if (item === selectedItem && selectedItem.fieldType !== 'BOOLEAN') {
-    return (
-      <Box
-        margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
-        position="relative"
-      >
-        <Box
-          position="absolute"
-          width="w-full"
-          backgroundColor="bg-transparent"
-          maxWidth="max-w-full"
-          inset="inset-0"
-          padding="px-1"
-          ref={inputRef}
-          onBlur={() => {
-            if (tempValue !== '') {
-              replaceItem(index, { ...item, value: tempValue });
-              setTempValue('');
-            }
-            setSelectedItem(null);
-          }}
-          as="input"
-          textColor="text-gray-600"
-          outline="outline-none"
-          value={tempValue}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setTempValue(e.target.value)
-          }
-          onKeyDown={(e) => {
-            if (e.key !== 'Enter') {
-              return;
-            }
-            if (tempValue !== '') {
-              replaceItem(index, { ...item, value: tempValue.trim() });
-              setTempValue('');
-            }
-            setSelectedItem(null);
-          }}
-        />
-        <Box
-          style={{ minWidth: 50 }}
-          padding="px-2"
-          textColor="text-transparent"
-          userSelect="select-none"
-          whitespace="whitespace-no-wrap"
-        >
-          {tempValue}
-        </Box>
-      </Box>
-    );
-  }
-
   if (item === selectedItem && selectedItem.fieldType === 'BOOLEAN') {
     return (
       <Box
@@ -276,6 +224,60 @@ export const Pill = ({ index, item }: Props) => {
             FALSE
           </Button>
         </ButtonGroup>
+      </Box>
+    );
+  }
+
+  if (item === selectedItem) {
+    const isNumber = selectedItem.fieldType !== 'STRING';
+    return (
+      <Box
+        margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
+        position="relative"
+      >
+        <Box
+          position="absolute"
+          width="w-full"
+          backgroundColor="bg-transparent"
+          maxWidth="max-w-full"
+          inset="inset-0"
+          padding="px-1"
+          ref={inputRef}
+          onBlur={() => {
+            if (tempValue !== '') {
+              replaceItem(index, { ...item, value: tempValue });
+              setTempValue('');
+            }
+            setSelectedItem(null);
+          }}
+          as="input"
+          type={isNumber ? 'number' : 'text'}
+          textColor="text-gray-600"
+          outline="outline-none"
+          value={tempValue}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setTempValue(e.target.value)
+          }
+          onKeyDown={(e) => {
+            if (e.key !== 'Enter') {
+              return;
+            }
+            if (tempValue !== '') {
+              replaceItem(index, { ...item, value: tempValue.trim() });
+              setTempValue('');
+            }
+            setSelectedItem(null);
+          }}
+        />
+        <Box
+          style={{ minWidth: 50 }}
+          padding="px-2"
+          textColor="text-transparent"
+          userSelect="select-none"
+          whitespace="whitespace-no-wrap"
+        >
+          {tempValue}
+        </Box>
       </Box>
     );
   }

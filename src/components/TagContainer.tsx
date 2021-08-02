@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Flex, FlexProps, IconButton, TagInput } from '@sajari-ui/core';
 import { useContextProvider } from '../ContextProvider';
 import { Item, Operator, Value } from '../shared';

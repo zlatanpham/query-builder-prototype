@@ -244,6 +244,11 @@ function DropdownMultipleCombobox() {
               <Box
                 height="h-8"
                 as="input"
+                type={
+                  ['INTEGER', 'FLOAT', 'DOUBLE'].includes(lastItem.fieldType)
+                    ? 'number'
+                    : 'text'
+                }
                 textColor="text-gray-600"
                 outline="outline-none"
                 padding="p-0"
