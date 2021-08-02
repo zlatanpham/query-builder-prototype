@@ -1,17 +1,16 @@
-type FieldType = 'INTEGER' | 'BOOLEAN' | 'STRING' | 'FLOAT' | 'TIMESTAMP';
+type FieldType =
+  | 'INTEGER'
+  | 'BOOLEAN'
+  | 'STRING'
+  | 'FLOAT'
+  | 'DOUBLE'
+  | 'TIMESTAMP';
 export interface FieldOption {
   text: string;
   value: string;
   type: FieldType;
   isArray: boolean;
 }
-
-// export const fieldOptions: FieldOption[] = [
-//   { text: 'image', value: 'image', isArray: false, type: 'STRING' },
-//   { text: 'category', value: 'category', isArray: false, type: 'STRING' },
-//   { text: 'price', value: 'price', isArray: false, type: 'FLOAT' },
-//   { text: 'onSale', value: 'onSale', isArray: false, type: 'BOOLEAN' },
-// ];
 
 export interface GroupMenu<T> {
   title: string;
@@ -142,50 +141,6 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
   },
 ];
 
-// export const operatorOptions: OperatorOption[] = [
-//   { value: '=', text: 'is', types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER'] },
-//   {
-//     value: '~',
-//     text: 'contains',
-//     types: ['STRING'],
-//   },
-//   {
-//     value: '!=',
-//     text: 'is not',
-//     types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER'],
-//   },
-//   {
-//     value: '!~',
-//     text: 'does not contain',
-//     types: ['STRING'],
-//   },
-//   {
-//     value: '$',
-//     text: 'ends with',
-//     types: ['STRING'],
-//   },
-//   {
-//     value: '^',
-//     text: 'begins with',
-//     types: ['STRING'],
-//   },
-//   {
-//     value: '>',
-//     text: 'greater than',
-//     types: ['FLOAT', 'INTEGER'],
-//   },
-//   {
-//     value: '<',
-//     text: 'less than',
-//     types: ['FLOAT', 'INTEGER'],
-//   },
-//   {
-//     value: '~',
-//     text: 'contain any',
-//     types: ['STRING'],
-//     isAdvanced: true,
-//   },
-// ];
 export interface OperatorOption {
   text: string;
   value: keyof typeof operatorMapping;

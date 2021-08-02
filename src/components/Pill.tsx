@@ -31,7 +31,7 @@ export const Pill = ({ index, item }: Props) => {
   const [tempValue, setTempValue] = useState('');
 
   let innerRender: JSX.Element | null = null;
-  let inputRef = useRef<HTMLInputElement>(null);
+  let inputRef = useRef<HTMLInputElement | null>(null);
 
   const hasDateContainer =
     item.type === 'value' && item.fieldType === 'TIMESTAMP';
@@ -126,8 +126,7 @@ export const Pill = ({ index, item }: Props) => {
           inset="inset-0"
           padding="px-1"
           ref={(ref) => {
-            // @ts-ignore
-            inputRef.current = ref;
+            inputRef.current = ref as HTMLInputElement;
             // @ts-ignore
             reference.ref.current = ref;
           }}
