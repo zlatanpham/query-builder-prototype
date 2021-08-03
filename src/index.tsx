@@ -247,7 +247,9 @@ function DropdownMultipleCombobox() {
                 height="h-8"
                 as="input"
                 type={
-                  ['INTEGER', 'FLOAT', 'DOUBLE'].includes(lastItem?.fieldType)
+                  ['INTEGER', 'FLOAT', 'DOUBLE'].includes(
+                    lastItem?.fieldType,
+                  ) && lastItem.type === 'operator'
                     ? 'number'
                     : 'text'
                 }
