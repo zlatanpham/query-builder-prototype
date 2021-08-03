@@ -145,6 +145,19 @@ function DropdownMultipleCombobox() {
                   .advancedJoinOperator,
               });
               openMenu();
+
+              const isAdvanced = (selectedItem as Operator).isAdvanced;
+              if (isAdvanced) {
+                const item: Item = {
+                  type: 'value',
+                  value: [],
+                  component: 'tags',
+                  field: lastItem.value,
+                  fieldType: lastItem.fieldType,
+                };
+                addItem(item);
+                setSelectedItem(item);
+              }
             } else if (lastItem?.type === 'operator') {
               if (lastItem.isAdvanced && inputValue) {
                 addItem({
@@ -231,7 +244,15 @@ function DropdownMultipleCombobox() {
             flexWrap="flex-no-wrap"
           >
             {items.map((item, index) => (
-              <Pill key={index} item={item} index={index} />
+              <Pill
+                key={index}
+                item={item}
+                index={index}
+                onFocusLast={() => {
+                  inputRef.current?.focus();
+                  openMenu();
+                }}
+              />
             ))}
             <Box
               flex="flex-1"

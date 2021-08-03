@@ -16,9 +16,10 @@ import { TagContainer } from './TagContainer';
 interface Props {
   index: number;
   item: Item;
+  onFocusLast: () => void;
 }
 
-export const Pill = ({ index, item }: Props) => {
+export const Pill = ({ index, item, onFocusLast }: Props) => {
   const {
     hoverIndexes,
     setHoverIndexes,
@@ -107,6 +108,7 @@ export const Pill = ({ index, item }: Props) => {
           index={index}
           item={item}
           hovered={hoverIndexes.includes(index)}
+          onFocusLast={onFocusLast}
         />
       </Box>
     );

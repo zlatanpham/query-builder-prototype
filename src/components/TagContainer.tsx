@@ -8,9 +8,15 @@ interface TagContainerProps {
   index: number;
   item?: Item;
   hovered: boolean;
+  onFocusLast: () => void;
 }
 
-export const TagContainer = ({ index, item, hovered }: TagContainerProps) => {
+export const TagContainer = ({
+  index,
+  item,
+  hovered,
+  onFocusLast,
+}: TagContainerProps) => {
   const { value = [] } = item || {};
   const [tags, setTags] = useState<string[]>(
     Array.isArray(value) ? value : [value],
@@ -100,6 +106,9 @@ export const TagContainer = ({ index, item, hovered }: TagContainerProps) => {
               replaceItem(index, { ...item, value: tags } as Value);
             }
             setSelectedItem(null);
+            if (item === lastItem) {
+              onFocusLast();
+            }
           }
         }}
         // placeholder="Type and press enter"
