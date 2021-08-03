@@ -4,6 +4,7 @@ import {
   ButtonGroup,
   IconButton,
   Portal,
+  Tooltip,
   usePopper,
 } from '@sajari-ui/core';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
@@ -284,7 +285,9 @@ export const Pill = ({ index, item, onFocusLast }: Props) => {
     );
   }
 
-  return (
+  const hovered = hoverIndexes.includes(index);
+
+  const renderPill = (
     <Box
       height="h-8"
       key={`selected-item-${index}`}
@@ -314,9 +317,7 @@ export const Pill = ({ index, item, onFocusLast }: Props) => {
       alignItems="items-center"
       transitionProperty="transition"
       transitionDuration="duration-200"
-      backgroundColor={
-        hoverIndexes.includes(index) ? 'bg-gray-300' : 'bg-gray-100'
-      }
+      backgroundColor={hovered ? 'bg-gray-300' : 'bg-gray-100'}
     >
       {innerRender}
       {item.type === 'value' && (
@@ -339,4 +340,46 @@ export const Pill = ({ index, item, onFocusLast }: Props) => {
       )}
     </Box>
   );
+
+  if (item.type === 'operator' && items[index + 1] && !selectedItem) {
+    return (
+      <Tooltip
+        whitespace="whitespace-no-wrap"
+        open={hovered}
+        label={
+          <Box maxWidth="max-w-lg" truncate="truncate">
+            {getExpression(items, index)}
+          </Box>
+        }
+        placement="top"
+      >
+        {renderPill}
+      </Tooltip>
+    );
+  }
+
+  return <>{renderPill}</>;
 };
+
+function getExpression(items: Item[], index: number) {
+  const field = items[index - 1];
+  const operator = items[index];
+  const value = items[index + 1];
+
+  if (
+    operator.type === 'operator' &&
+    operator.isAdvanced &&
+    Array.isArray(value.value)
+  ) {
+    const tokens = value.value.map(
+      (v) => `${field.value} ${operator.value} '${v}'`,
+    );
+    return tokens.join(` ${operator.advancedJoinOperator} `);
+  }
+
+  return `${field.value} ${operator.value} ${
+    ['INTEGER', 'DOUBLE', 'FLOAT'].includes(field.fieldType)
+      ? value.value
+      : `'${value.value}'`
+  }`;
+}

@@ -212,7 +212,7 @@ function DropdownMultipleCombobox() {
 
   return (
     <>
-      <Box padding="p-10" maxWidth="max-w-7xl" margin="mx-auto">
+      <Box padding={['p-10', 'pt-20']} maxWidth="max-w-7xl" margin="mx-auto">
         <Box
           position="relative"
           borderWidth="border"
