@@ -371,6 +371,10 @@ function getExpression(items: Item[], index: number) {
     operator.isAdvanced &&
     Array.isArray(value.value)
   ) {
+    if (value.value.length === 0) {
+      return `${field.value} ${operator.value} `;
+    }
+
     const tokens = value.value.map(
       (v) => `${field.value} ${operator.value} '${v}'`,
     );
