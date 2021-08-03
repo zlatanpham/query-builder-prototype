@@ -69,6 +69,7 @@ export const TagContainer = ({
         onChange={setTags}
         editable={false}
         style={{ height: 24 }}
+        placeholder="Type and press Enter"
         tagRender={({ tag, onDelete, index }) => (
           <Box
             height="h-8"

@@ -20,8 +20,10 @@ export const DropdownItem = ({
   openMenu,
   setInputValue,
 }: DropdownItemProps) => {
-  const { items, addItem } = useContextProvider();
+  const { items, addItem, setSelectedItem, selectedItem } =
+    useContextProvider();
   const lastItem = items[items.length - 1];
+  console.log({ selectedItem });
 
   return (
     <Flex
@@ -57,7 +59,27 @@ export const DropdownItem = ({
                 // @ts-ignore
                 advancedJoinOperator: (item as Operator).advancedJoinOperator,
               });
-              openMenu();
+
+              // @ts-ignore
+              const isAdvanced = (item as Operator).isAdvanced;
+              if (isAdvanced) {
+                console.log(123456);
+                const newItem: Item = {
+                  type: 'value',
+                  value: [],
+                  component: 'tags',
+                  field: lastItem.value,
+                  fieldType: lastItem.fieldType,
+                };
+                addItem(newItem);
+                // FIXME: look like a race condition happens here. Temporarily use setTimeout to make sure the selectedItem is set correctly
+                setTimeout(() => {
+                  setSelectedItem(newItem);
+                });
+                return;
+              } else {
+                openMenu();
+              }
             } else if (
               lastItem?.type === 'operator' &&
               lastItem?.fieldType === 'BOOLEAN'
@@ -80,8 +102,6 @@ export const DropdownItem = ({
             openMenu();
           }
           setInputValue('');
-          //   // @ts-ignore
-          //   selectItem(null);
         },
       })}
     >
