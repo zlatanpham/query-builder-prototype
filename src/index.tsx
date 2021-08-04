@@ -207,6 +207,10 @@ function DropdownMultipleCombobox() {
     update();
   }, [isOpen, update, setHighlightedIndex, items.length]);
 
+  const isNumberInput =
+    ['INTEGER', 'FLOAT', 'DOUBLE'].includes(lastItem?.fieldType) &&
+    lastItem.type === 'operator';
+
   return (
     <>
       <Box padding={['p-10', 'pt-20']} maxWidth="max-w-7xl" margin="mx-auto">
@@ -264,13 +268,8 @@ function DropdownMultipleCombobox() {
               <Box
                 height="h-8"
                 as="input"
-                type={
-                  ['INTEGER', 'FLOAT', 'DOUBLE'].includes(
-                    lastItem?.fieldType,
-                  ) && lastItem.type === 'operator'
-                    ? 'number'
-                    : 'text'
-                }
+                type={isNumberInput ? 'number' : 'text'}
+                placeholder={isNumberInput ? 'Enter a number' : ''}
                 textColor="text-gray-600"
                 outline="outline-none"
                 padding="p-0"
