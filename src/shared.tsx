@@ -53,6 +53,14 @@ export const operatorMapping = {
   '<': 'less than',
 };
 
+export const advancedOperatorMapping = {
+  '~AND': 'contains all of',
+  '~OR': 'contains any of',
+  '!~OR': 'contains none of',
+  '=OR': 'equals any of',
+  '!=AND': 'missing all of',
+};
+
 export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
   {
     title: 'Basic',
@@ -104,21 +112,21 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
     items: [
       {
         value: '~',
-        text: 'contain all',
+        text: 'contains all',
         types: ['STRING'],
         isAdvanced: true,
         advancedJoinOperator: 'AND',
       },
       {
         value: '~',
-        text: 'contain any',
+        text: 'contains any',
         types: ['STRING'],
         isAdvanced: true,
         advancedJoinOperator: 'OR',
       },
       {
         value: '!~',
-        text: 'contain none of',
+        text: 'contains none of',
         types: ['STRING'],
         isAdvanced: true,
         advancedJoinOperator: 'OR',

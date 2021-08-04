@@ -9,7 +9,7 @@ import {
 } from '@sajari-ui/core';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useContextProvider } from '../ContextProvider';
-import { Item } from '../shared';
+import { advancedOperatorMapping, Item, operatorMapping } from '../shared';
 import { formatDate } from '../utils/dateUtils';
 import { DatePicker } from './DatePicker';
 import { TagContainer } from './TagContainer';
@@ -371,17 +371,23 @@ function getExpression(items: Item[], index: number) {
     operator.isAdvanced &&
     Array.isArray(value.value)
   ) {
+    const operatorText =
+      advancedOperatorMapping[
+        `${operator.value}${operator.advancedJoinOperator}`
+      ];
+
     if (value.value.length === 0) {
-      return `${field.value} ${operator.value} `;
+      return `${field.value} ${operatorText} `;
     }
 
-    const tokens = value.value.map(
-      (v) => `${field.value} ${operator.value} '${v}'`,
-    );
-    return tokens.join(` ${operator.advancedJoinOperator} `);
+    return `${field.value} ${operatorText} ${value.value
+      .map((v) => `'${v}'`)
+      .join(', ')}`;
   }
 
-  return `${field.value} ${operator.value} ${
+  return `${field.value} ${
+    operatorMapping[operator.value as keyof typeof operatorMapping]
+  } ${
     ['INTEGER', 'DOUBLE', 'FLOAT'].includes(field.fieldType)
       ? value.value
       : `'${value.value}'`

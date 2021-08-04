@@ -20,10 +20,8 @@ export const DropdownItem = ({
   openMenu,
   setInputValue,
 }: DropdownItemProps) => {
-  const { items, addItem, setSelectedItem, selectedItem } =
-    useContextProvider();
+  const { items, addItem, setSelectedItem } = useContextProvider();
   const lastItem = items[items.length - 1];
-  console.log({ selectedItem });
 
   return (
     <Flex
@@ -63,7 +61,6 @@ export const DropdownItem = ({
               // @ts-ignore
               const isAdvanced = (item as Operator).isAdvanced;
               if (isAdvanced) {
-                console.log(123456);
                 const newItem: Item = {
                   type: 'value',
                   value: [],
