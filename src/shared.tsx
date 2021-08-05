@@ -1,4 +1,4 @@
-type FieldType =
+export type FieldType =
   | 'INTEGER'
   | 'BOOLEAN'
   | 'STRING'
