@@ -1,24 +1,24 @@
-import { Field, FieldType, Item, Operator, Value } from '../shared';
-
-const schema = [
-  { name: 'image', isArray: false, type: 'STRING' },
-  { name: 'category', isArray: false, type: 'STRING' },
-  { name: 'price', isArray: false, type: 'FLOAT' },
-  { name: 'onSale', isArray: false, type: 'BOOLEAN' },
-];
-
-const operationMapping: { [key: string]: string } = {
-  '=': 'is',
-  '~': 'contains', // only STRING
-  '!=': 'is not',
-  '!~': 'does not contain', // only STRING
-  $: 'ends with', // only STRING
-  '^': 'begins with', // only STRING
-  '>': 'greater than', // only FLOAT
-  '<': 'less than', // only FLOAT
-};
+import {
+  advancedOperatorMapping,
+  Field,
+  FieldType,
+  groupFieldOptions,
+  groupOperatorOptions,
+  Item,
+  Operator,
+  operatorMapping,
+  Value,
+} from '../shared';
 
 type Block = [string, string, string | string[]];
+
+const _regex = /(?:[^_(']|\([^)]*\)|'[^']*')+/g;
+
+const isOrExpression = (expression: string) => {
+  return expression
+    .match(/(?:[^\s(']+|\([^)]*\)|'[^']*')+/g)
+    ?.some((text) => text === 'OR');
+};
 
 const toBlock = (expression: string) => {
   const [a, b, c, ...rest] = expression.match(/(?:[^\s']+|'[^']*')+/g) || [];
@@ -27,43 +27,66 @@ const toBlock = (expression: string) => {
 };
 
 const handleExpression = (expression: string) => {
-  return expression.startsWith('(')
-    ? expression
-        .replace(/[()]/g, '')
-        .split(' OR ')
-        .map((value) => toBlock(value))
-        .reduce((result, value) => {
-          if (!value || !result) return;
-          if (value[0] !== result[0] || value[1] !== result[1]) return;
-          return [
-            result[0],
-            result[1],
-            Array.isArray(result[2])
-              ? [...result[2], value[2]]
-              : [result[2], value[2]],
-          ] as Block;
-        })
-    : toBlock(expression);
+  if (!expression.trim().startsWith('(')) {
+    return toBlock(expression.trim());
+  }
+  const newExpression = expression.trim().replace(/[()]/g, '');
+  const conjunction = isOrExpression(newExpression) ? ' OR ' : ' AND ';
+  const regex = new RegExp(conjunction, 'g');
+  return newExpression
+    .replace(/[()]/g, '')
+    .replace(regex, '_')
+    .match(_regex)
+    ?.map((value) => toBlock(value.replace(/_/g, conjunction)))
+    .reduce((result, value) => {
+      if (!value || !result) return;
+      if (
+        value[0] !== result[0] ||
+        value[1] !== result[1].replace(/AND|OR/g, '')
+      )
+        return;
+      return [
+        value[0],
+        value[1] + conjunction.trim(),
+        Array.isArray(result[2])
+          ? [...result[2], value[2]]
+          : [result[2], value[2]],
+      ] as Block;
+    });
 };
 
 export const stringParser = (expressionString: string) => {
   let isError = false;
+  let error = '';
   const expressions: Item[] = [];
+  const conjunction = isOrExpression(expressionString) ? ' OR ' : ' AND ';
+  const regex = new RegExp(conjunction, 'g');
   const blockList = expressionString
-    .split(' AND ')
-    .map((expression) => handleExpression(expression));
+    .replace(regex, '_')
+    .match(_regex)
+    ?.map((expression) =>
+      handleExpression(expression.replace(/_/g, conjunction)),
+    );
+
+  if (!blockList) {
+    return error;
+  }
 
   for (let index = 0; index < blockList.length; index += 1) {
     const [f, o, v] = blockList[index] || [];
     if (!blockList[index] || !f || !o || !v) {
       isError = true;
+      error = 'undefined';
       break;
     }
     const {
-      name,
+      text: name,
       isArray,
       type: fieldType,
-    } = schema.find((field) => field.name === f) || {};
+    } = groupFieldOptions
+      .map((group) => group.items)
+      .flat()
+      .find((field) => field.text === f) || {};
     const isBooleanSelect = fieldType === 'BOOLEAN';
     // check field
     if (
@@ -72,24 +95,32 @@ export const stringParser = (expressionString: string) => {
       fieldType === undefined
     ) {
       isError = true;
+      error = `field ${f} is not found`;
       break;
     }
     // check operator
-    if (!operationMapping[o]) {
+    if (!operatorMapping[o] && !advancedOperatorMapping[o]) {
       isError = true;
+      error = `operator ${o} is not found`;
       break;
     }
-    if (fieldType !== 'STRING' && ['~', '!~', '$', '^'].includes(o)) {
+    const availableTypes = groupOperatorOptions
+      .map((group) => group.items)
+      .flat()
+      .find((operator) =>
+        operator.advancedJoinOperator
+          ? operator.value + operator.advancedJoinOperator === o
+          : operator.value === o,
+      )?.types;
+    if (!availableTypes?.includes(fieldType)) {
       isError = true;
-      break;
-    }
-    if (fieldType !== 'FLOAT' && ['>', '<'].includes(o)) {
-      isError = true;
+      error = `operator ${o} is only able to use with type ${availableTypes}`;
       break;
     }
     // check value
     if (isBooleanSelect && v !== 'TRUE' && v !== 'FALSE') {
       isError = true;
+      error = `value ${v} is only able to be TRUE or FALSE`;
       break;
     }
 
@@ -98,12 +129,19 @@ export const stringParser = (expressionString: string) => {
       value: f,
       fieldType: fieldType as FieldType,
     };
+    const advancedJoinOperator = o.includes('OR')
+      ? 'OR'
+      : o.includes('AND')
+      ? 'AND'
+      : undefined;
     const operator: Operator = {
       type: 'operator',
-      value: o,
+      value: advancedJoinOperator ? o.replace(advancedJoinOperator, '') : o,
       field: f,
       fieldType: fieldType as FieldType,
-      isAdvanced: Array.isArray(v),
+      ...(advancedJoinOperator
+        ? { isAdvanced: true, advancedJoinOperator }
+        : {}),
     };
     const value: Value = Array.isArray(v)
       ? {
@@ -123,5 +161,6 @@ export const stringParser = (expressionString: string) => {
     expressions.push(field, operator, value);
   }
 
-  return isError ? undefined : expressions;
+  return isError ? error : { expressions, conjunction: conjunction.trim() };
+  // return isError ? undefined : expressions;
 };
