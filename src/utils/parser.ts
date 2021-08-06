@@ -69,7 +69,7 @@ export const stringParser = (expressionString: string) => {
     );
 
   if (!blockList) {
-    return error;
+    throw new Error(error);
   }
 
   for (let index = 0; index < blockList.length; index += 1) {
@@ -161,6 +161,10 @@ export const stringParser = (expressionString: string) => {
     expressions.push(field, operator, value);
   }
 
-  return isError ? error : { expressions, conjunction: conjunction.trim() };
+  if (isError) {
+    throw new Error(error);
+  }
+
+  return { expressions, conjunction: conjunction.trim() };
   // return isError ? undefined : expressions;
 };

@@ -20,11 +20,22 @@ import {
   Select,
   Heading,
   Divider,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
+  TextInput,
+  Tooltip,
+  useDisclosure,
+  AlertDialog,
+  Text,
 } from '@sajari-ui/core';
 import { ContextProvider, useContextProvider } from './ContextProvider';
-import { Pill, Result, DropdownItem } from './components';
+import { Pill, Result, DropdownItem, objectToString } from './components';
 import { DatePicker } from './components/DatePicker';
 import { formatDate } from './utils/dateUtils';
+import { stringParser } from './utils/parser';
 
 // TODO: cannot infer because the type of the suggestions is different from the type of items
 const getFilteredSuggestions = (
@@ -78,6 +89,10 @@ function DropdownMultipleCombobox() {
   const showDateContainer =
     lastItem?.type === 'operator' && lastItem?.fieldType === 'TIMESTAMP';
 
+  const [textExpression, setTextExpression] = useState('');
+  const [tabIndex, setTabIndex] = useState(0);
+  const [transformError, setTransformError] = useState('');
+
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const type = items[items.length - 1]?.type;
@@ -98,6 +113,30 @@ function DropdownMultipleCombobox() {
   );
 
   const flatSuggestions = flattenSuggestions(filteredSuggestions);
+
+  useEffect(() => {
+    if (tabIndex === 0) {
+      setTextExpression(objectToString(items, joinOperator));
+    }
+  }, [items, joinOperator, tabIndex]);
+
+  useEffect(() => {
+    if (tabIndex === 1) {
+      try {
+        const { conjunction, expressions } = stringParser(textExpression);
+        setItems(expressions);
+        // @ts-ignore
+        setJoinOperator(conjunction);
+        setTransformError('');
+      } catch (error) {
+        console.log(error);
+        setTransformError(error.message);
+      }
+    }
+  }, [textExpression, tabIndex, setItems, setJoinOperator]);
+
+  // Toast
+  const { open, onOpen, onClose } = useDisclosure();
 
   const {
     isOpen,
@@ -213,250 +252,317 @@ function DropdownMultipleCombobox() {
 
   return (
     <>
+      <AlertDialog
+        open={open}
+        onClose={onClose}
+        onConfirm={() => {
+          setItems([]);
+          setTabIndex(0);
+          setTextExpression('');
+          setTransformError('');
+          onClose();
+        }}
+        title="Switch to Visual mode"
+        // @ts-ignore
+        description={
+          <Text>
+            Since your query is not supported by the Visual mode, all data will
+            be lost. Are you sure to continue?
+          </Text>
+        }
+        confirmLabel="Switch"
+        destructive
+      />
       <Box padding={['p-10', 'pt-20']} maxWidth="max-w-7xl" margin="mx-auto">
-        <Box
-          position="relative"
-          borderWidth="border"
-          borderColor="border-gray-200"
-          borderRadius="rounded-md"
-          padding={['py-1', 'pl-1']}
-          display="flex"
-          justifyContent="justify-between"
-          flexWrap="flex-no-wrap"
-          boxShadow={inputFocus ? 'shadow-outline-blue' : undefined}
+        <Tabs
+          index={tabIndex}
+          onChange={(index) => {
+            if (transformError && index === 0) {
+              onOpen();
+              return;
+            }
+            setTabIndex(index);
+          }}
         >
-          <Select
-            width="w-20"
-            borderWidth="border-0"
-            padding={['p-0', 'pl-3']}
-            value={joinOperator}
-            onChange={(e) => setJoinOperator(e.target.value as JoinOperator)}
-          >
-            <option value="AND">AND</option>
-            <option value="OR">OR</option>
-          </Select>
-          <Box width="w-px" backgroundColor="bg-gray-200" margin="m-1" />
-          <Box
-            ref={wrapperRef}
-            overflow="overflow-auto"
-            width="w-auto"
-            display="flex"
-            flex="flex-1"
-            flexWrap="flex-no-wrap"
-          >
-            {items.map((item, index) => (
-              <Pill
-                key={index}
-                item={item}
-                index={index}
-                onFocusLast={() => {
-                  inputRef.current?.focus();
-                  openMenu();
-                }}
-              />
-            ))}
-            <Box
-              flex="flex-1"
-              width="w-full"
-              display="inline-flex"
-              margin="pl-1"
-              onClick={() => {
-                inputRef.current?.focus();
-              }}
-              {...getComboboxProps()}
-            >
-              <Box
-                height="h-8"
-                as="input"
-                type={isNumberInput ? 'number' : 'text'}
-                placeholder={isNumberInput ? 'Enter a number' : ''}
-                textColor="text-gray-600"
-                outline="outline-none"
-                padding="p-0"
-                {...getInputProps({
-                  ref: (ref) => {
-                    // @ts-ignore
-                    inputRef.current = ref;
-                    // @ts-ignore
-                    reference.ref.current = ref;
-                  },
-                  onFocus: () => {
-                    openMenu();
-                    setInputFocus(true);
-                    setSelectedItem(null);
-                  },
-                  onBlur: () => {
-                    setInputFocus(false);
-                  },
-                  onKeyDown: (e) => {
-                    if (e.key === 'Backspace' && inputValue === '') {
-                      removeLast();
-                    }
-
-                    if (
-                      (e.key === 'Enter' || e.key === 'Tab') &&
-                      inputValue !== '' &&
-                      flatSuggestions.length > 0 &&
-                      highlightedIndex === -1
-                    ) {
-                      e.preventDefault();
-                      setHighlightedIndex(0);
-                      return;
-                    }
-
-                    if (
-                      e.key === 'Enter' &&
-                      lastItem?.type === 'operator' &&
-                      inputValue !== ''
-                    ) {
-                      openMenu();
-                      if (lastItem.isAdvanced) {
-                        addItem({
-                          type: 'value',
-                          value: inputValue
-                            .trim()
-                            .split(',')
-                            .filter(Boolean)
-                            .map((v) => v.trim()),
-                          component: 'tags',
-                          field: lastItem.field,
-                          fieldType: lastItem.fieldType,
-                        });
-                      } else if (lastItem.fieldType === 'TIMESTAMP') {
-                        addItem({
-                          type: 'value',
-                          value: formatDate(inputValue),
-                          component: 'text',
-                          field: lastItem.field,
-                          fieldType: lastItem.fieldType,
-                        });
-                      } else {
-                        addItem({
-                          type: 'value',
-                          value: inputValue.trim(),
-                          component: 'text',
-                          field: lastItem.field,
-                          fieldType: lastItem.fieldType,
-                        });
-                      }
-                      setInputValue('');
-                    }
-                  },
-                })}
-              />
-              <Portal>
-                <Box
-                  style={popper.style}
-                  ref={popper.ref}
-                  display={
-                    isOpen && filteredSuggestions.length > 0
-                      ? undefined
-                      : 'hidden'
-                  }
-                  backgroundColor="bg-white"
-                  borderRadius="rounded-lg"
-                  padding="p-2"
-                  zIndex="z-50"
-                  borderWidth="border"
-                  width="w-52"
-                  borderColor="border-gray-200"
-                  boxShadow="shadow-menu"
-                  as="ul"
-                >
-                  <Box {...getMenuProps()}>
-                    {filteredSuggestions[0]?.title
-                      ? (
-                          filteredSuggestions as GroupMenu<FieldOption>[]
-                        ).reduce(
-                          (result, section, sectionIndex) => {
-                            result.sections.push(
-                              // @ts-ignore
-                              <Box as="li" key={sectionIndex}>
-                                {sectionIndex > 0 && <Divider />}
-                                <Heading margin={['ml-1', 'my-1']} as="h6">
-                                  {section.title}
-                                </Heading>
-                                <Box as="ul">
-                                  {section.items.map((item) => {
-                                    const index = result.itemIndex;
-                                    result.itemIndex = result.itemIndex + 1;
-                                    return (
-                                      <DropdownItem
-                                        key={`${item.value}${index}`}
-                                        item={item}
-                                        highlightedIndex={highlightedIndex}
-                                        index={index}
-                                        openMenu={openMenu}
-                                        setInputValue={setInputValue}
-                                        getItemProps={getItemProps}
-                                      />
-                                    );
-                                  })}
-                                </Box>
-                              </Box>,
-                            );
-
-                            return result;
-                          },
-                          { sections: [], itemIndex: 0 },
-                        ).sections
-                      : filteredSuggestions.map((item, index) => (
-                          <DropdownItem
-                            key={`${item.value}${index}`}
-                            item={item}
-                            highlightedIndex={highlightedIndex}
-                            index={index}
-                            openMenu={openMenu}
-                            setInputValue={setInputValue}
-                            getItemProps={getItemProps}
-                          />
-                        ))}
+          <TabList margin="mb-2">
+            <Tab>
+              {!transformError ? (
+                <>Visual mode</>
+              ) : (
+                <Tooltip label="The query is not supported by the Visual mode">
+                  <Box as="span" textColor="text-gray-300">
+                    Visual mode
                   </Box>
-                </Box>
-                <Box
-                  style={popper.style}
-                  ref={popper.ref}
-                  display={isOpen && showDateContainer ? undefined : 'hidden'}
-                  backgroundColor="bg-white"
-                  borderRadius="rounded-lg"
-                  padding="p-2"
-                  zIndex="z-50"
-                  borderWidth="border"
-                  borderColor="border-gray-200"
-                  boxShadow="shadow-menu"
+                </Tooltip>
+              )}
+            </Tab>
+            <Tab>Text mode</Tab>
+          </TabList>
+
+          <TabPanels>
+            <TabPanel>
+              <Box
+                position="relative"
+                borderWidth="border"
+                borderColor="border-gray-200"
+                borderRadius="rounded-md"
+                padding={['py-1', 'pl-1']}
+                display="flex"
+                justifyContent="justify-between"
+                flexWrap="flex-no-wrap"
+                boxShadow={inputFocus ? 'shadow-outline-blue' : undefined}
+              >
+                <Select
+                  width="w-20"
+                  borderWidth="border-0"
+                  padding={['p-0', 'pl-3']}
+                  value={joinOperator}
+                  onChange={(e) =>
+                    setJoinOperator(e.target.value as JoinOperator)
+                  }
                 >
-                  <DatePicker
-                    inputValue={inputValue}
-                    onChange={(date) => {
-                      openMenu();
-                      addItem({
-                        type: 'value',
-                        value: formatDate(date),
-                        component: 'text',
-                        field: (lastItem as Operator).field,
-                        fieldType: lastItem.fieldType,
-                      });
-                      setInputValue('');
+                  <option value="AND">AND</option>
+                  <option value="OR">OR</option>
+                </Select>
+                <Box width="w-px" backgroundColor="bg-gray-200" margin="m-1" />
+                <Box
+                  ref={wrapperRef}
+                  overflow="overflow-auto"
+                  width="w-auto"
+                  display="flex"
+                  flex="flex-1"
+                  flexWrap="flex-no-wrap"
+                >
+                  {items.map((item, index) => (
+                    <Pill
+                      key={index}
+                      item={item}
+                      index={index}
+                      onFocusLast={() => {
+                        inputRef.current?.focus();
+                        openMenu();
+                      }}
+                    />
+                  ))}
+                  <Box
+                    flex="flex-1"
+                    width="w-full"
+                    display="inline-flex"
+                    margin="pl-1"
+                    onClick={() => {
                       inputRef.current?.focus();
                     }}
-                  />
+                    {...getComboboxProps()}
+                  >
+                    <Box
+                      height="h-8"
+                      as="input"
+                      type={isNumberInput ? 'number' : 'text'}
+                      placeholder={isNumberInput ? 'Enter a number' : ''}
+                      textColor="text-gray-600"
+                      outline="outline-none"
+                      padding="p-0"
+                      {...getInputProps({
+                        ref: (ref) => {
+                          // @ts-ignore
+                          inputRef.current = ref;
+                          // @ts-ignore
+                          reference.ref.current = ref;
+                        },
+                        onFocus: () => {
+                          openMenu();
+                          setInputFocus(true);
+                          setSelectedItem(null);
+                        },
+                        onBlur: () => {
+                          setInputFocus(false);
+                        },
+                        onKeyDown: (e) => {
+                          if (e.key === 'Backspace' && inputValue === '') {
+                            removeLast();
+                          }
+
+                          if (
+                            (e.key === 'Enter' || e.key === 'Tab') &&
+                            inputValue !== '' &&
+                            flatSuggestions.length > 0 &&
+                            highlightedIndex === -1
+                          ) {
+                            e.preventDefault();
+                            setHighlightedIndex(0);
+                            return;
+                          }
+
+                          if (
+                            e.key === 'Enter' &&
+                            lastItem?.type === 'operator' &&
+                            inputValue !== ''
+                          ) {
+                            openMenu();
+                            if (lastItem.isAdvanced) {
+                              addItem({
+                                type: 'value',
+                                value: inputValue
+                                  .trim()
+                                  .split(',')
+                                  .filter(Boolean)
+                                  .map((v) => v.trim()),
+                                component: 'tags',
+                                field: lastItem.field,
+                                fieldType: lastItem.fieldType,
+                              });
+                            } else if (lastItem.fieldType === 'TIMESTAMP') {
+                              addItem({
+                                type: 'value',
+                                value: formatDate(inputValue),
+                                component: 'text',
+                                field: lastItem.field,
+                                fieldType: lastItem.fieldType,
+                              });
+                            } else {
+                              addItem({
+                                type: 'value',
+                                value: inputValue.trim(),
+                                component: 'text',
+                                field: lastItem.field,
+                                fieldType: lastItem.fieldType,
+                              });
+                            }
+                            setInputValue('');
+                          }
+                        },
+                      })}
+                    />
+                    <Portal>
+                      <Box
+                        style={popper.style}
+                        ref={popper.ref}
+                        display={
+                          isOpen && filteredSuggestions.length > 0
+                            ? undefined
+                            : 'hidden'
+                        }
+                        backgroundColor="bg-white"
+                        borderRadius="rounded-lg"
+                        padding="p-2"
+                        zIndex="z-50"
+                        borderWidth="border"
+                        width="w-52"
+                        borderColor="border-gray-200"
+                        boxShadow="shadow-menu"
+                        as="ul"
+                      >
+                        <Box {...getMenuProps()}>
+                          {filteredSuggestions[0]?.title
+                            ? (
+                                filteredSuggestions as GroupMenu<FieldOption>[]
+                              ).reduce(
+                                (result, section, sectionIndex) => {
+                                  result.sections.push(
+                                    // @ts-ignore
+                                    <Box as="li" key={sectionIndex}>
+                                      {sectionIndex > 0 && <Divider />}
+                                      <Heading
+                                        margin={['ml-1', 'my-1']}
+                                        as="h6"
+                                      >
+                                        {section.title}
+                                      </Heading>
+                                      <Box as="ul">
+                                        {section.items.map((item) => {
+                                          const index = result.itemIndex;
+                                          result.itemIndex =
+                                            result.itemIndex + 1;
+                                          return (
+                                            <DropdownItem
+                                              key={`${item.value}${index}`}
+                                              item={item}
+                                              highlightedIndex={
+                                                highlightedIndex
+                                              }
+                                              index={index}
+                                              openMenu={openMenu}
+                                              setInputValue={setInputValue}
+                                              getItemProps={getItemProps}
+                                            />
+                                          );
+                                        })}
+                                      </Box>
+                                    </Box>,
+                                  );
+
+                                  return result;
+                                },
+                                { sections: [], itemIndex: 0 },
+                              ).sections
+                            : filteredSuggestions.map((item, index) => (
+                                <DropdownItem
+                                  key={`${item.value}${index}`}
+                                  item={item}
+                                  highlightedIndex={highlightedIndex}
+                                  index={index}
+                                  openMenu={openMenu}
+                                  setInputValue={setInputValue}
+                                  getItemProps={getItemProps}
+                                />
+                              ))}
+                        </Box>
+                      </Box>
+                      <Box
+                        style={popper.style}
+                        ref={popper.ref}
+                        display={
+                          isOpen && showDateContainer ? undefined : 'hidden'
+                        }
+                        backgroundColor="bg-white"
+                        borderRadius="rounded-lg"
+                        padding="p-2"
+                        zIndex="z-50"
+                        borderWidth="border"
+                        borderColor="border-gray-200"
+                        boxShadow="shadow-menu"
+                      >
+                        <DatePicker
+                          inputValue={inputValue}
+                          onChange={(date) => {
+                            openMenu();
+                            addItem({
+                              type: 'value',
+                              value: formatDate(date),
+                              component: 'text',
+                              field: (lastItem as Operator).field,
+                              fieldType: lastItem.fieldType,
+                            });
+                            setInputValue('');
+                            inputRef.current?.focus();
+                          }}
+                        />
+                      </Box>
+                    </Portal>
+                  </Box>
                 </Box>
-              </Portal>
-            </Box>
-          </Box>
-          {items.length > 0 && (
-            <IconButton
-              label="Clear"
-              icon="close"
-              size="sm"
-              appearance="ghost"
-              onClick={() => setItems([])}
-            />
-          )}
-        </Box>
+                {items.length > 0 && (
+                  <IconButton
+                    label="Clear"
+                    icon="close"
+                    size="sm"
+                    appearance="ghost"
+                    onClick={() => setItems([])}
+                  />
+                )}
+              </Box>
+            </TabPanel>
+            <TabPanel>
+              <TextInput
+                value={textExpression}
+                onChange={(e) => setTextExpression(e.target.value)}
+              />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </Box>
 
-      <Result />
+      <Result textExpression={textExpression} />
     </>
   );
 }
