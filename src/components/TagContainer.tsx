@@ -101,8 +101,10 @@ export const TagContainer = ({
         )}
         styleProps={styleProps}
         onKeyDown={(e) => {
-          // @ts-ignore
-          if (e.code === 'Enter' && e.target.value === '') {
+          if (
+            e.code === 'Enter' &&
+            (e.target as HTMLInputElement).value === ''
+          ) {
             if (tags.length && index) {
               replaceItem(index, { ...item, value: tags } as Value);
             }

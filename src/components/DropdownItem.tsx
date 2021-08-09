@@ -1,7 +1,7 @@
 import { Box, Flex } from '@sajari-ui/core';
 import { UseComboboxGetItemPropsOptions } from 'downshift';
-import { useContextProvider } from '../../ContextProvider';
-import { FieldOption, Item, Operator, Suggestion } from '../../shared';
+import { useContextProvider } from '../ContextProvider';
+import { FieldOption, Item, Operator, Suggestion } from '../shared';
 
 interface DropdownItemProps {
   item: Suggestion;
@@ -47,19 +47,17 @@ export const DropdownItem = ({
               });
               openMenu();
             } else if (lastItem?.type === 'field') {
+              const operatorItem = item as unknown as Operator;
               addItem({
                 type: 'operator',
                 value: item.value,
                 field: lastItem.value,
                 fieldType: lastItem.fieldType,
-                // @ts-ignore
-                isAdvanced: (item as Operator).isAdvanced,
-                // @ts-ignore
-                advancedJoinOperator: (item as Operator).advancedJoinOperator,
+                isAdvanced: operatorItem.isAdvanced,
+                advancedJoinOperator: operatorItem.advancedJoinOperator,
               });
 
-              // @ts-ignore
-              const isAdvanced = (item as Operator).isAdvanced;
+              const isAdvanced = operatorItem.isAdvanced;
               if (isAdvanced) {
                 const newItem: Item = {
                   type: 'value',
@@ -69,7 +67,7 @@ export const DropdownItem = ({
                   fieldType: lastItem.fieldType,
                 };
                 addItem(newItem);
-                // FIXME: look like a race condition happens here. Temporarily use setTimeout to make sure the selectedItem is set correctly
+                // TODO: look like a race condition happens here. Temporarily use setTimeout to make sure the selectedItem is set correctly.
                 setTimeout(() => {
                   setSelectedItem(newItem);
                 });

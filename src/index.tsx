@@ -10,6 +10,7 @@ import {
   Operator,
   GroupMenu,
   FieldOption,
+  numberTypes,
 } from './shared';
 import './index.css';
 import {
@@ -25,8 +26,10 @@ import { ContextProvider, useContextProvider } from './ContextProvider';
 import { Pill, Result, DropdownItem } from './components';
 import { DatePicker } from './components/DatePicker';
 import { formatDate } from './utils/dateUtils';
+import { filterObjectToString } from './utils/filterObjectToString';
 
-// TODO: cannot infer because the type of the suggestions is different from the type of items
+// Getting this function right with TypeScript is complicated
+// Cannot infer because the type of the suggestions is different from the type of items
 const getFilteredSuggestions = (
   items: any[],
   inputValue: string,
@@ -106,7 +109,6 @@ function DropdownMultipleCombobox() {
     getComboboxProps,
     highlightedIndex,
     getItemProps,
-    selectItem,
     openMenu,
     setHighlightedIndex,
   } = useCombobox<Item>({
@@ -132,18 +134,18 @@ function DropdownMultipleCombobox() {
               });
               openMenu();
             } else if (lastItem?.type === 'field') {
+              const operatorSelectedItem = selectedItem as Operator;
               addItem({
                 type: 'operator',
                 value: selectedItem.value as string,
                 field: lastItem.value,
                 fieldType: lastItem.fieldType,
-                isAdvanced: (selectedItem as Operator).isAdvanced,
-                advancedJoinOperator: (selectedItem as Operator)
-                  .advancedJoinOperator,
+                isAdvanced: operatorSelectedItem.isAdvanced,
+                advancedJoinOperator: operatorSelectedItem.advancedJoinOperator,
               });
               openMenu();
 
-              const isAdvanced = (selectedItem as Operator).isAdvanced;
+              const isAdvanced = operatorSelectedItem.isAdvanced;
               if (isAdvanced) {
                 const item: Item = {
                   type: 'value',
@@ -176,8 +178,6 @@ function DropdownMultipleCombobox() {
               }
             }
             setInputValue('');
-            // @ts-ignore
-            selectItem(null);
           }
 
           break;
@@ -186,7 +186,7 @@ function DropdownMultipleCombobox() {
       }
     },
   });
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (wrapperRef.current && items.length > previousLength.current) {
@@ -208,8 +208,7 @@ function DropdownMultipleCombobox() {
   }, [isOpen, update, setHighlightedIndex, items.length]);
 
   const isNumberInput =
-    ['INTEGER', 'FLOAT', 'DOUBLE'].includes(lastItem?.fieldType) &&
-    lastItem.type === 'operator';
+    numberTypes.includes(lastItem?.fieldType) && lastItem.type === 'operator';
 
   return (
     <>
@@ -275,8 +274,8 @@ function DropdownMultipleCombobox() {
                 padding="p-0"
                 {...getInputProps({
                   ref: (ref) => {
-                    // @ts-ignore
                     inputRef.current = ref;
+                    // Consider fixing this since reference.ref points to HTMLButtonElement
                     // @ts-ignore
                     reference.ref.current = ref;
                   },
@@ -370,7 +369,6 @@ function DropdownMultipleCombobox() {
                         ).reduce(
                           (result, section, sectionIndex) => {
                             result.sections.push(
-                              // @ts-ignore
                               <Box as="li" key={sectionIndex}>
                                 {sectionIndex > 0 && <Divider />}
                                 <Heading margin={['ml-1', 'my-1']} as="h6">
@@ -398,7 +396,7 @@ function DropdownMultipleCombobox() {
 
                             return result;
                           },
-                          { sections: [], itemIndex: 0 },
+                          { sections: [] as JSX.Element[], itemIndex: 0 },
                         ).sections
                       : filteredSuggestions.map((item, index) => (
                           <DropdownItem
@@ -456,7 +454,7 @@ function DropdownMultipleCombobox() {
         </Box>
       </Box>
 
-      <Result />
+      <Result textExpression={filterObjectToString(items, joinOperator)} />
     </>
   );
 }

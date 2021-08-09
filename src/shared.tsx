@@ -1,4 +1,4 @@
-type FieldType =
+export type FieldType =
   | 'INTEGER'
   | 'BOOLEAN'
   | 'STRING'
@@ -16,6 +16,8 @@ export interface GroupMenu<T> {
   title: string;
   items: T[];
 }
+
+export const numberTypes: FieldType[] = ['INTEGER', 'FLOAT', 'DOUBLE'];
 
 export const groupFieldOptions: GroupMenu<FieldOption>[] = [
   {
