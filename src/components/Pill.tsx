@@ -100,7 +100,7 @@ export const Pill = ({ index, item, onFocusLast }: Props) => {
   ) {
     return (
       <Box
-        margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
+        margin={item.type === 'field' && index !== 0 ? 'ml-0' : 'ml-0.5'}
         position="relative"
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
@@ -118,7 +118,7 @@ export const Pill = ({ index, item, onFocusLast }: Props) => {
   if (item === selectedItem && selectedItem.fieldType === 'TIMESTAMP') {
     return (
       <Box
-        margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
+        margin={item.type === 'field' && index !== 0 ? 'ml-0' : 'ml-0.5'}
         position="relative"
       >
         <Box
@@ -196,7 +196,7 @@ export const Pill = ({ index, item, onFocusLast }: Props) => {
   if (item === selectedItem && selectedItem.fieldType === 'BOOLEAN') {
     return (
       <Box
-        margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
+        margin={item.type === 'field' && index !== 0 ? 'ml-0' : 'ml-0.5'}
         position="relative"
       >
         <ButtonGroup attached>
@@ -235,7 +235,7 @@ export const Pill = ({ index, item, onFocusLast }: Props) => {
     const isNumber = selectedItem.fieldType !== 'STRING';
     return (
       <Box
-        margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
+        margin={item.type === 'field' && index !== 0 ? 'ml-0' : 'ml-0.5'}
         position="relative"
       >
         <Box
@@ -302,7 +302,7 @@ export const Pill = ({ index, item, onFocusLast }: Props) => {
       }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      margin={item.type === 'field' && index !== 0 ? 'ml-2' : 'ml-0.5'}
+      margin={item.type === 'field' && index !== 0 ? 'ml-0' : 'ml-0.5'}
       padding={[item.type === 'value' ? 'pl-2' : 'px-2', 'py-0.5']}
       whitespace="whitespace-no-wrap"
       borderRadius={

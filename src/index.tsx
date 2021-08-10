@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { render } from 'react-dom';
 import { useCombobox } from 'downshift';
 import { JoinOperator } from './ContextProvider';
@@ -21,6 +21,7 @@ import {
   Select,
   Heading,
   Divider,
+  Flex,
 } from '@sajari-ui/core';
 import { ContextProvider, useContextProvider } from './ContextProvider';
 import { Pill, Result, DropdownItem } from './components';
@@ -224,16 +225,6 @@ function DropdownMultipleCombobox() {
           flexWrap="flex-no-wrap"
           boxShadow={inputFocus ? 'shadow-outline-blue' : undefined}
         >
-          <Select
-            width="w-20"
-            borderWidth="border-0"
-            padding={['p-0', 'pl-3']}
-            value={joinOperator}
-            onChange={(e) => setJoinOperator(e.target.value as JoinOperator)}
-          >
-            <option value="AND">AND</option>
-            <option value="OR">OR</option>
-          </Select>
           <Box width="w-px" backgroundColor="bg-gray-200" margin="m-1" />
           <Box
             ref={wrapperRef}
@@ -244,15 +235,47 @@ function DropdownMultipleCombobox() {
             flexWrap="flex-no-wrap"
           >
             {items.map((item, index) => (
-              <Pill
-                key={index}
-                item={item}
-                index={index}
-                onFocusLast={() => {
-                  inputRef.current?.focus();
-                  openMenu();
-                }}
-              />
+              <React.Fragment key={index}>
+                <Pill
+                  key={index}
+                  index={index}
+                  item={item}
+                  onFocusLast={() => {
+                    inputRef.current?.focus();
+                    openMenu();
+                  }}
+                />
+                {index === 2 && (
+                  <Select
+                    borderRadius="rounded-none"
+                    width="w-20"
+                    flex="flex-none"
+                    borderWidth="border-0"
+                    padding={['p-0', 'pl-3']}
+                    value={joinOperator}
+                    onChange={(e) =>
+                      setJoinOperator(e.target.value as JoinOperator)
+                    }
+                  >
+                    <option value="AND">AND</option>
+                    <option value="OR">OR</option>
+                  </Select>
+                )}
+
+                {index > 2 && index % 3 === 2 && index !== items.length - 1 && (
+                  <Flex
+                    height="h-8"
+                    justifyContent="justify-center"
+                    flex="flex-none"
+                    width="w-14"
+                    textColor="text-gray-500"
+                    lineHeight="leading-none"
+                    alignItems="items-center"
+                  >
+                    {joinOperator}
+                  </Flex>
+                )}
+              </React.Fragment>
             ))}
             <Box
               flex="flex-1"
