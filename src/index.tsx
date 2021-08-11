@@ -387,6 +387,9 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
                     maxWidth="max-w-full"
                     inset="inset-0"
                     {...getInputProps({
+                      value: inputValue,
+                      onChange: (e) =>
+                        setInputValue((e.target as HTMLInputElement).value),
                       ref: (ref) => {
                         inputRef.current = ref;
                         // Consider fixing this since reference.ref points to HTMLButtonElement
