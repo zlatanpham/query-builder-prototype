@@ -137,7 +137,7 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
         setTransformError(error.message);
       }
     }
-  }, [textExpression, mode, setItems, setJoinOperator]);
+  }, [textExpression, mode, setItems, setJoinOperator, groupFieldOptions]);
 
   const flatSuggestions = flattenSuggestions(filteredSuggestions);
 
@@ -363,85 +363,101 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
                 }}
                 {...getComboboxProps()}
               >
-                <Box
-                  height="h-8"
-                  as="input"
-                  type={isNumberInput ? 'number' : 'text'}
-                  placeholder={isNumberInput ? 'Enter a number' : ''}
-                  textColor="text-gray-600"
-                  outline="outline-none"
-                  padding="p-0"
-                  {...getInputProps({
-                    ref: (ref) => {
-                      inputRef.current = ref;
-                      // Consider fixing this since reference.ref points to HTMLButtonElement
-                      // @ts-ignore
-                      reference.ref.current = ref;
-                    },
-                    onFocus: () => {
-                      openMenu();
-                      setInputFocus(true);
-                      setSelectedItem(null);
-                    },
-                    onBlur: () => {
-                      setInputFocus(false);
-                    },
-                    onKeyDown: (e) => {
-                      if (e.key === 'Backspace' && inputValue === '') {
-                        removeLast();
-                      }
-
-                      if (
-                        (e.key === 'Enter' || e.key === 'Tab') &&
-                        inputValue !== '' &&
-                        flatSuggestions.length > 0 &&
-                        highlightedIndex === -1
-                      ) {
-                        e.preventDefault();
-                        setHighlightedIndex(0);
-                        return;
-                      }
-
-                      if (
-                        e.key === 'Enter' &&
-                        lastItem?.type === 'operator' &&
-                        inputValue !== ''
-                      ) {
+                <Box position="relative">
+                  <Box
+                    style={{ minWidth: 150 }}
+                    padding="px-2"
+                    textColor="text-transparent"
+                    userSelect="select-none"
+                    whitespace="whitespace-no-wrap"
+                  >
+                    {inputValue}
+                  </Box>
+                  <Box
+                    height="h-8"
+                    as="input"
+                    type={isNumberInput ? 'number' : 'text'}
+                    placeholder={isNumberInput ? 'Enter a number' : ''}
+                    textColor="text-gray-600"
+                    outline="outline-none"
+                    padding="p-0"
+                    position="absolute"
+                    width="w-full"
+                    backgroundColor="bg-transparent"
+                    maxWidth="max-w-full"
+                    inset="inset-0"
+                    {...getInputProps({
+                      ref: (ref) => {
+                        inputRef.current = ref;
+                        // Consider fixing this since reference.ref points to HTMLButtonElement
+                        // @ts-ignore
+                        reference.ref.current = ref;
+                      },
+                      onFocus: () => {
                         openMenu();
-                        if (lastItem.isAdvanced) {
-                          addItem({
-                            type: 'value',
-                            value: inputValue
-                              .trim()
-                              .split(',')
-                              .filter(Boolean)
-                              .map((v) => v.trim()),
-                            component: 'tags',
-                            field: lastItem.field,
-                            fieldType: lastItem.fieldType,
-                          });
-                        } else if (lastItem.fieldType === 'TIMESTAMP') {
-                          addItem({
-                            type: 'value',
-                            value: formatDate(inputValue),
-                            component: 'text',
-                            field: lastItem.field,
-                            fieldType: lastItem.fieldType,
-                          });
-                        } else {
-                          addItem({
-                            type: 'value',
-                            value: inputValue.trim(),
-                            component: 'text',
-                            field: lastItem.field,
-                            fieldType: lastItem.fieldType,
-                          });
+                        setInputFocus(true);
+                        setSelectedItem(null);
+                      },
+                      onBlur: () => {
+                        setInputFocus(false);
+                      },
+                      onKeyDown: (e) => {
+                        if (e.key === 'Backspace' && inputValue === '') {
+                          removeLast();
                         }
-                        setInputValue('');
-                      }
-                    },
-                  })}
-                />
+
+                        if (
+                          (e.key === 'Enter' || e.key === 'Tab') &&
+                          inputValue !== '' &&
+                          flatSuggestions.length > 0 &&
+                          highlightedIndex === -1
+                        ) {
+                          e.preventDefault();
+                          setHighlightedIndex(0);
+                          return;
+                        }
+
+                        if (
+                          e.key === 'Enter' &&
+                          lastItem?.type === 'operator' &&
+                          inputValue !== ''
+                        ) {
+                          openMenu();
+                          if (lastItem.isAdvanced) {
+                            addItem({
+                              type: 'value',
+                              value: inputValue
+                                .trim()
+                                .split(',')
+                                .filter(Boolean)
+                                .map((v) => v.trim()),
+                              component: 'tags',
+                              field: lastItem.field,
+                              fieldType: lastItem.fieldType,
+                            });
+                          } else if (lastItem.fieldType === 'TIMESTAMP') {
+                            addItem({
+                              type: 'value',
+                              value: formatDate(inputValue),
+                              component: 'text',
+                              field: lastItem.field,
+                              fieldType: lastItem.fieldType,
+                            });
+                          } else {
+                            addItem({
+                              type: 'value',
+                              value: inputValue.trim(),
+                              component: 'text',
+                              field: lastItem.field,
+                              fieldType: lastItem.fieldType,
+                            });
+                          }
+                          setInputValue('');
+                        }
+                      },
+                    })}
+                  />
+                </Box>
                 <Portal>
                   <Box
                     style={popper.style}
