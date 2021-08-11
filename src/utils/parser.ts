@@ -1,8 +1,9 @@
 import {
   advancedOperatorMapping,
   Field,
+  FieldOption,
   FieldType,
-  groupFieldOptions,
+  GroupMenu,
   groupOperatorOptions,
   Item,
   Operator,
@@ -59,7 +60,10 @@ const handleExpression = (expression: string) => {
     });
 };
 
-export const stringParser = (expressionString: string) => {
+export const stringParser = (
+  expressionString: string,
+  groupFieldOptions: GroupMenu<FieldOption>[],
+) => {
   let isError = false;
   let error = '';
   const expressions: Item[] = [];

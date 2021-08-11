@@ -70,7 +70,11 @@ const flattenSuggestions = (items: any[]) => {
   return items;
 };
 
-function DropdownMultipleCombobox() {
+interface QueryBuilderProps {
+  groupFieldOptions: GroupMenu<FieldOption>[];
+}
+
+function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
   const [inputValue, setInputValue] = useState('');
   const {
     items,
@@ -120,7 +124,10 @@ function DropdownMultipleCombobox() {
   useEffect(() => {
     if (mode === 'text') {
       try {
-        const { conjunction, expressions } = stringParser(textExpression);
+        const { conjunction, expressions } = stringParser(
+          textExpression,
+          groupFieldOptions,
+        );
         setItems(expressions);
         // @ts-ignore
         setJoinOperator(conjunction);
@@ -554,7 +561,7 @@ function DropdownMultipleCombobox() {
 
 render(
   <ContextProvider>
-    <DropdownMultipleCombobox />
+    <QueryBuilder groupFieldOptions={groupFieldOptions} />
   </ContextProvider>,
   document.getElementById('root'),
 );

@@ -290,6 +290,7 @@ export const Pill = ({ index, item, onFocusLast }: Props) => {
   const renderPill = (
     <Box
       height="h-8"
+      cursor="cursor-pointer"
       key={`selected-item-${index}`}
       onClick={() => {
         if (index % 3 === 2) {

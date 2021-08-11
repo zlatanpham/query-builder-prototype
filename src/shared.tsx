@@ -5,6 +5,7 @@ export type FieldType =
   | 'FLOAT'
   | 'DOUBLE'
   | 'TIMESTAMP';
+
 export interface FieldOption {
   text: string;
   value: string;

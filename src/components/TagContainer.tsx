@@ -39,9 +39,7 @@ export const TagContainer = ({
       if (!ref.current || ref.current.contains(event.target)) {
         return;
       }
-      if (tags.length) {
-        replaceItem(index, { ...item, value: tags } as Value);
-      }
+      replaceItem(index, { ...item, value: tags } as Value);
       setSelectedItem(null);
     };
     document.addEventListener('mousedown', listener);
@@ -105,7 +103,7 @@ export const TagContainer = ({
             e.code === 'Enter' &&
             (e.target as HTMLInputElement).value === ''
           ) {
-            if (tags.length && index) {
+            if (index) {
               replaceItem(index, { ...item, value: tags } as Value);
             }
             setSelectedItem(null);
