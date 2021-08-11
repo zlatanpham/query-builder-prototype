@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Flex, FlexProps, IconButton, TagInput } from '@sajari-ui/core';
 import { useContextProvider } from '../ContextProvider';
-import { Item, Operator, Value } from '../shared';
+import { Item, Value } from '../shared';
 import { useEffect } from 'react';
 
 interface TagContainerProps {
@@ -22,7 +22,7 @@ export const TagContainer = ({
     Array.isArray(value) ? value : [value],
   );
   const ref: React.RefObject<HTMLInputElement> = React.createRef();
-  const { items, replaceItem, addItem, setSelectedItem } = useContextProvider();
+  const { items, replaceItem, setSelectedItem } = useContextProvider();
   const lastItem: Item | undefined = items[items.length - 1];
 
   const styleProps: FlexProps = {
@@ -67,6 +67,7 @@ export const TagContainer = ({
         onChange={setTags}
         editable={false}
         style={{ height: 24 }}
+        splitChar=","
         placeholder="Type and press Enter"
         tagRender={({ tag, onDelete, index }) => (
           <Box
@@ -110,18 +111,6 @@ export const TagContainer = ({
             if (item === lastItem) {
               onFocusLast();
             }
-          }
-        }}
-        // placeholder="Type and press enter"
-        onEnterPress={(tags) => {
-          if (!item) {
-            addItem({
-              type: 'value',
-              value: tags[0].split(','),
-              component: 'tags',
-              field: (lastItem as Operator).field,
-              fieldType: lastItem.fieldType,
-            });
           }
         }}
       />

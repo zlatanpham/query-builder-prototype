@@ -1,3 +1,4 @@
+import { JoinOperator } from '../ContextProvider';
 import {
   advancedOperatorMapping,
   Field,
@@ -173,5 +174,5 @@ export const stringParser = (
     throw new Error(error);
   }
 
-  return { expressions, conjunction: conjunction.trim() };
+  return { expressions, conjunction: conjunction.trim() as JoinOperator };
 };

@@ -129,7 +129,6 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
           groupFieldOptions,
         );
         setItems(expressions);
-        // @ts-ignore
         setJoinOperator(conjunction);
         setTransformError('');
       } catch (error) {
@@ -150,6 +149,7 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
     getItemProps,
     openMenu,
     closeMenu,
+    selectItem,
     setHighlightedIndex,
   } = useCombobox<Item>({
     inputValue,
@@ -164,20 +164,27 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
         case useCombobox.stateChangeTypes.FunctionSelectItem:
         case useCombobox.stateChangeTypes.ItemClick:
         case useCombobox.stateChangeTypes.InputBlur:
-          if (selectedItem) {
+          let nextItem = selectedItem;
+          // if selectedItem is undefined, set [0] as fallback
+          // as the result of onKeyDown in getInputProps
+          if (!nextItem && lastItem?.type === 'field') {
+            nextItem = flatSuggestions[0];
+          }
+
+          if (nextItem) {
             if (!lastItem || lastItem?.type === 'value') {
               addItem({
                 type: 'field',
-                value: selectedItem.value,
+                value: nextItem.value,
                 // @ts-ignore
-                fieldType: selectedItem.type,
+                fieldType: nextItem.type,
               });
               openMenu();
             } else if (lastItem?.type === 'field') {
-              const operatorSelectedItem = selectedItem as Operator;
+              const operatorSelectedItem = nextItem as Operator;
               addItem({
                 type: 'operator',
-                value: selectedItem.value as string,
+                value: nextItem.value as string,
                 field: lastItem.value,
                 fieldType: lastItem.fieldType,
                 isAdvanced: operatorSelectedItem.isAdvanced,
@@ -210,7 +217,7 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
                 openMenu();
                 addItem({
                   type: 'value',
-                  value: selectedItem.value as string,
+                  value: nextItem.value as string,
                   component: 'boolean',
                   field: lastItem.field,
                   fieldType: lastItem.fieldType,
@@ -295,6 +302,8 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
               borderRadius="rounded-none"
               value={textExpression}
               onChange={(e) => setTextExpression(e.target.value)}
+              onFocus={() => setInputFocus(true)}
+              onBlur={() => setInputFocus(false)}
               borderWidth="border-0"
               height="h-8"
             />
@@ -418,6 +427,11 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
                           e.preventDefault();
                           setHighlightedIndex(0);
                           return;
+                        }
+
+                        if (e.key === 'Enter' && highlightedIndex === 0) {
+                          console.log('123');
+                          selectItem(flatSuggestions[0]);
                         }
 
                         if (
