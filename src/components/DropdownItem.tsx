@@ -44,6 +44,7 @@ export const DropdownItem = ({
                 type: 'field',
                 value: item.value,
                 fieldType: (item as FieldOption).type,
+                isArray: (item as FieldOption).isArray,
               });
               openMenu();
             } else if (lastItem?.type === 'field') {
@@ -55,6 +56,7 @@ export const DropdownItem = ({
                 fieldType: lastItem.fieldType,
                 isAdvanced: operatorItem.isAdvanced,
                 advancedJoinOperator: operatorItem.advancedJoinOperator,
+                isArray: lastItem.isArray,
               });
 
               const isAdvanced = operatorItem.isAdvanced;
@@ -65,6 +67,7 @@ export const DropdownItem = ({
                   component: 'tags',
                   field: lastItem.value,
                   fieldType: lastItem.fieldType,
+                  isArray: lastItem.isArray,
                 };
                 addItem(newItem);
                 // TODO: look like a race condition happens here. Temporarily use setTimeout to make sure the selectedItem is set correctly.
@@ -86,6 +89,7 @@ export const DropdownItem = ({
                 component: 'boolean',
                 field: lastItem.field,
                 fieldType: lastItem.fieldType,
+                isArray: lastItem.isArray,
               });
             }
           } else {
@@ -93,6 +97,7 @@ export const DropdownItem = ({
               type: 'field',
               value: item.value,
               fieldType: (item as FieldOption).type,
+              isArray: (item as FieldOption).isArray,
             });
             openMenu();
           }

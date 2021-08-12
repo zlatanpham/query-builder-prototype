@@ -33,6 +33,7 @@ export const groupFieldOptions: GroupMenu<FieldOption>[] = [
     items: [
       { text: 'image', value: 'image', isArray: false, type: 'STRING' },
       { text: 'category', value: 'category', isArray: false, type: 'STRING' },
+      { text: 'brand', value: 'brand', isArray: true, type: 'STRING' },
       { text: 'price', value: 'price', isArray: false, type: 'FLOAT' },
       { text: 'onSale', value: 'onSale', isArray: false, type: 'BOOLEAN' },
       {
@@ -77,6 +78,7 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
         value: '~',
         text: 'contains',
         types: ['STRING'],
+        supportIsArray: true,
       },
       {
         value: '!=',
@@ -87,6 +89,7 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
         value: '!~',
         text: 'does not contain',
         types: ['STRING'],
+        supportIsArray: true,
       },
       {
         value: '$',
@@ -157,6 +160,7 @@ export interface OperatorOption {
   value: keyof typeof operatorMapping;
   types: FieldType[];
   isAdvanced?: boolean;
+  supportIsArray?: boolean;
   advancedJoinOperator?: 'AND' | 'OR';
 }
 
@@ -176,6 +180,7 @@ export interface Field {
   type: 'field';
   value: string;
   fieldType: FieldOption['type'];
+  isArray: boolean;
 }
 
 export interface Operator {
@@ -185,6 +190,7 @@ export interface Operator {
   fieldType: FieldOption['type'];
   isAdvanced?: boolean;
   advancedJoinOperator?: 'OR' | 'AND';
+  isArray: boolean;
 }
 
 export type Value =
@@ -194,6 +200,7 @@ export type Value =
       component: 'text' | 'boolean' | 'tags';
       field: string;
       fieldType: FieldOption['type'];
+      isArray: boolean;
     }
   | {
       type: 'value';
@@ -201,18 +208,26 @@ export type Value =
       component: 'tags';
       field: string;
       fieldType: FieldOption['type'];
+      isArray: boolean;
     };
 
 export type Item = Field | Operator | Value;
 
 export const defaultItems: Item[] = [
-  { type: 'field', value: 'category', fieldType: 'STRING' },
-  { type: 'operator', value: '=', fieldType: 'STRING', field: 'category' },
+  { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+  {
+    type: 'operator',
+    value: '=',
+    fieldType: 'STRING',
+    field: 'category',
+    isArray: false,
+  },
   {
     type: 'value',
     value: 'application',
     component: 'text',
     fieldType: 'STRING',
     field: 'category',
+    isArray: false,
   },
 ];

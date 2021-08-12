@@ -133,16 +133,26 @@ export const stringParser = (
       break;
     }
 
+    let isArrayField = false;
+    let inputValue = v;
+    if (v.includes('[') && typeof v === 'string') {
+      isArrayField = true;
+      inputValue = v.replace(/(^.*\[|\].*$)/g, '');
+    }
+
     const field: Field = {
       type: 'field',
       value: f,
       fieldType: fieldType as FieldType,
+      isArray: isArrayField,
     };
+
     const advancedJoinOperator = o.includes('OR')
       ? 'OR'
       : o.includes('AND')
       ? 'AND'
       : undefined;
+
     const operator: Operator = {
       type: 'operator',
       value: advancedJoinOperator ? o.replace(advancedJoinOperator, '') : o,
@@ -151,21 +161,24 @@ export const stringParser = (
       ...(advancedJoinOperator
         ? { isAdvanced: true, advancedJoinOperator }
         : {}),
+      isArray: isArrayField,
     };
-    const value: Value = Array.isArray(v)
+    const value: Value = Array.isArray(inputValue)
       ? {
           type: 'value',
-          value: v,
+          value: inputValue,
           field: f,
           fieldType: fieldType as FieldType,
           component: 'tags',
+          isArray: isArrayField,
         }
       : {
           type: 'value',
-          value: v.replace(/'/g, ''),
+          value: inputValue.replace(/'/g, ''),
           field: f,
           fieldType: fieldType as FieldType,
           component: isBooleanSelect ? 'boolean' : 'text',
+          isArray: isArrayField,
         };
     expressions.push(field, operator, value);
   }

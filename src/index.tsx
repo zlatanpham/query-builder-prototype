@@ -46,7 +46,11 @@ const getFilteredSuggestions = (
     (activeItem?.type !== 'field' ||
       (activeItem?.type === 'field' &&
         'types' in item &&
-        item?.types.includes(activeItem.fieldType)));
+        item?.types.includes(activeItem.fieldType))) &&
+    (activeItem?.type !== 'field' ||
+      (activeItem?.type === 'field' &&
+        'supportIsArray' in item &&
+        (!item.supportIsArray || (item.supportIsArray && activeItem.isArray))));
 
   // Group case
   if (items[0]?.title) {
@@ -176,6 +180,7 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
               addItem({
                 type: 'field',
                 value: nextItem.value,
+                isArray: nextItem.isArray,
                 // @ts-ignore
                 fieldType: nextItem.type,
               });
@@ -189,6 +194,7 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
                 fieldType: lastItem.fieldType,
                 isAdvanced: operatorSelectedItem.isAdvanced,
                 advancedJoinOperator: operatorSelectedItem.advancedJoinOperator,
+                isArray: lastItem.isArray,
               });
               openMenu();
 
@@ -200,6 +206,7 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
                   component: 'tags',
                   field: lastItem.value,
                   fieldType: lastItem.fieldType,
+                  isArray: lastItem.isArray,
                 };
                 addItem(item);
                 setSelectedItem(item);
@@ -212,6 +219,7 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
                   component: 'tags',
                   field: lastItem.field,
                   fieldType: lastItem.fieldType,
+                  isArray: lastItem.isArray,
                 });
               } else if (lastItem?.fieldType === 'BOOLEAN') {
                 openMenu();
@@ -219,6 +227,7 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
                   type: 'value',
                   value: nextItem.value as string,
                   component: 'boolean',
+                  isArray: lastItem.isArray,
                   field: lastItem.field,
                   fieldType: lastItem.fieldType,
                 });
@@ -458,12 +467,14 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
                               component: 'tags',
                               field: lastItem.field,
                               fieldType: lastItem.fieldType,
+                              isArray: lastItem.isArray,
                             });
                           } else if (lastItem.fieldType === 'TIMESTAMP') {
                             addItem({
                               type: 'value',
                               value: formatDate(inputValue),
                               component: 'text',
+                              isArray: lastItem.isArray,
                               field: lastItem.field,
                               fieldType: lastItem.fieldType,
                             });
@@ -472,6 +483,7 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
                               type: 'value',
                               value: inputValue.trim(),
                               component: 'text',
+                              isArray: lastItem.isArray,
                               field: lastItem.field,
                               fieldType: lastItem.fieldType,
                             });
@@ -570,6 +582,7 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
                           type: 'value',
                           value: formatDate(date),
                           component: 'text',
+                          isArray: lastItem.isArray,
                           field: (lastItem as Operator).field,
                           fieldType: lastItem.fieldType,
                         });

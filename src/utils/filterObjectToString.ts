@@ -1,4 +1,4 @@
-import { Item, Operator } from '../shared';
+import { Item, numberTypes, Operator } from '../shared';
 
 export const filterObjectToString = (items: Item[], joinOperator: string) => {
   const result: string[] = [];
@@ -14,14 +14,16 @@ export const filterObjectToString = (items: Item[], joinOperator: string) => {
         .join(` ${operatorItem.advancedJoinOperator} `);
       result.push(`(${exp})`);
     } else {
+      const value = valueItem?.value
+        ? numberTypes.includes(valueItem?.fieldType)
+          ? valueItem?.value
+          : `'${valueItem?.value}'`
+        : undefined;
+
       const exp = [
         fieldItem?.value,
         operatorItem?.value,
-        valueItem?.value
-          ? ['INTEGER', 'DOUBLE', 'FLOAT'].includes(valueItem?.fieldType)
-            ? valueItem?.value
-            : `'${valueItem?.value}'`
-          : undefined,
+        valueItem?.isArray ? `[${value}]` : value,
       ].join(' ');
       result.push(exp);
     }
