@@ -57,7 +57,7 @@ export const TagContainer = ({
       transitionDuration="duration-200"
       height="h-8"
       alignItems="items-center"
-      padding={[tags.length === 0 ? 'px-2' : 'pr-2']}
+      padding={[tags.length === 0 ? 'px-0.5' : 'pr-0.5']}
       borderRadius="rounded-r-md"
     >
       <TagInput
@@ -66,9 +66,10 @@ export const TagContainer = ({
         hasInputWrapper={false}
         onChange={setTags}
         editable={false}
-        style={{ height: 24 }}
+        style={{ height: 28 }}
         splitChar=","
         placeholder="Type and press Enter"
+        borderRadius="rounded-l-none"
         tagRender={({ tag, onDelete, index }) => (
           <Box
             height="h-8"
