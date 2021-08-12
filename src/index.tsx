@@ -329,6 +329,13 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
                       inputRef.current?.focus();
                       openMenu();
                     }}
+                    onScrollEnd={() => {
+                      setTimeout(() => {
+                        wrapperRef.current?.scroll({
+                          left: wrapperRef.current.scrollWidth,
+                        });
+                      });
+                    }}
                   />
                   {index === 2 && items.length > 3 && (
                     <Select

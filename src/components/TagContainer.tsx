@@ -9,6 +9,7 @@ interface TagContainerProps {
   item?: Item;
   hovered: boolean;
   onFocusLast: () => void;
+  onScrollEnd: () => void;
 }
 
 export const TagContainer = ({
@@ -16,6 +17,7 @@ export const TagContainer = ({
   item,
   hovered,
   onFocusLast,
+  onScrollEnd,
 }: TagContainerProps) => {
   const { value = [] } = item || {};
   const [tags, setTags] = useState<string[]>(
@@ -67,6 +69,7 @@ export const TagContainer = ({
         onChange={setTags}
         editable={false}
         style={{ height: 28 }}
+        padding="pl-2"
         splitChar=","
         placeholder="Type and press enter"
         borderRadius="rounded-l-none"
@@ -114,6 +117,7 @@ export const TagContainer = ({
             }
           }
         }}
+        onEnterPress={() => onScrollEnd()}
       />
     </Flex>
   );

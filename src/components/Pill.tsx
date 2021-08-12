@@ -18,9 +18,10 @@ interface Props {
   index: number;
   item: Item;
   onFocusLast: () => void;
+  onScrollEnd: () => void;
 }
 
-export const Pill = ({ index, item, onFocusLast }: Props) => {
+export const Pill = ({ index, item, onScrollEnd, onFocusLast }: Props) => {
   const {
     hoverIndexes,
     setHoverIndexes,
@@ -110,6 +111,7 @@ export const Pill = ({ index, item, onFocusLast }: Props) => {
           item={item}
           hovered={hoverIndexes.includes(index)}
           onFocusLast={onFocusLast}
+          onScrollEnd={onScrollEnd}
         />
       </Box>
     );
