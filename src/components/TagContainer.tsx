@@ -68,7 +68,7 @@ export const TagContainer = ({
         editable={false}
         style={{ height: 28 }}
         splitChar=","
-        placeholder="Type and press Enter"
+        placeholder="Type and press enter"
         borderRadius="rounded-l-none"
         tagRender={({ tag, onDelete, index }) => (
           <Box
