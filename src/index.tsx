@@ -37,7 +37,7 @@ import {
   ModalFooter,
 } from '@sajari-ui/core';
 import { ContextProvider, useContextProvider } from './ContextProvider';
-import { Pill, Result, DropdownItem } from './components';
+import { Pill, DropdownItem } from './components';
 import { DatePicker } from './components/DatePicker';
 import { formatDate } from './utils/dateUtils';
 import { filterObjectToString } from './utils/filterObjectToString';
@@ -59,13 +59,10 @@ const getFilteredSuggestions = (
   };
 
   const filterFunc = (item) =>
-    (activeItem?.type !== 'field' ||
-      (activeItem?.type === 'field' && 'isArray' in item && item.isArray)) &&
     (item?.text?.toLowerCase().startsWith(inputValue.toLowerCase()) ||
       item?.value?.toLowerCase().startsWith(inputValue.toLowerCase())) &&
     (activeItem?.type !== 'field' ||
       (activeItem?.type === 'field' &&
-        !('isArray' in item) &&
         'types' in item &&
         item?.types.includes(activeItem.fieldType)));
 
@@ -109,13 +106,19 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
     joinOperator,
     setJoinOperator,
   } = useContextProvider();
+
   const lastItem: Item | undefined = items[items.length - 1];
   const [inputFocus, setInputFocus] = useState(false);
   const previousLength = useRef(items.length);
   const showDateContainer =
     lastItem?.type === 'operator' && lastItem?.fieldType === 'TIMESTAMP';
 
+  const previousItems = useRef(items);
+
   const [textExpression, setTextExpression] = useState('');
+  const [originalExpression, setOriginalExpression] = useState(
+    `category = 'application'`,
+  );
   const [mode, setMode] = useState<'visual' | 'text'>('visual');
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -163,6 +166,19 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
   }, [textExpression, mode, setItems, setJoinOperator, groupFieldOptions]);
 
   const flatSuggestions = flattenSuggestions(filteredSuggestions);
+
+  const { open, onOpen, onClose } = useDisclosure();
+
+  useEffect(() => {
+    if (open) {
+      previousItems.current = items;
+    } else {
+      setTimeout(() => {
+        setItems(previousItems.current);
+      });
+      setInputValue('');
+    }
+  }, [open]);
 
   const {
     isOpen,
@@ -283,29 +299,34 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
     update();
   }, [isOpen, update, setHighlightedIndex, items.length]);
 
-  const { open, onOpen, onClose } = useDisclosure();
-
   const isNumberInput =
     numberTypes.includes(lastItem?.fieldType) && lastItem.type === 'operator';
 
   return (
     <Box
       width="w-96"
-      padding={['px-5', 'py-10']}
+      padding={['px-4', 'py-5']}
       position="fixed"
       inset={['inset-y-0', 'left-0']}
+      backgroundColor="bg-gray-50"
       borderWidth="border-r"
+      borderColor="border-gray-200"
     >
+      <Heading as="h6" margin="mb-2">
+        Promotion query
+      </Heading>
       <Flex
         borderWidth="border"
         borderRadius="rounded-md"
         textColor="text-gray-500"
-        padding={['pl-2', 'pr-1', 'py-1']}
+        borderColor="border-gray-200"
+        padding={['pl-3', 'pr-1.5', 'py-1']}
         justifyContent="justify-between"
         alignItems="items-center"
+        backgroundColor="bg-white"
       >
-        <Box truncate="truncate" padding="pr-2">
-          {textExpression}
+        <Box truncate="truncate" padding="pr-2" fontSize="text-sm">
+          {originalExpression}
         </Box>
         <IconButton icon="pencil" label="Edit" size="sm" onClick={onOpen} />
       </Flex>
@@ -321,7 +342,7 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
-            <ModalTitle>Edit filter</ModalTitle>
+            <ModalTitle>Edit query</ModalTitle>
             <ModalCloseButton />
           </ModalHeader>
 
@@ -364,6 +385,7 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
 
                   <Box
                     width="w-px"
+                    height="h-6"
                     backgroundColor="bg-gray-200"
                     margin="m-1"
                   />
@@ -692,12 +714,19 @@ function QueryBuilder({ groupFieldOptions }: QueryBuilderProps) {
                 </Box>
               </Box>
 
-              <Result textExpression={textExpression} />
+              {/* <Result textExpression={textExpression} /> */}
             </>
           </ModalBody>
 
           <ModalFooter>
-            <Button onClick={onClose} appearance="primary">
+            <Button
+              onClick={() => {
+                onClose();
+                setOriginalExpression(textExpression);
+                previousItems.current = items;
+              }}
+              appearance="primary"
+            >
               Save
             </Button>
             <Button onClick={onClose}>Close</Button>
