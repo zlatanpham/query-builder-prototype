@@ -78,7 +78,7 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
         value: '~',
         text: 'contains',
         types: ['STRING'],
-        supportIsArray: true,
+        isArray: true,
       },
       {
         value: '!=',
@@ -89,7 +89,7 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
         value: '!~',
         text: 'does not contain',
         types: ['STRING'],
-        supportIsArray: true,
+        isArray: true,
       },
       {
         value: '$',
@@ -160,7 +160,7 @@ export interface OperatorOption {
   value: keyof typeof operatorMapping;
   types: FieldType[];
   isAdvanced?: boolean;
-  supportIsArray?: boolean;
+  isArray?: boolean;
   advancedJoinOperator?: 'AND' | 'OR';
 }
 
