@@ -245,13 +245,26 @@ export function Inner({ groupFieldOptions }: QueryBuilderProps) {
           boxShadow={inputFocus ? 'shadow-outline-blue' : undefined}
         >
           {transformError ? (
-            <Tooltip label="The query is not supported by the Visual mode">
+            <Tooltip
+              label={
+                transformError === 'undefined'
+                  ? 'The query is not supported by the Visual mode'
+                  : transformError
+              }
+            >
               <Flex
                 justifyContent="justify-center"
                 alignItems="items-center"
                 width="w-8"
               >
-                <Icon name="warning" color="text-red-500" />
+                <Icon
+                  name="warning"
+                  color={
+                    transformError === 'undefined'
+                      ? 'text-gray-400'
+                      : 'text-red-500'
+                  }
+                />
               </Flex>
             </Tooltip>
           ) : (

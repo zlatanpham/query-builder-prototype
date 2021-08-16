@@ -4,6 +4,7 @@ import {
   Field,
   FieldOption,
   FieldType,
+  groupFieldOptions,
   GroupMenu,
   groupOperatorOptions,
   Item,
@@ -22,15 +23,31 @@ const isOrExpression = (expression: string) => {
     ?.some((text) => text === 'OR');
 };
 
-const toBlock = (expression: string) => {
-  const [a, b, c, ...rest] = expression.match(/(?:[^\s']+|'[^']*')+/g) || [];
-  if (!a || !b || !c || rest.length) return;
+const toBlock = (
+  expression: string,
+  groupFieldOptions: GroupMenu<FieldOption>[],
+) => {
+  let temp = expression;
+  const a = groupFieldOptions
+    .map((group) => group.items)
+    .flat()
+    .find((field) => temp.startsWith(field.text))?.text;
+  if (!a) return;
+  temp = temp.slice(a.length).trim();
+  const b =
+    Object.keys(advancedOperatorMapping).find((operator) =>
+      temp.startsWith(operator),
+    ) ||
+    Object.keys(operatorMapping).find((operator) => temp.startsWith(operator));
+  if (!b) return;
+  const c = temp.slice(b.length).trim();
+  if (!c) return;
   return [a, b, c.replace(/'/g, '')] as Block;
 };
 
 const handleExpression = (expression: string) => {
   if (!expression.trim().startsWith('(')) {
-    return toBlock(expression.trim());
+    return toBlock(expression.trim(), groupFieldOptions);
   }
   const newExpression = expression.trim().replace(/[()]/g, '');
   const conjunction = isOrExpression(newExpression) ? ' OR ' : ' AND ';
@@ -39,7 +56,10 @@ const handleExpression = (expression: string) => {
     .replace(/[()]/g, '')
     .replace(regex, '_')
     .match(_regex)
-    ?.map((value) => toBlock(value.replace(/_/g, conjunction)))
+    ?.map(
+      (value) => toBlock(value.replace(/_/g, conjunction), groupFieldOptions),
+      groupFieldOptions,
+    )
     .reduce((result, value) => {
       if (!value || !result) {
         return undefined;
@@ -104,13 +124,13 @@ export const stringParser = (
       fieldType === undefined
     ) {
       isError = true;
-      error = `field ${f} is not found`;
+      error = `Field '${f}' is not found`;
       break;
     }
     // check operator
     if (!operatorMapping[o] && !advancedOperatorMapping[o]) {
       isError = true;
-      error = `operator ${o} is not found`;
+      error = `Operator '${o}' is not found`;
       break;
     }
     const availableTypes = groupOperatorOptions
@@ -123,13 +143,13 @@ export const stringParser = (
       )?.types;
     if (!availableTypes?.includes(fieldType)) {
       isError = true;
-      error = `operator ${o} is only able to use with type ${availableTypes}`;
+      error = `Operator '${o}' is only able to use with type ${availableTypes}`;
       break;
     }
     // check value
     if (isBooleanSelect && v !== 'TRUE' && v !== 'FALSE') {
       isError = true;
-      error = `value ${v} is only able to be TRUE or FALSE`;
+      error = `Value '${v}' is only able to be TRUE or FALSE`;
       break;
     }
 

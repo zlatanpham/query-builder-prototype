@@ -776,39 +776,39 @@ test('is Array', () => {
   });
 });
 
-// test('without spacing', () => {
-//   const expected = {
-//     conjunction: 'AND',
-//     expressions: [
-//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
-//       {
-//         type: 'operator',
-//         value: '~',
-//         field: 'category',
-//         fieldType: 'STRING',
-//         isArray: false,
-//       },
-//       {
-//         type: 'value',
-//         value: 'application',
-//         field: 'category',
-//         fieldType: 'STRING',
-//         isArray: false,
-//         component: 'text',
-//       },
-//     ],
-//   };
+test('without spacing', () => {
+  const expected = {
+    conjunction: 'AND',
+    expressions: [
+      { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+      {
+        type: 'operator',
+        value: '~',
+        field: 'category',
+        fieldType: 'STRING',
+        isArray: false,
+      },
+      {
+        type: 'value',
+        value: 'application',
+        field: 'category',
+        fieldType: 'STRING',
+        isArray: false,
+        component: 'text',
+      },
+    ],
+  };
 
-//   expect(
-//     stringParser("category~'application'", groupFieldOptions),
-//   ).toStrictEqual(expected);
-//   expect(
-//     stringParser("category~ 'application'", groupFieldOptions),
-//   ).toStrictEqual(expected);
-//   expect(
-//     stringParser("category ~'application'", groupFieldOptions),
-//   ).toStrictEqual(expected);
-// });
+  expect(
+    stringParser("category~'application'", groupFieldOptions),
+  ).toStrictEqual(expected);
+  expect(
+    stringParser("category~ 'application'", groupFieldOptions),
+  ).toStrictEqual(expected);
+  expect(
+    stringParser("category ~'application'", groupFieldOptions),
+  ).toStrictEqual(expected);
+});
 
 // test('without spacing has conjunction', () => {
 //   const expected = {
@@ -861,62 +861,62 @@ test('is Array', () => {
 //   ).toStrictEqual(expected);
 // });
 
-// test('without spacing has conjunction contain OR', () => {
-//   const expected = {
-//     conjunction: 'AND',
-//     expressions: [
-//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
-//       {
-//         type: 'operator',
-//         value: '=',
-//         field: 'category',
-//         fieldType: 'STRING',
-//         isArray: false,
-//       },
-//       {
-//         type: 'value',
-//         value: 'application',
-//         field: 'category',
-//         fieldType: 'STRING',
-//         isArray: false,
-//         component: 'text',
-//       },
-//       { type: 'field', value: 'image', fieldType: 'STRING', isArray: false },
-//       {
-//         type: 'operator',
-//         value: '~',
-//         field: 'image',
-//         fieldType: 'STRING',
-//         isArray: false,
-//         isAdvanced: true,
-//         advancedJoinOperator: 'OR',
-//       },
-//       {
-//         type: 'value',
-//         value: ['a', 'b', ' OR '],
-//         field: 'image',
-//         fieldType: 'STRING',
-//         isArray: false,
-//         component: 'tags',
-//       },
-//     ],
-//   };
-//   expect(
-//     stringParser(
-//       "category = 'application' AND (image~'a' OR image~'b' OR image ~ ' OR ')",
-//       groupFieldOptions,
-//     ),
-//   ).toStrictEqual(expected);
-//   expect(
-//     stringParser(
-//       "category='application' AND (image ~ 'a' OR image ~ 'b' OR image ~ ' OR ')",
-//       groupFieldOptions,
-//     ),
-//   ).toStrictEqual(expected);
-//   expect(
-//     stringParser(
-//       "category ='application' AND (image ~ 'a' OR image ~ 'b' OR image~' OR ')",
-//       groupFieldOptions,
-//     ),
-//   ).toStrictEqual(expected);
-// });
+test('without spacing has conjunction contain OR', () => {
+  const expected = {
+    conjunction: 'AND',
+    expressions: [
+      { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+      {
+        type: 'operator',
+        value: '=',
+        field: 'category',
+        fieldType: 'STRING',
+        isArray: false,
+      },
+      {
+        type: 'value',
+        value: 'application',
+        field: 'category',
+        fieldType: 'STRING',
+        isArray: false,
+        component: 'text',
+      },
+      { type: 'field', value: 'image', fieldType: 'STRING', isArray: false },
+      {
+        type: 'operator',
+        value: '~',
+        field: 'image',
+        fieldType: 'STRING',
+        isArray: false,
+        isAdvanced: true,
+        advancedJoinOperator: 'OR',
+      },
+      {
+        type: 'value',
+        value: ['a', 'b', ' OR '],
+        field: 'image',
+        fieldType: 'STRING',
+        isArray: false,
+        component: 'tags',
+      },
+    ],
+  };
+  expect(
+    stringParser(
+      "category = 'application' AND (image~'a' OR image~'b' OR image ~ ' OR ')",
+      groupFieldOptions,
+    ),
+  ).toStrictEqual(expected);
+  expect(
+    stringParser(
+      "category='application' AND (image ~ 'a' OR image ~ 'b' OR image ~ ' OR ')",
+      groupFieldOptions,
+    ),
+  ).toStrictEqual(expected);
+  expect(
+    stringParser(
+      "category ='application' AND (image ~ 'a' OR image ~ 'b' OR image~' OR ')",
+      groupFieldOptions,
+    ),
+  ).toStrictEqual(expected);
+});
