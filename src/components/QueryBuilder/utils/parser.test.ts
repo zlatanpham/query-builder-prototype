@@ -648,6 +648,79 @@ test('value contain OR', () => {
   });
 });
 
+// test('incomplete query with field and operator', () => {
+//   const expected = {
+//     conjunction: 'AND',
+//     expressions: [
+//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+//       {
+//         type: 'operator',
+//         value: '~',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//       },
+//     ],
+//   };
+
+//   expect(stringParser('category ~ ', groupFieldOptions)).toStrictEqual(
+//     expected,
+//   );
+//   expect(stringParser('category~', groupFieldOptions)).toStrictEqual(expected);
+//   expect(stringParser('category~ ', groupFieldOptions)).toStrictEqual(expected);
+// });
+
+// test('incomplete query with only field', () => {
+//   expect(stringParser('category', groupFieldOptions)).toStrictEqual({
+//     conjunction: 'AND',
+//     expressions: [
+//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+//     ],
+//   });
+// });
+
+// test('incomplete query with conjunction', () => {
+//   expect(
+//     stringParser("category ~ 'application' AND onSale =", groupFieldOptions),
+//   ).toStrictEqual({
+//     conjunction: 'AND',
+//     expressions: [
+//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+//       {
+//         type: 'operator',
+//         value: '~',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//       },
+//       {
+//         type: 'value',
+//         value: 'application',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//         component: 'text',
+//       },
+//       { type: 'field', value: 'onSale', fieldType: 'BOOLEAN', isArray: false },
+//       {
+//         type: 'operator',
+//         value: '=',
+//         field: 'onSale',
+//         fieldType: 'BOOLEAN',
+//         isArray: false,
+//       },
+//       {
+//         type: 'value',
+//         value: 'TRUE',
+//         field: 'onSale',
+//         fieldType: 'BOOLEAN',
+//         component: 'boolean',
+//         isArray: false,
+//       },
+//     ],
+//   });
+// });
+
 test('is Array', () => {
   expect(
     stringParser(
@@ -702,3 +775,148 @@ test('is Array', () => {
     ],
   });
 });
+
+// test('without spacing', () => {
+//   const expected = {
+//     conjunction: 'AND',
+//     expressions: [
+//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+//       {
+//         type: 'operator',
+//         value: '~',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//       },
+//       {
+//         type: 'value',
+//         value: 'application',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//         component: 'text',
+//       },
+//     ],
+//   };
+
+//   expect(
+//     stringParser("category~'application'", groupFieldOptions),
+//   ).toStrictEqual(expected);
+//   expect(
+//     stringParser("category~ 'application'", groupFieldOptions),
+//   ).toStrictEqual(expected);
+//   expect(
+//     stringParser("category ~'application'", groupFieldOptions),
+//   ).toStrictEqual(expected);
+// });
+
+// test('without spacing has conjunction', () => {
+//   const expected = {
+//     conjunction: 'OR',
+//     expressions: {
+//       conjunction: 'AND',
+//       expressions: [
+//         {
+//           type: 'field',
+//           value: 'category',
+//           fieldType: 'STRING',
+//           isArray: false,
+//         },
+//         {
+//           type: 'operator',
+//           value: '~',
+//           field: 'category',
+//           fieldType: 'STRING',
+//           isArray: false,
+//         },
+//         {
+//           type: 'value',
+//           value: 'application',
+//           field: 'category',
+//           fieldType: 'STRING',
+//           isArray: false,
+//           component: 'text',
+//         },
+//       ],
+//     },
+//   };
+
+//   expect(
+//     stringParser(
+//       "category = 'application' AND brand~['red']",
+//       groupFieldOptions,
+//     ),
+//   ).toStrictEqual(expected);
+//   expect(
+//     stringParser(
+//       "category='application' AND brand ~ ['red']",
+//       groupFieldOptions,
+//     ),
+//   ).toStrictEqual(expected);
+//   expect(
+//     stringParser(
+//       "category ='application' AND brand~ ['red']",
+//       groupFieldOptions,
+//     ),
+//   ).toStrictEqual(expected);
+// });
+
+// test('without spacing has conjunction contain OR', () => {
+//   const expected = {
+//     conjunction: 'AND',
+//     expressions: [
+//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+//       {
+//         type: 'operator',
+//         value: '=',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//       },
+//       {
+//         type: 'value',
+//         value: 'application',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//         component: 'text',
+//       },
+//       { type: 'field', value: 'image', fieldType: 'STRING', isArray: false },
+//       {
+//         type: 'operator',
+//         value: '~',
+//         field: 'image',
+//         fieldType: 'STRING',
+//         isArray: false,
+//         isAdvanced: true,
+//         advancedJoinOperator: 'OR',
+//       },
+//       {
+//         type: 'value',
+//         value: ['a', 'b', ' OR '],
+//         field: 'image',
+//         fieldType: 'STRING',
+//         isArray: false,
+//         component: 'tags',
+//       },
+//     ],
+//   };
+//   expect(
+//     stringParser(
+//       "category = 'application' AND (image~'a' OR image~'b' OR image ~ ' OR ')",
+//       groupFieldOptions,
+//     ),
+//   ).toStrictEqual(expected);
+//   expect(
+//     stringParser(
+//       "category='application' AND (image ~ 'a' OR image ~ 'b' OR image ~ ' OR ')",
+//       groupFieldOptions,
+//     ),
+//   ).toStrictEqual(expected);
+//   expect(
+//     stringParser(
+//       "category ='application' AND (image ~ 'a' OR image ~ 'b' OR image~' OR ')",
+//       groupFieldOptions,
+//     ),
+//   ).toStrictEqual(expected);
+// });
