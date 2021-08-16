@@ -28,5 +28,5 @@ export const filterObjectToString = (items: Item[], joinOperator: string) => {
       result.push(exp);
     }
   }
-  return result.join(` ${joinOperator} `);
+  return result.join(` ${joinOperator} `).trim();
 };

@@ -1714,10 +1714,10 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
-"@sajari-ui/core@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@sajari-ui/core/-/core-0.11.0.tgz#d7791110a6b3a278cf207e6a5664612d0468031a"
-  integrity sha512-fPABAUEhPzFEAWg/VgLcRIx1bF+LVuLGcFxtB0pKMcGbUtCtaeh8MeyGZYl456vyFFjb3tLUTImQdJUf+OrZgg==
+"@sajari-ui/core@^0.11.1":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@sajari-ui/core/-/core-0.11.1.tgz#36f2e1c6e63ffc0ac37a11f1aa58c9ec78a59c62"
+  integrity sha512-VY7Cf4Lhwxtdoe8BdtpGM3GU5w4rFU9zZjHrIiM4PUbA8I6r+xTiXqRJOMMg2r8spxvgtF4WGB18vUxrsOhrHA==
   dependencies:
     "@popperjs/core" "^2.9.1"
     "@reach/auto-id" "^0.13.2"
@@ -11884,10 +11884,8 @@ watchpack@^1.7.4:
   resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-1.7.5.tgz#1267e6c55e0b9b5be44c2023aed5437a2c26c453"
   integrity sha512-9P3MWk6SrKjHsGkLT2KHXdQ/9SNkyoJbabxnKOoJepsvJjJG8uYTR3yTPxPQvNDI3w4Nz1xnE0TLHK4RIVe/MQ==
   dependencies:
-    chokidar "^3.4.1"
     graceful-fs "^4.1.2"
     neo-async "^2.5.0"
-    watchpack-chokidar2 "^2.0.1"
   optionalDependencies:
     chokidar "^3.4.1"
     watchpack-chokidar2 "^2.0.1"
