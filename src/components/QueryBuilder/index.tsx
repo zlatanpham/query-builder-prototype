@@ -255,6 +255,7 @@ export function Inner({ groupFieldOptions }: QueryBuilderProps) {
               <Flex
                 justifyContent="justify-center"
                 alignItems="items-center"
+                flex="flex-none"
                 width="w-8"
               >
                 <Icon
@@ -270,6 +271,7 @@ export function Inner({ groupFieldOptions }: QueryBuilderProps) {
           ) : (
             <IconButton
               width="w-8"
+              flex="flex-none"
               icon={mode === 'text' ? 'pencil' : 'small-filter'}
               onClick={() => {
                 setMode(mode === 'text' ? 'visual' : 'text');
@@ -280,7 +282,12 @@ export function Inner({ groupFieldOptions }: QueryBuilderProps) {
             />
           )}
 
-          <Box width="w-px" backgroundColor="bg-gray-200" margin="m-1" />
+          <Box
+            width="w-px"
+            backgroundColor="bg-gray-200"
+            margin="m-1"
+            height="h-6"
+          />
           {mode === 'text' ? (
             <TextInput
               outline="outline-none"
