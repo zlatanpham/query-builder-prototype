@@ -5,7 +5,7 @@ import { Item } from '../shared';
 export const getFilteredSuggestions = (
   items: any[],
   inputValue: string,
-  activeItem: Item,
+  activeItem?: Item,
 ) => {
   const isArrayFilter = (item) => {
     return (
@@ -23,7 +23,7 @@ export const getFilteredSuggestions = (
     (activeItem?.type !== 'field' ||
       (activeItem?.type === 'field' &&
         'types' in item &&
-        item?.types.includes(activeItem.fieldType)));
+        item?.types.includes(activeItem?.fieldType)));
 
   // Group case
   if (items[0]?.title) {
