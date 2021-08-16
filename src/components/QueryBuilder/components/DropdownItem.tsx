@@ -1,6 +1,6 @@
 import { Box, Flex } from '@sajari-ui/core';
 import { UseComboboxGetItemPropsOptions } from 'downshift';
-import { useContextProvider } from '../ContextProvider';
+import { useQueryBuilderContext } from '../context';
 import { FieldOption, Item, Operator, Suggestion } from '../shared';
 
 interface DropdownItemProps {
@@ -20,7 +20,7 @@ export const DropdownItem = ({
   openMenu,
   setInputValue,
 }: DropdownItemProps) => {
-  const { items, addItem, setSelectedItem } = useContextProvider();
+  const { items, addItem, setSelectedItem } = useQueryBuilderContext();
   const lastItem = items[items.length - 1];
 
   return (

@@ -8,7 +8,7 @@ import {
   usePopper,
 } from '@sajari-ui/core';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { useContextProvider } from '../ContextProvider';
+import { useQueryBuilderContext } from '../context';
 import { advancedOperatorMapping, Item, operatorMapping } from '../shared';
 import { formatDate } from '../utils/dateUtils';
 import { DatePicker } from './DatePicker';
@@ -30,7 +30,7 @@ export const Pill = ({ index, item, onScrollEnd, onFocusLast }: Props) => {
     setSelectedItem,
     items,
     replaceItem,
-  } = useContextProvider();
+  } = useQueryBuilderContext();
   const [tempValue, setTempValue] = useState('');
 
   let innerRender: JSX.Element | null = null;

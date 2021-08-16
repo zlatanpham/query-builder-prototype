@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Box, Flex, FlexProps, IconButton, TagInput } from '@sajari-ui/core';
-import { useContextProvider } from '../ContextProvider';
 import { Item, Value } from '../shared';
 import { useEffect } from 'react';
+import { useQueryBuilderContext } from '../context';
 
 interface TagContainerProps {
   index: number;
@@ -24,7 +24,7 @@ export const TagContainer = ({
     Array.isArray(value) ? value : [value],
   );
   const ref: React.RefObject<HTMLInputElement> = React.createRef();
-  const { items, replaceItem, setSelectedItem } = useContextProvider();
+  const { items, replaceItem, setSelectedItem } = useQueryBuilderContext();
   const lastItem: Item | undefined = items[items.length - 1];
 
   const styleProps: FlexProps = {

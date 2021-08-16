@@ -4,7 +4,7 @@ import { createContext } from './utils/react-helpers';
 
 export type JoinOperator = 'OR' | 'AND';
 
-interface ContextValues {
+interface QueryBuilderContextValues {
   items: Item[];
   setItems: React.Dispatch<React.SetStateAction<Item[]>>;
   removeBlock: (index: number) => void;
@@ -19,9 +19,10 @@ interface ContextValues {
   setJoinOperator: (operator: JoinOperator) => void;
 }
 
-const [Provider, useContextProvider] = createContext<ContextValues>();
+const [Provider, useQueryBuilderContext] =
+  createContext<QueryBuilderContextValues>();
 
-export const ContextProvider: React.FC<any> = ({ children }) => {
+export const QueryBuilderContextProvider: React.FC<any> = ({ children }) => {
   const [items, setItems] = useState([...defaultItems]);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [hoverIndexes, setHoverIndexes] = useState<number[]>([]);
@@ -84,4 +85,4 @@ export const ContextProvider: React.FC<any> = ({ children }) => {
   );
 };
 
-export { useContextProvider };
+export { useQueryBuilderContext };

@@ -1,4 +1,4 @@
-import { JoinOperator } from '../ContextProvider';
+import { JoinOperator } from '../context';
 import {
   advancedOperatorMapping,
   Field,
