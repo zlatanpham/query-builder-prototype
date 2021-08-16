@@ -131,7 +131,11 @@ export function Inner({ groupFieldOptions }: QueryBuilderProps) {
           let nextItem = selectedItem;
           // if selectedItem is undefined, set [0] as fallback
           // as the result of onKeyDown in getInputProps
-          if (!nextItem && lastItem?.type === 'field') {
+          if (
+            !nextItem &&
+            lastItem?.type === 'field' &&
+            type === useCombobox.stateChangeTypes.InputKeyDownEnter
+          ) {
             nextItem = flatSuggestions[0];
           }
 
@@ -406,7 +410,6 @@ export function Inner({ groupFieldOptions }: QueryBuilderProps) {
                         }
 
                         if (e.key === 'Enter' && highlightedIndex === 0) {
-                          console.log('123');
                           selectItem(flatSuggestions[0]);
                         }
 
