@@ -6,16 +6,17 @@ export const toDate = (value: string) => {
   const dateValue = value.replace(/\D/g, '');
   const date = parse(
     dateValue,
-    'ddMMyyyy'.slice(0, dateValue.length),
+    'yyyyMMdd'.slice(0, dateValue.length),
     defaultDate,
   );
   return isValid(date) ? date : defaultDate;
 };
 
 export const formatDate = (value: string | Date) => {
+  const validFormat = 'yyyy-MM-dd';
   if (typeof value === 'string') {
     const date = toDate(value);
-    return format(date, 'dd/MM/yyyy');
+    return format(date, validFormat);
   }
-  return format(value, 'dd/MM/yyyy');
+  return format(value, validFormat);
 };

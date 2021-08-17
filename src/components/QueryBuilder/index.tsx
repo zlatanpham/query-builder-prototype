@@ -15,7 +15,7 @@ import {
 } from '@sajari-ui/core';
 import { Pill, Result, DropdownItem } from './components';
 import { DatePicker } from './components/DatePicker';
-import { formatDate } from './utils/dateUtils';
+import { formatDate } from './utils/datetime';
 import { filterObjectToString } from './utils/filterObjectToString';
 import { stringParser } from './utils/parser';
 import { flattenSuggestions, getFilteredSuggestions } from './utils/filter';

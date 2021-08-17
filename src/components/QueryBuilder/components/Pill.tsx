@@ -10,7 +10,7 @@ import {
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useQueryBuilderContext } from '../context';
 import { advancedOperatorMapping, Item, operatorMapping } from '../shared';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate } from '../utils/datetime';
 import { DatePicker } from './DatePicker';
 import { TagContainer } from './TagContainer';
 

@@ -2,7 +2,7 @@ import { Box } from '@sajari-ui/core';
 import { Calendar } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
-import { toDate } from '../utils/dateUtils';
+import { toDate } from '../utils/datetime';
 
 interface DatePickerProps {
   inputValue: string;
