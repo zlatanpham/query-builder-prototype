@@ -20,7 +20,7 @@ const Result = ({ textExpression }: { textExpression: string }) => {
 };
 
 const App = () => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState('test hellow world');
 
   return (
     <Box padding={['p-10', 'pt-20']} maxWidth="max-w-7xl" margin="mx-auto">

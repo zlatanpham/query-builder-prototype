@@ -14,7 +14,7 @@ import {
 
 type Block = [string, string, string | string[]];
 
-const _regex = /(?:[^_(']|\([^)]*\)|'[^']*')+/g;
+const _regex = /(?:[^@#@(']|\([^)]*\)|'[^']*')+/g;
 
 const isOrExpression = (expression: string) => {
   return expression
@@ -56,10 +56,11 @@ const handleExpression = (
   const regex = new RegExp(joinOperator, 'g');
   return newExpression
     .replace(/[()]/g, '')
-    .replace(regex, '_')
+    .replace(regex, '@#@')
     .match(_regex)
     ?.map(
-      (value) => toBlock(value.replace(/_/g, joinOperator), groupFieldOptions),
+      (value) =>
+        toBlock(value.replace(/@#@/g, joinOperator), groupFieldOptions),
       groupFieldOptions,
     )
     .reduce((result, value) => {
@@ -93,11 +94,11 @@ export const stringParser = (
   const joinOperator = isOrExpression(expressionString) ? ' OR ' : ' AND ';
   const regex = new RegExp(joinOperator, 'g');
   const blockList = expressionString
-    .replace(regex, '_')
+    .replace(regex, '@#@')
     .match(_regex)
     ?.map((expression) =>
       handleExpression(
-        expression.replace(/_/g, joinOperator),
+        expression.replace(/@#@/g, joinOperator),
         groupFieldOptions,
       ),
     );

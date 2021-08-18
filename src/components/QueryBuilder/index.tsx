@@ -38,8 +38,7 @@ interface QueryBuilderProps {
   onChange: (value: string) => void;
 }
 
-export function Inner(props: Omit<QueryBuilderProps, 'schema'>) {
-  const { value: textExpression, onChange: setTextExpression } = props;
+export function Inner() {
   const [inputValue, setInputValue] = useState('');
   const {
     items,
@@ -50,6 +49,9 @@ export function Inner(props: Omit<QueryBuilderProps, 'schema'>) {
     joinOperator,
     setJoinOperator,
     groupFieldOptions,
+    value: textExpression,
+    onChange: setTextExpression,
+    isDefaultVisualMode,
   } = useQueryBuilderContext();
   const lastItem: Item | undefined = items[items.length - 1];
   const [inputFocus, setInputFocus] = useState(false);
@@ -57,7 +59,9 @@ export function Inner(props: Omit<QueryBuilderProps, 'schema'>) {
   const showDateContainer =
     lastItem?.type === 'operator' && lastItem?.fieldType === 'TIMESTAMP';
 
-  const [mode, setMode] = useState<'visual' | 'text'>('visual');
+  const [mode, setMode] = useState<'visual' | 'text'>(
+    isDefaultVisualMode ? 'visual' : 'text',
+  );
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -98,6 +102,7 @@ export function Inner(props: Omit<QueryBuilderProps, 'schema'>) {
         setTransformError('');
       } catch (error) {
         console.error(error);
+        console.log(error.message);
         setTransformError(error.message);
       }
     }
@@ -594,10 +599,10 @@ export function Inner(props: Omit<QueryBuilderProps, 'schema'>) {
   );
 }
 
-export const QueryBuilder = ({ schema, ...rest }: QueryBuilderProps) => {
+export const QueryBuilder = (props: QueryBuilderProps) => {
   return (
-    <QueryBuilderContextProvider schema={schema}>
-      <Inner {...rest} />
+    <QueryBuilderContextProvider {...props}>
+      <Inner />
     </QueryBuilderContextProvider>
   );
 };
