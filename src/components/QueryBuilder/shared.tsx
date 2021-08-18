@@ -72,7 +72,7 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
       {
         value: '=',
         text: 'is',
-        types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE', 'TIMESTAMP'],
+        types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
       },
       {
         value: '~',
@@ -83,7 +83,7 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
       {
         value: '!=',
         text: 'is not',
-        types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE', 'TIMESTAMP'],
+        types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
       },
       {
         value: '!~',

@@ -81,14 +81,7 @@ test.each<[any[], string, Item | undefined, any[]]>([
           {
             value: '=',
             text: 'is',
-            types: [
-              'STRING',
-              'BOOLEAN',
-              'FLOAT',
-              'INTEGER',
-              'DOUBLE',
-              'TIMESTAMP',
-            ],
+            types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
           },
           {
             value: '~',
@@ -99,14 +92,7 @@ test.each<[any[], string, Item | undefined, any[]]>([
           {
             value: '!=',
             text: 'is not',
-            types: [
-              'STRING',
-              'BOOLEAN',
-              'FLOAT',
-              'INTEGER',
-              'DOUBLE',
-              'TIMESTAMP',
-            ],
+            types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
           },
           {
             value: '!~',
@@ -223,26 +209,12 @@ test.each<[any[], string, Item | undefined, any[]]>([
           {
             value: '=',
             text: 'is',
-            types: [
-              'STRING',
-              'BOOLEAN',
-              'FLOAT',
-              'INTEGER',
-              'DOUBLE',
-              'TIMESTAMP',
-            ],
+            types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
           },
           {
             value: '!=',
             text: 'is not',
-            types: [
-              'STRING',
-              'BOOLEAN',
-              'FLOAT',
-              'INTEGER',
-              'DOUBLE',
-              'TIMESTAMP',
-            ],
+            types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
           },
         ],
       },
@@ -259,26 +231,12 @@ test.each<[any[], string, Item | undefined, any[]]>([
           {
             value: '=',
             text: 'is',
-            types: [
-              'STRING',
-              'BOOLEAN',
-              'FLOAT',
-              'INTEGER',
-              'DOUBLE',
-              'TIMESTAMP',
-            ],
+            types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
           },
           {
             value: '!=',
             text: 'is not',
-            types: [
-              'STRING',
-              'BOOLEAN',
-              'FLOAT',
-              'INTEGER',
-              'DOUBLE',
-              'TIMESTAMP',
-            ],
+            types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
           },
           {
             value: '>',
@@ -305,14 +263,7 @@ test.each<[any[], string, Item | undefined, any[]]>([
           {
             value: '!=',
             text: 'is not',
-            types: [
-              'STRING',
-              'BOOLEAN',
-              'FLOAT',
-              'INTEGER',
-              'DOUBLE',
-              'TIMESTAMP',
-            ],
+            types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
           },
         ],
       },
@@ -329,26 +280,12 @@ test.each<[any[], string, Item | undefined, any[]]>([
           {
             value: '=',
             text: 'is',
-            types: [
-              'STRING',
-              'BOOLEAN',
-              'FLOAT',
-              'INTEGER',
-              'DOUBLE',
-              'TIMESTAMP',
-            ],
+            types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
           },
           {
             value: '!=',
             text: 'is not',
-            types: [
-              'STRING',
-              'BOOLEAN',
-              'FLOAT',
-              'INTEGER',
-              'DOUBLE',
-              'TIMESTAMP',
-            ],
+            types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
           },
         ],
       },
