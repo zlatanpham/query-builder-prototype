@@ -495,6 +495,8 @@ export function Inner(props: Omit<QueryBuilderProps, 'schema'>) {
                   borderColor="border-gray-200"
                   boxShadow="shadow-menu"
                   as="ul"
+                  maxHeight="max-h-96"
+                  overflow="overflow-y-auto"
                 >
                   <Box {...getMenuProps()}>
                     {filteredSuggestions[0]?.title
