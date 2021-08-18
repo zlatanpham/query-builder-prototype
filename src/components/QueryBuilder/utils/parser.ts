@@ -1,9 +1,8 @@
+import { SchemaFieldType } from '../../../schema';
 import {
   advancedOperatorMapping,
   Field,
   FieldOption,
-  FieldType,
-  groupFieldOptions,
   GroupMenu,
   groupOperatorOptions,
   Item,
@@ -45,7 +44,10 @@ const toBlock = (
   return [a, b, c.replace(/'/g, '')] as Block;
 };
 
-const handleExpression = (expression: string) => {
+const handleExpression = (
+  expression: string,
+  groupFieldOptions: GroupMenu<FieldOption>[],
+) => {
   if (!expression.trim().startsWith('(')) {
     return toBlock(expression.trim(), groupFieldOptions);
   }
@@ -94,7 +96,10 @@ export const stringParser = (
     .replace(regex, '_')
     .match(_regex)
     ?.map((expression) =>
-      handleExpression(expression.replace(/_/g, joinOperator)),
+      handleExpression(
+        expression.replace(/_/g, joinOperator),
+        groupFieldOptions,
+      ),
     );
 
   if (!blockList) {
@@ -163,7 +168,7 @@ export const stringParser = (
     const field: Field = {
       type: 'field',
       value: f,
-      fieldType: fieldType as FieldType,
+      fieldType: fieldType as SchemaFieldType,
       isArray: isArrayField,
     };
 
@@ -177,7 +182,7 @@ export const stringParser = (
       type: 'operator',
       value: advancedJoinOperator ? o.replace(advancedJoinOperator, '') : o,
       field: f,
-      fieldType: fieldType as FieldType,
+      fieldType: fieldType as SchemaFieldType,
       ...(advancedJoinOperator
         ? { isAdvanced: true, advancedJoinOperator }
         : {}),
@@ -188,7 +193,7 @@ export const stringParser = (
           type: 'value',
           value: inputValue,
           field: f,
-          fieldType: fieldType as FieldType,
+          fieldType: fieldType as SchemaFieldType,
           component: 'tags',
           isArray: isArrayField,
         }
@@ -196,7 +201,7 @@ export const stringParser = (
           type: 'value',
           value: inputValue.replace(/'/g, ''),
           field: f,
-          fieldType: fieldType as FieldType,
+          fieldType: fieldType as SchemaFieldType,
           component: isBooleanSelect ? 'boolean' : 'text',
           isArray: isArrayField,
         };

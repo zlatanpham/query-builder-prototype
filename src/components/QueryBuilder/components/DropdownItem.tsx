@@ -34,6 +34,7 @@ export const DropdownItem = ({
       textColor={highlightedIndex === index ? 'text-white' : 'text-gray-500'}
       key={`${item.value}${index}`}
       {...getItemProps({
+        // Complex to do type inference here
         // @ts-ignore
         item,
         index,
@@ -106,9 +107,14 @@ export const DropdownItem = ({
         },
       })}
     >
-      {lastItem?.type === 'field' ? <Box as="span">{item.value}</Box> : null}
+      {lastItem?.type === 'field' ? (
+        <Box as="span" truncate="truncate">
+          {item.value}
+        </Box>
+      ) : null}
       <Box
         as="span"
+        truncate="truncate"
         fontSize={lastItem?.type === 'field' ? 'text-sm' : 'text-base'}
       >
         {item.text}

@@ -1,5 +1,7 @@
+import { SchemaField } from '../../../schema';
 import {
   advancedOperatorMapping,
+  FieldOption,
   Item,
   numberTypes,
   Operator,
@@ -66,4 +68,13 @@ export function getExpression(items: Item[], index: number) {
   } ${
     numberTypes.includes(field.fieldType) ? value.value : `'${value.value}'`
   }`;
+}
+
+export function schemaToFieldOptions(schema: SchemaField[]): FieldOption[] {
+  return schema.map(({ Name, Type, Repeated }) => ({
+    text: Name,
+    value: Name,
+    type: Type,
+    isArray: Repeated,
+  }));
 }

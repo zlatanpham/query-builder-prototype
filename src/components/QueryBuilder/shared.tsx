@@ -1,17 +1,10 @@
+import { SchemaFieldType } from '../../schema';
 export type JoinOperator = 'OR' | 'AND';
-
-export type FieldType =
-  | 'INTEGER'
-  | 'BOOLEAN'
-  | 'STRING'
-  | 'FLOAT'
-  | 'DOUBLE'
-  | 'TIMESTAMP';
 
 export interface FieldOption {
   text: string;
   value: string;
-  type: FieldType;
+  type: SchemaFieldType;
   isArray: boolean;
 }
 
@@ -23,7 +16,7 @@ export interface GroupMenu<T> {
 export interface OperatorOption {
   text: string;
   value: keyof typeof operatorMapping;
-  types: FieldType[];
+  types: SchemaFieldType[];
   isAdvanced?: boolean;
   supportIsArray?: boolean;
   advancedJoinOperator?: 'AND' | 'OR';
@@ -73,33 +66,7 @@ export type Value =
 
 export type Item = Field | Operator | Value;
 
-export const numberTypes: FieldType[] = ['INTEGER', 'FLOAT', 'DOUBLE'];
-
-export const groupFieldOptions: GroupMenu<FieldOption>[] = [
-  {
-    title: 'Params',
-    items: [
-      { text: 'q', value: 'q', isArray: false, type: 'STRING' },
-      { text: 'page', value: 'page', isArray: false, type: 'INTEGER' },
-    ],
-  },
-  {
-    title: 'Fields',
-    items: [
-      { text: 'image', value: 'image', isArray: false, type: 'STRING' },
-      { text: 'category', value: 'category', isArray: false, type: 'STRING' },
-      { text: 'brand', value: 'brand', isArray: true, type: 'STRING' },
-      { text: 'price', value: 'price', isArray: false, type: 'FLOAT' },
-      { text: 'onSale', value: 'onSale', isArray: false, type: 'BOOLEAN' },
-      {
-        text: 'createdAt',
-        value: 'createdAt',
-        isArray: false,
-        type: 'TIMESTAMP',
-      },
-    ],
-  },
-];
+export const numberTypes: SchemaFieldType[] = ['INTEGER', 'FLOAT', 'DOUBLE'];
 
 export const operatorMapping = {
   '=': 'is',
@@ -213,23 +180,4 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
 export const booleanOptions = [
   { text: 'TRUE', value: 'TRUE' },
   { text: 'FALSE', value: 'FALSE' },
-];
-
-export const defaultItems: Item[] = [
-  { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
-  {
-    type: 'operator',
-    value: '=',
-    fieldType: 'STRING',
-    field: 'category',
-    isArray: false,
-  },
-  {
-    type: 'value',
-    value: 'application',
-    component: 'text',
-    fieldType: 'STRING',
-    field: 'category',
-    isArray: false,
-  },
 ];

@@ -13,7 +13,7 @@ import {
   Icon,
   Tooltip,
 } from '@sajari-ui/core';
-import { Pill, Result, DropdownItem } from './components';
+import { Pill, DropdownItem } from './components';
 import { DatePicker } from './components/DatePicker';
 import { formatDate } from './utils/datetime';
 import { filterObjectToString } from './utils/filterObjectToString';
@@ -30,12 +30,16 @@ import {
   Operator,
 } from './shared';
 import { QueryBuilderContextProvider, useQueryBuilderContext } from './context';
+import { SchemaField } from '../../schema';
 
 interface QueryBuilderProps {
-  groupFieldOptions: GroupMenu<FieldOption>[];
+  schema: SchemaField[];
+  value: string;
+  onChange: (value: string) => void;
 }
 
-export function Inner({ groupFieldOptions }: QueryBuilderProps) {
+export function Inner(props: Omit<QueryBuilderProps, 'schema'>) {
+  const { value: textExpression, onChange: setTextExpression } = props;
   const [inputValue, setInputValue] = useState('');
   const {
     items,
@@ -45,6 +49,7 @@ export function Inner({ groupFieldOptions }: QueryBuilderProps) {
     setSelectedItem,
     joinOperator,
     setJoinOperator,
+    groupFieldOptions,
   } = useQueryBuilderContext();
   const lastItem: Item | undefined = items[items.length - 1];
   const [inputFocus, setInputFocus] = useState(false);
@@ -52,7 +57,6 @@ export function Inner({ groupFieldOptions }: QueryBuilderProps) {
   const showDateContainer =
     lastItem?.type === 'operator' && lastItem?.fieldType === 'TIMESTAMP';
 
-  const [textExpression, setTextExpression] = useState('');
   const [mode, setMode] = useState<'visual' | 'text'>('visual');
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -78,7 +82,7 @@ export function Inner({ groupFieldOptions }: QueryBuilderProps) {
     if (mode === 'visual') {
       setTextExpression(filterObjectToString(items, joinOperator));
     }
-  }, [items, joinOperator, mode]);
+  }, [items, joinOperator, mode, setTextExpression]);
 
   const [transformError, setTransformError] = useState('');
 
@@ -93,7 +97,7 @@ export function Inner({ groupFieldOptions }: QueryBuilderProps) {
         setJoinOperator(joinOperator);
         setTransformError('');
       } catch (error) {
-        console.log(error);
+        console.error(error);
         setTransformError(error.message);
       }
     }
@@ -229,373 +233,369 @@ export function Inner({ groupFieldOptions }: QueryBuilderProps) {
 
   return (
     <>
-      <Box padding={['p-10', 'pt-20']} maxWidth="max-w-7xl" margin="mx-auto">
-        <Box
-          position="relative"
-          borderWidth="border"
-          borderColor="border-gray-200"
-          borderRadius="rounded-md"
-          padding={['py-1', 'pl-1']}
-          display="flex"
-          justifyContent="justify-between"
-          flexWrap="flex-no-wrap"
-          boxShadow={inputFocus ? 'shadow-outline-blue' : undefined}
-        >
-          {transformError ? (
-            <Tooltip
-              label={
-                transformError === 'undefined'
-                  ? 'The query is not supported by the Visual mode'
-                  : transformError
-              }
-            >
-              <Flex
-                justifyContent="justify-center"
-                alignItems="items-center"
-                flex="flex-none"
-                width="w-8"
-              >
-                <Icon
-                  name="warning"
-                  color={
-                    transformError === 'undefined'
-                      ? 'text-gray-400'
-                      : 'text-red-500'
-                  }
-                />
-              </Flex>
-            </Tooltip>
-          ) : (
-            <IconButton
-              width="w-8"
+      <Box
+        position="relative"
+        borderWidth="border"
+        borderColor="border-gray-200"
+        borderRadius="rounded-md"
+        padding={['py-1', 'pl-1']}
+        display="flex"
+        justifyContent="justify-between"
+        flexWrap="flex-no-wrap"
+        boxShadow={inputFocus ? 'shadow-outline-blue' : undefined}
+      >
+        {transformError ? (
+          <Tooltip
+            label={
+              transformError === 'undefined'
+                ? 'The query is not supported by the Visual mode'
+                : transformError
+            }
+          >
+            <Flex
+              justifyContent="justify-center"
+              alignItems="items-center"
               flex="flex-none"
-              icon={mode === 'text' ? 'pencil' : 'small-filter'}
-              onClick={() => {
-                setMode(mode === 'text' ? 'visual' : 'text');
-              }}
-              label={mode === 'text' ? 'Text mode' : 'Visual mode'}
-              size="sm"
-              borderWidth="border-0"
-            />
-          )}
-
-          <Box
-            width="w-px"
-            backgroundColor="bg-gray-200"
-            margin="m-1"
-            height="h-6"
-          />
-          {mode === 'text' ? (
-            <TextInput
-              outline="outline-none"
-              boxShadow="focus:shadow-none"
-              borderRadius="rounded-none"
-              value={textExpression}
-              onChange={(e) => setTextExpression(e.target.value)}
-              onFocus={() => setInputFocus(true)}
-              onBlur={() => setInputFocus(false)}
-              borderWidth="border-0"
-              height="h-8"
-            />
-          ) : (
-            <Box
-              ref={wrapperRef}
-              overflow="overflow-auto"
-              onScroll={() => {
-                closeMenu();
-              }}
-              width="w-auto"
-              display="flex"
-              flex="flex-1"
-              flexWrap="flex-no-wrap"
+              width="w-8"
             >
-              {items.map((item, index) => (
-                <React.Fragment key={index}>
-                  <Pill
-                    key={index}
-                    index={index}
-                    item={item}
-                    onFocusLast={() => {
-                      inputRef.current?.focus();
-                      openMenu();
-                    }}
-                    onScrollEnd={() => {
-                      setTimeout(() => {
-                        wrapperRef.current?.scroll({
-                          left: wrapperRef.current.scrollWidth,
-                        });
+              <Icon
+                name="warning"
+                color={
+                  transformError === 'undefined'
+                    ? 'text-gray-400'
+                    : 'text-red-500'
+                }
+              />
+            </Flex>
+          </Tooltip>
+        ) : (
+          <IconButton
+            width="w-8"
+            flex="flex-none"
+            icon={mode === 'text' ? 'pencil' : 'small-filter'}
+            onClick={() => {
+              setMode(mode === 'text' ? 'visual' : 'text');
+            }}
+            label={mode === 'text' ? 'Text mode' : 'Visual mode'}
+            size="sm"
+            borderWidth="border-0"
+          />
+        )}
+
+        <Box
+          width="w-px"
+          backgroundColor="bg-gray-200"
+          margin="m-1"
+          height="h-6"
+        />
+        {mode === 'text' ? (
+          <TextInput
+            outline="outline-none"
+            boxShadow="focus:shadow-none"
+            borderRadius="rounded-none"
+            value={textExpression}
+            onChange={(e) => setTextExpression(e.target.value)}
+            onFocus={() => setInputFocus(true)}
+            onBlur={() => setInputFocus(false)}
+            borderWidth="border-0"
+            height="h-8"
+          />
+        ) : (
+          <Box
+            ref={wrapperRef}
+            overflow="overflow-auto"
+            onScroll={() => {
+              closeMenu();
+            }}
+            width="w-auto"
+            display="flex"
+            flex="flex-1"
+            flexWrap="flex-no-wrap"
+          >
+            {items.map((item, index) => (
+              <React.Fragment key={index}>
+                <Pill
+                  key={index}
+                  index={index}
+                  item={item}
+                  onFocusLast={() => {
+                    inputRef.current?.focus();
+                    openMenu();
+                  }}
+                  onScrollEnd={() => {
+                    setTimeout(() => {
+                      wrapperRef.current?.scroll({
+                        left: wrapperRef.current.scrollWidth,
                       });
-                    }}
-                  />
-                  {index === 2 && items.length > 3 && (
-                    <Select
-                      borderRadius="rounded-none"
-                      width="w-20"
-                      flex="flex-none"
-                      borderWidth="border-0"
-                      padding={['p-0', 'pl-3']}
-                      value={joinOperator}
-                      onChange={(e) =>
-                        setJoinOperator(e.target.value as JoinOperator)
-                      }
-                    >
-                      <option value="AND">AND</option>
-                      <option value="OR">OR</option>
-                    </Select>
-                  )}
-
-                  {index > 2 && index % 3 === 2 && index !== items.length - 1 && (
-                    <Flex
-                      height="h-8"
-                      justifyContent="justify-center"
-                      flex="flex-none"
-                      width="w-14"
-                      textColor="text-gray-500"
-                      lineHeight="leading-none"
-                      alignItems="items-center"
-                    >
-                      {joinOperator}
-                    </Flex>
-                  )}
-                </React.Fragment>
-              ))}
-              <Box
-                flex="flex-1"
-                width="w-full"
-                display="inline-flex"
-                margin="pl-1"
-                onClick={() => {
-                  inputRef.current?.focus();
-                }}
-                {...getComboboxProps()}
-              >
-                <Box position="relative">
-                  <Box
-                    style={{ minWidth: 150 }}
-                    padding="px-2"
-                    textColor="text-transparent"
-                    userSelect="select-none"
-                    whitespace="whitespace-no-wrap"
+                    });
+                  }}
+                />
+                {index === 2 && items.length > 3 && (
+                  <Select
+                    borderRadius="rounded-none"
+                    width="w-20"
+                    flex="flex-none"
+                    borderWidth="border-0"
+                    padding={['p-0', 'pl-3']}
+                    value={joinOperator}
+                    onChange={(e) =>
+                      setJoinOperator(e.target.value as JoinOperator)
+                    }
                   >
-                    {inputValue}
-                  </Box>
-                  <Box
+                    <option value="AND">AND</option>
+                    <option value="OR">OR</option>
+                  </Select>
+                )}
+
+                {index > 2 && index % 3 === 2 && index !== items.length - 1 && (
+                  <Flex
                     height="h-8"
-                    as="input"
-                    type={isNumberInput ? 'number' : 'text'}
-                    placeholder={isNumberInput ? 'Enter a number' : ''}
-                    textColor="text-gray-600"
-                    outline="outline-none"
-                    padding="p-0"
-                    position="absolute"
-                    width="w-full"
-                    backgroundColor="bg-transparent"
-                    maxWidth="max-w-full"
-                    inset="inset-0"
-                    {...getInputProps({
-                      value: inputValue,
-                      onChange: (e) =>
-                        setInputValue((e.target as HTMLInputElement).value),
-                      ref: (ref) => {
-                        inputRef.current = ref;
-                        // Consider fixing this since reference.ref points to HTMLButtonElement
-                        // @ts-ignore
-                        reference.ref.current = ref;
-                      },
-                      onFocus: () => {
+                    justifyContent="justify-center"
+                    flex="flex-none"
+                    width="w-14"
+                    textColor="text-gray-500"
+                    lineHeight="leading-none"
+                    alignItems="items-center"
+                  >
+                    {joinOperator}
+                  </Flex>
+                )}
+              </React.Fragment>
+            ))}
+            <Box
+              flex="flex-1"
+              width="w-full"
+              display="inline-flex"
+              margin="pl-1"
+              onClick={() => {
+                inputRef.current?.focus();
+              }}
+              {...getComboboxProps()}
+            >
+              <Box position="relative">
+                <Box
+                  style={{ minWidth: 150 }}
+                  padding="px-2"
+                  textColor="text-transparent"
+                  userSelect="select-none"
+                  whitespace="whitespace-no-wrap"
+                >
+                  {inputValue}
+                </Box>
+                <Box
+                  height="h-8"
+                  as="input"
+                  type={isNumberInput ? 'number' : 'text'}
+                  placeholder={isNumberInput ? 'Enter a number' : ''}
+                  textColor="text-gray-600"
+                  outline="outline-none"
+                  padding="p-0"
+                  position="absolute"
+                  width="w-full"
+                  backgroundColor="bg-transparent"
+                  maxWidth="max-w-full"
+                  inset="inset-0"
+                  {...getInputProps({
+                    value: inputValue,
+                    onChange: (e) =>
+                      setInputValue((e.target as HTMLInputElement).value),
+                    ref: (ref) => {
+                      inputRef.current = ref;
+                      // Consider fixing this since reference.ref points to HTMLButtonElement
+                      // @ts-ignore
+                      reference.ref.current = ref;
+                    },
+                    onFocus: () => {
+                      openMenu();
+                      setInputFocus(true);
+                      setSelectedItem(null);
+                    },
+                    onBlur: () => {
+                      setInputFocus(false);
+                    },
+                    onKeyDown: (e) => {
+                      if (e.key === 'Backspace' && inputValue === '') {
+                        removeLast();
+                      }
+
+                      if (
+                        (e.key === 'Enter' || e.key === 'Tab') &&
+                        inputValue !== '' &&
+                        flatSuggestions.length > 0 &&
+                        highlightedIndex === -1
+                      ) {
+                        e.preventDefault();
+                        setHighlightedIndex(0);
+                        return;
+                      }
+
+                      if (e.key === 'Enter' && highlightedIndex === 0) {
+                        selectItem(flatSuggestions[0]);
+                      }
+
+                      if (
+                        e.key === 'Enter' &&
+                        lastItem?.type === 'operator' &&
+                        inputValue !== ''
+                      ) {
                         openMenu();
-                        setInputFocus(true);
-                        setSelectedItem(null);
-                      },
-                      onBlur: () => {
-                        setInputFocus(false);
-                      },
-                      onKeyDown: (e) => {
-                        if (e.key === 'Backspace' && inputValue === '') {
-                          removeLast();
+                        if (lastItem.isAdvanced) {
+                          addItem({
+                            type: 'value',
+                            value: inputValue
+                              .trim()
+                              .split(',')
+                              .filter(Boolean)
+                              .map((v) => v.trim()),
+                            component: 'tags',
+                            field: lastItem.field,
+                            fieldType: lastItem.fieldType,
+                            isArray: lastItem.isArray,
+                          });
+                        } else if (lastItem.fieldType === 'TIMESTAMP') {
+                          addItem({
+                            type: 'value',
+                            value: formatDate(inputValue),
+                            component: 'text',
+                            isArray: lastItem.isArray,
+                            field: lastItem.field,
+                            fieldType: lastItem.fieldType,
+                          });
+                        } else {
+                          addItem({
+                            type: 'value',
+                            value: inputValue.trim(),
+                            component: 'text',
+                            isArray: lastItem.isArray,
+                            field: lastItem.field,
+                            fieldType: lastItem.fieldType,
+                          });
                         }
+                        setInputValue('');
+                      }
+                    },
+                  })}
+                />
+              </Box>
+              <Portal>
+                <Box
+                  style={popper.style}
+                  ref={popper.ref}
+                  display={
+                    isOpen && filteredSuggestions.length > 0
+                      ? undefined
+                      : 'hidden'
+                  }
+                  backgroundColor="bg-white"
+                  borderRadius="rounded-lg"
+                  padding="p-2"
+                  zIndex="z-50"
+                  borderWidth="border"
+                  width="w-52"
+                  borderColor="border-gray-200"
+                  boxShadow="shadow-menu"
+                  as="ul"
+                >
+                  <Box {...getMenuProps()}>
+                    {filteredSuggestions[0]?.title
+                      ? (
+                          filteredSuggestions as GroupMenu<FieldOption>[]
+                        ).reduce(
+                          (result, section, sectionIndex) => {
+                            result.sections.push(
+                              <Box as="li" key={sectionIndex}>
+                                {sectionIndex > 0 && <Divider />}
+                                <Heading margin={['ml-1', 'my-1']} as="h6">
+                                  {section.title}
+                                </Heading>
+                                <Box as="ul">
+                                  {section.items.map((item) => {
+                                    const index = result.itemIndex;
+                                    result.itemIndex = result.itemIndex + 1;
+                                    return (
+                                      <DropdownItem
+                                        key={`${item.value}${index}`}
+                                        item={item}
+                                        highlightedIndex={highlightedIndex}
+                                        index={index}
+                                        openMenu={openMenu}
+                                        setInputValue={setInputValue}
+                                        getItemProps={getItemProps}
+                                      />
+                                    );
+                                  })}
+                                </Box>
+                              </Box>,
+                            );
 
-                        if (
-                          (e.key === 'Enter' || e.key === 'Tab') &&
-                          inputValue !== '' &&
-                          flatSuggestions.length > 0 &&
-                          highlightedIndex === -1
-                        ) {
-                          e.preventDefault();
-                          setHighlightedIndex(0);
-                          return;
-                        }
-
-                        if (e.key === 'Enter' && highlightedIndex === 0) {
-                          selectItem(flatSuggestions[0]);
-                        }
-
-                        if (
-                          e.key === 'Enter' &&
-                          lastItem?.type === 'operator' &&
-                          inputValue !== ''
-                        ) {
-                          openMenu();
-                          if (lastItem.isAdvanced) {
-                            addItem({
-                              type: 'value',
-                              value: inputValue
-                                .trim()
-                                .split(',')
-                                .filter(Boolean)
-                                .map((v) => v.trim()),
-                              component: 'tags',
-                              field: lastItem.field,
-                              fieldType: lastItem.fieldType,
-                              isArray: lastItem.isArray,
-                            });
-                          } else if (lastItem.fieldType === 'TIMESTAMP') {
-                            addItem({
-                              type: 'value',
-                              value: formatDate(inputValue),
-                              component: 'text',
-                              isArray: lastItem.isArray,
-                              field: lastItem.field,
-                              fieldType: lastItem.fieldType,
-                            });
-                          } else {
-                            addItem({
-                              type: 'value',
-                              value: inputValue.trim(),
-                              component: 'text',
-                              isArray: lastItem.isArray,
-                              field: lastItem.field,
-                              fieldType: lastItem.fieldType,
-                            });
-                          }
-                          setInputValue('');
-                        }
-                      },
-                    })}
+                            return result;
+                          },
+                          { sections: [] as JSX.Element[], itemIndex: 0 },
+                        ).sections
+                      : filteredSuggestions.map((item, index) => (
+                          <DropdownItem
+                            key={`${item.value}${index}`}
+                            item={item}
+                            highlightedIndex={highlightedIndex}
+                            index={index}
+                            openMenu={openMenu}
+                            setInputValue={setInputValue}
+                            getItemProps={getItemProps}
+                          />
+                        ))}
+                  </Box>
+                </Box>
+                <Box
+                  style={popper.style}
+                  ref={popper.ref}
+                  display={isOpen && showDateContainer ? undefined : 'hidden'}
+                  backgroundColor="bg-white"
+                  borderRadius="rounded-lg"
+                  padding="p-2"
+                  zIndex="z-50"
+                  borderWidth="border"
+                  borderColor="border-gray-200"
+                  boxShadow="shadow-menu"
+                >
+                  <DatePicker
+                    inputValue={inputValue}
+                    onChange={(date) => {
+                      openMenu();
+                      addItem({
+                        type: 'value',
+                        value: formatDate(date),
+                        component: 'text',
+                        isArray: lastItem.isArray,
+                        field: (lastItem as Operator).field,
+                        fieldType: lastItem.fieldType,
+                      });
+                      setInputValue('');
+                      inputRef.current?.focus();
+                    }}
                   />
                 </Box>
-                <Portal>
-                  <Box
-                    style={popper.style}
-                    ref={popper.ref}
-                    display={
-                      isOpen && filteredSuggestions.length > 0
-                        ? undefined
-                        : 'hidden'
-                    }
-                    backgroundColor="bg-white"
-                    borderRadius="rounded-lg"
-                    padding="p-2"
-                    zIndex="z-50"
-                    borderWidth="border"
-                    width="w-52"
-                    borderColor="border-gray-200"
-                    boxShadow="shadow-menu"
-                    as="ul"
-                  >
-                    <Box {...getMenuProps()}>
-                      {filteredSuggestions[0]?.title
-                        ? (
-                            filteredSuggestions as GroupMenu<FieldOption>[]
-                          ).reduce(
-                            (result, section, sectionIndex) => {
-                              result.sections.push(
-                                <Box as="li" key={sectionIndex}>
-                                  {sectionIndex > 0 && <Divider />}
-                                  <Heading margin={['ml-1', 'my-1']} as="h6">
-                                    {section.title}
-                                  </Heading>
-                                  <Box as="ul">
-                                    {section.items.map((item) => {
-                                      const index = result.itemIndex;
-                                      result.itemIndex = result.itemIndex + 1;
-                                      return (
-                                        <DropdownItem
-                                          key={`${item.value}${index}`}
-                                          item={item}
-                                          highlightedIndex={highlightedIndex}
-                                          index={index}
-                                          openMenu={openMenu}
-                                          setInputValue={setInputValue}
-                                          getItemProps={getItemProps}
-                                        />
-                                      );
-                                    })}
-                                  </Box>
-                                </Box>,
-                              );
-
-                              return result;
-                            },
-                            { sections: [] as JSX.Element[], itemIndex: 0 },
-                          ).sections
-                        : filteredSuggestions.map((item, index) => (
-                            <DropdownItem
-                              key={`${item.value}${index}`}
-                              item={item}
-                              highlightedIndex={highlightedIndex}
-                              index={index}
-                              openMenu={openMenu}
-                              setInputValue={setInputValue}
-                              getItemProps={getItemProps}
-                            />
-                          ))}
-                    </Box>
-                  </Box>
-                  <Box
-                    style={popper.style}
-                    ref={popper.ref}
-                    display={isOpen && showDateContainer ? undefined : 'hidden'}
-                    backgroundColor="bg-white"
-                    borderRadius="rounded-lg"
-                    padding="p-2"
-                    zIndex="z-50"
-                    borderWidth="border"
-                    borderColor="border-gray-200"
-                    boxShadow="shadow-menu"
-                  >
-                    <DatePicker
-                      inputValue={inputValue}
-                      onChange={(date) => {
-                        openMenu();
-                        addItem({
-                          type: 'value',
-                          value: formatDate(date),
-                          component: 'text',
-                          isArray: lastItem.isArray,
-                          field: (lastItem as Operator).field,
-                          fieldType: lastItem.fieldType,
-                        });
-                        setInputValue('');
-                        inputRef.current?.focus();
-                      }}
-                    />
-                  </Box>
-                </Portal>
-              </Box>
+              </Portal>
             </Box>
-          )}
-          {items.length > 0 && (
-            <IconButton
-              label="Clear"
-              icon="close"
-              size="sm"
-              appearance="ghost"
-              onClick={() => setItems([])}
-            />
-          )}
-        </Box>
+          </Box>
+        )}
+        {items.length > 0 ? (
+          <IconButton
+            label="Clear"
+            icon="close"
+            size="sm"
+            appearance="ghost"
+            onClick={() => setItems([])}
+          />
+        ) : null}
       </Box>
-
-      <Result textExpression={textExpression} />
     </>
   );
 }
 
-export const QueryBuilder = ({ groupFieldOptions }: QueryBuilderProps) => {
+export const QueryBuilder = ({ schema, ...rest }: QueryBuilderProps) => {
   return (
-    <QueryBuilderContextProvider>
-      <Inner groupFieldOptions={groupFieldOptions} />
+    <QueryBuilderContextProvider schema={schema}>
+      <Inner {...rest} />
     </QueryBuilderContextProvider>
   );
 };

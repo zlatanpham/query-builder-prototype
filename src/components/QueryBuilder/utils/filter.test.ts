@@ -1,10 +1,6 @@
 import { flattenSuggestions, getFilteredSuggestions } from './filter';
-import {
-  groupFieldOptions,
-  groupOperatorOptions,
-  booleanOptions,
-  Item,
-} from '../shared';
+import { groupOperatorOptions, booleanOptions, Item } from '../shared';
+import { groupFieldOptions } from './__stubs__';
 
 test.each([
   [

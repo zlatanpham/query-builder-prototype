@@ -1,5 +1,5 @@
-import { groupFieldOptions } from '../shared';
 import { stringParser } from './parser';
+import { groupFieldOptions } from './__stubs__';
 
 test('AND joinOperator test', () => {
   expect(
