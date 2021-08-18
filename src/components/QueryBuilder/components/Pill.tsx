@@ -9,8 +9,9 @@ import {
 } from '@sajari-ui/core';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useQueryBuilderContext } from '../context';
-import { advancedOperatorMapping, Item, operatorMapping } from '../shared';
+import { Item } from '../shared';
 import { formatDate } from '../utils/datetime';
+import { getExpression } from '../utils/filterObjectToString';
 import { DatePicker } from './DatePicker';
 import { TagContainer } from './TagContainer';
 
@@ -363,36 +364,3 @@ export const Pill = ({ index, item, onScrollEnd, onFocusLast }: Props) => {
 
   return <>{renderPill}</>;
 };
-
-function getExpression(items: Item[], index: number) {
-  const field = items[index - 1];
-  const operator = items[index];
-  const value = items[index + 1];
-
-  if (
-    operator.type === 'operator' &&
-    operator.isAdvanced &&
-    Array.isArray(value.value)
-  ) {
-    const operatorText =
-      advancedOperatorMapping[
-        `${operator.value}${operator.advancedJoinOperator}`
-      ];
-
-    if (value.value.length === 0) {
-      return `${field.value} ${operatorText} `;
-    }
-
-    return `${field.value} ${operatorText} ${value.value
-      .map((v) => `'${v}'`)
-      .join(', ')}`;
-  }
-
-  return `${field.value} ${
-    operatorMapping[operator.value as keyof typeof operatorMapping]
-  } ${
-    ['INTEGER', 'DOUBLE', 'FLOAT'].includes(field.fieldType)
-      ? value.value
-      : `'${value.value}'`
-  }`;
-}

@@ -1,4 +1,3 @@
-import { JoinOperator } from '../context';
 import {
   advancedOperatorMapping,
   Field,
@@ -8,6 +7,7 @@ import {
   GroupMenu,
   groupOperatorOptions,
   Item,
+  JoinOperator,
   Operator,
   operatorMapping,
   Value,
@@ -50,14 +50,14 @@ const handleExpression = (expression: string) => {
     return toBlock(expression.trim(), groupFieldOptions);
   }
   const newExpression = expression.trim().replace(/[()]/g, '');
-  const conjunction = isOrExpression(newExpression) ? ' OR ' : ' AND ';
-  const regex = new RegExp(conjunction, 'g');
+  const joinOperator = isOrExpression(newExpression) ? ' OR ' : ' AND ';
+  const regex = new RegExp(joinOperator, 'g');
   return newExpression
     .replace(/[()]/g, '')
     .replace(regex, '_')
     .match(_regex)
     ?.map(
-      (value) => toBlock(value.replace(/_/g, conjunction), groupFieldOptions),
+      (value) => toBlock(value.replace(/_/g, joinOperator), groupFieldOptions),
       groupFieldOptions,
     )
     .reduce((result, value) => {
@@ -73,7 +73,7 @@ const handleExpression = (expression: string) => {
 
       return [
         value[0],
-        value[1] + conjunction.trim(),
+        value[1] + joinOperator.trim(),
         Array.isArray(result[2])
           ? [...result[2], value[2]]
           : [result[2], value[2]],
@@ -88,13 +88,13 @@ export const stringParser = (
   let isError = false;
   let error = '';
   const expressions: Item[] = [];
-  const conjunction = isOrExpression(expressionString) ? ' OR ' : ' AND ';
-  const regex = new RegExp(conjunction, 'g');
+  const joinOperator = isOrExpression(expressionString) ? ' OR ' : ' AND ';
+  const regex = new RegExp(joinOperator, 'g');
   const blockList = expressionString
     .replace(regex, '_')
     .match(_regex)
     ?.map((expression) =>
-      handleExpression(expression.replace(/_/g, conjunction)),
+      handleExpression(expression.replace(/_/g, joinOperator)),
     );
 
   if (!blockList) {
@@ -207,5 +207,5 @@ export const stringParser = (
     throw new Error(error);
   }
 
-  return { expressions, conjunction: conjunction.trim() as JoinOperator };
+  return { expressions, joinOperator: joinOperator.trim() as JoinOperator };
 };

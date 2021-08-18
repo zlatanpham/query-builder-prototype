@@ -1,3 +1,5 @@
+export type JoinOperator = 'OR' | 'AND';
+
 export type FieldType =
   | 'INTEGER'
   | 'BOOLEAN'
@@ -17,6 +19,59 @@ export interface GroupMenu<T> {
   title: string;
   items: T[];
 }
+
+export interface OperatorOption {
+  text: string;
+  value: keyof typeof operatorMapping;
+  types: FieldType[];
+  isAdvanced?: boolean;
+  supportIsArray?: boolean;
+  advancedJoinOperator?: 'AND' | 'OR';
+}
+
+export interface Option {
+  text: string;
+  value: string;
+}
+
+export type Suggestion = Option | OperatorOption | FieldOption;
+
+export interface Field {
+  type: 'field';
+  value: string;
+  fieldType: FieldOption['type'];
+  isArray: boolean;
+}
+
+export interface Operator {
+  type: 'operator';
+  value: string;
+  field: string;
+  fieldType: FieldOption['type'];
+  isAdvanced?: boolean;
+  advancedJoinOperator?: 'OR' | 'AND';
+  isArray: boolean;
+}
+
+export type Value =
+  | {
+      type: 'value';
+      value: string;
+      component: 'text' | 'boolean' | 'tags';
+      field: string;
+      fieldType: FieldOption['type'];
+      isArray: boolean;
+    }
+  | {
+      type: 'value';
+      value: string[];
+      component: 'tags';
+      field: string;
+      fieldType: FieldOption['type'];
+      isArray: boolean;
+    };
+
+export type Item = Field | Operator | Value;
 
 export const numberTypes: FieldType[] = ['INTEGER', 'FLOAT', 'DOUBLE'];
 
@@ -155,63 +210,10 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
   },
 ];
 
-export interface OperatorOption {
-  text: string;
-  value: keyof typeof operatorMapping;
-  types: FieldType[];
-  isAdvanced?: boolean;
-  supportIsArray?: boolean;
-  advancedJoinOperator?: 'AND' | 'OR';
-}
-
-export interface Option {
-  text: string;
-  value: string;
-}
-
-export type Suggestion = Option | OperatorOption | FieldOption;
-
 export const booleanOptions = [
   { text: 'TRUE', value: 'TRUE' },
   { text: 'FALSE', value: 'FALSE' },
 ];
-
-export interface Field {
-  type: 'field';
-  value: string;
-  fieldType: FieldOption['type'];
-  isArray: boolean;
-}
-
-export interface Operator {
-  type: 'operator';
-  value: string;
-  field: string;
-  fieldType: FieldOption['type'];
-  isAdvanced?: boolean;
-  advancedJoinOperator?: 'OR' | 'AND';
-  isArray: boolean;
-}
-
-export type Value =
-  | {
-      type: 'value';
-      value: string;
-      component: 'text' | 'boolean' | 'tags';
-      field: string;
-      fieldType: FieldOption['type'];
-      isArray: boolean;
-    }
-  | {
-      type: 'value';
-      value: string[];
-      component: 'tags';
-      field: string;
-      fieldType: FieldOption['type'];
-      isArray: boolean;
-    };
-
-export type Item = Field | Operator | Value;
 
 export const defaultItems: Item[] = [
   { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },

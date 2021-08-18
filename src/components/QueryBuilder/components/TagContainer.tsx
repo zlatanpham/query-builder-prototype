@@ -12,6 +12,11 @@ interface TagContainerProps {
   onScrollEnd: () => void;
 }
 
+const styleProps: FlexProps = {
+  overflow: undefined,
+  boxShadow: undefined,
+};
+
 export const TagContainer = ({
   index,
   item,
@@ -26,11 +31,6 @@ export const TagContainer = ({
   const ref: React.RefObject<HTMLInputElement> = React.createRef();
   const { items, replaceItem, setSelectedItem } = useQueryBuilderContext();
   const lastItem: Item | undefined = items[items.length - 1];
-
-  const styleProps: FlexProps = {
-    overflow: undefined,
-    boxShadow: undefined,
-  };
 
   useEffect(() => {
     if (!index || !item) {

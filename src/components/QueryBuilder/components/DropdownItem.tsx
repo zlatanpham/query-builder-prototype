@@ -70,7 +70,8 @@ export const DropdownItem = ({
                   isArray: lastItem.isArray,
                 };
                 addItem(newItem);
-                // TODO: look like a race condition happens here. Temporarily use setTimeout to make sure the selectedItem is set correctly.
+                // Seems a race condition happens here.
+                // Use setTimeout to make sure the selectedItem is set correctly.
                 setTimeout(() => {
                   setSelectedItem(newItem);
                 });
@@ -105,7 +106,7 @@ export const DropdownItem = ({
         },
       })}
     >
-      {lastItem?.type === 'field' && <Box as="span">{item.value}</Box>}
+      {lastItem?.type === 'field' ? <Box as="span">{item.value}</Box> : null}
       <Box
         as="span"
         fontSize={lastItem?.type === 'field' ? 'text-sm' : 'text-base'}

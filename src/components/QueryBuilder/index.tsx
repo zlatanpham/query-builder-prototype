@@ -25,14 +25,11 @@ import {
   GroupMenu,
   groupOperatorOptions,
   Item,
+  JoinOperator,
   numberTypes,
   Operator,
 } from './shared';
-import {
-  JoinOperator,
-  QueryBuilderContextProvider,
-  useQueryBuilderContext,
-} from './context';
+import { QueryBuilderContextProvider, useQueryBuilderContext } from './context';
 
 interface QueryBuilderProps {
   groupFieldOptions: GroupMenu<FieldOption>[];
@@ -88,12 +85,12 @@ export function Inner({ groupFieldOptions }: QueryBuilderProps) {
   useEffect(() => {
     if (mode === 'text') {
       try {
-        const { conjunction, expressions } = stringParser(
+        const { joinOperator, expressions } = stringParser(
           textExpression,
           groupFieldOptions,
         );
         setItems(expressions);
-        setJoinOperator(conjunction);
+        setJoinOperator(joinOperator);
         setTransformError('');
       } catch (error) {
         console.log(error);

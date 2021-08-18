@@ -1,14 +1,14 @@
 import { groupFieldOptions } from '../shared';
 import { stringParser } from './parser';
 
-test('AND conjunction test', () => {
+test('AND joinOperator test', () => {
   expect(
     stringParser(
       "category ~ 'application' AND onSale = 'TRUE'",
       groupFieldOptions,
     ),
   ).toStrictEqual({
-    conjunction: 'AND',
+    joinOperator: 'AND',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {
@@ -46,14 +46,14 @@ test('AND conjunction test', () => {
   });
 });
 
-test('OR conjunction test', () => {
+test('OR joinOperator test', () => {
   expect(
     stringParser(
       "category ~ 'application' OR onSale = 'TRUE'",
       groupFieldOptions,
     ),
   ).toStrictEqual({
-    conjunction: 'OR',
+    joinOperator: 'OR',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {
@@ -98,7 +98,7 @@ test('OR advanced test', () => {
       groupFieldOptions,
     ),
   ).toStrictEqual({
-    conjunction: 'AND',
+    joinOperator: 'AND',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {
@@ -138,14 +138,14 @@ test('OR advanced test', () => {
   });
 });
 
-test('OR advanced with OR conjunction test', () => {
+test('OR advanced with OR joinOperator test', () => {
   expect(
     stringParser(
       "category = 'application' OR (image ~ 'a' OR image ~ 'b' OR image ~ 'c')",
       groupFieldOptions,
     ),
   ).toStrictEqual({
-    conjunction: 'OR',
+    joinOperator: 'OR',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {
@@ -192,7 +192,7 @@ test('AND advanced test', () => {
       groupFieldOptions,
     ),
   ).toStrictEqual({
-    conjunction: 'AND',
+    joinOperator: 'AND',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {
@@ -232,14 +232,14 @@ test('AND advanced test', () => {
   });
 });
 
-test('AND advanced with OR conjunction test', () => {
+test('AND advanced with OR joinOperator test', () => {
   expect(
     stringParser(
       "category = 'application' OR (image ~ 'a' AND image ~ 'b' AND image ~ 'c')",
       groupFieldOptions,
     ),
   ).toStrictEqual({
-    conjunction: 'OR',
+    joinOperator: 'OR',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {
@@ -282,11 +282,11 @@ test('AND advanced with OR conjunction test', () => {
 test('TIMESTAMP test', () => {
   expect(
     stringParser(
-      "category = 'application' AND createdAt > '03/08/2021'",
+      "category = 'application' AND createdAt > '2021-08-03'",
       groupFieldOptions,
     ),
   ).toStrictEqual({
-    conjunction: 'AND',
+    joinOperator: 'AND',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {
@@ -319,7 +319,7 @@ test('TIMESTAMP test', () => {
       },
       {
         type: 'value',
-        value: '03/08/2021',
+        value: '2021-08-03',
         field: 'createdAt',
         fieldType: 'TIMESTAMP',
         isArray: false,
@@ -332,11 +332,11 @@ test('TIMESTAMP test', () => {
 test('OR advanced with TIMESTAMP test', () => {
   expect(
     stringParser(
-      "category = 'application' AND (image ~ 'a' OR image ~ 'b' OR image ~ 'c') AND createdAt > '03/08/2021'",
+      "category = 'application' AND (image ~ 'a' OR image ~ 'b' OR image ~ 'c') AND createdAt > '2021-08-03'",
       groupFieldOptions,
     ),
   ).toStrictEqual({
-    conjunction: 'AND',
+    joinOperator: 'AND',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {
@@ -387,7 +387,7 @@ test('OR advanced with TIMESTAMP test', () => {
       },
       {
         type: 'value',
-        value: '03/08/2021',
+        value: '2021-08-03',
         field: 'createdAt',
         fieldType: 'TIMESTAMP',
         isArray: false,
@@ -397,14 +397,14 @@ test('OR advanced with TIMESTAMP test', () => {
   });
 });
 
-test('OR advanced with TIMESTAMP and OR conjunction test', () => {
+test('OR advanced with TIMESTAMP and OR joinOperator test', () => {
   expect(
     stringParser(
-      "category = 'application' OR (image ~ 'a' OR image ~ 'b' OR image ~ 'c') OR createdAt > '03/08/2021'",
+      "category = 'application' OR (image ~ 'a' OR image ~ 'b' OR image ~ 'c') OR createdAt > '2021-08-03'",
       groupFieldOptions,
     ),
   ).toStrictEqual({
-    conjunction: 'OR',
+    joinOperator: 'OR',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {
@@ -455,7 +455,7 @@ test('OR advanced with TIMESTAMP and OR conjunction test', () => {
       },
       {
         type: 'value',
-        value: '03/08/2021',
+        value: '2021-08-03',
         field: 'createdAt',
         fieldType: 'TIMESTAMP',
         isArray: false,
@@ -468,11 +468,11 @@ test('OR advanced with TIMESTAMP and OR conjunction test', () => {
 test('AND advanced with TIMESTAMP test', () => {
   expect(
     stringParser(
-      "category = 'application' AND (image ~ 'a' AND image ~ 'b' AND image ~ 'c') AND createdAt > '03/08/2021'",
+      "category = 'application' AND (image ~ 'a' AND image ~ 'b' AND image ~ 'c') AND createdAt > '2021-08-03'",
       groupFieldOptions,
     ),
   ).toStrictEqual({
-    conjunction: 'AND',
+    joinOperator: 'AND',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {
@@ -523,7 +523,7 @@ test('AND advanced with TIMESTAMP test', () => {
       },
       {
         type: 'value',
-        value: '03/08/2021',
+        value: '2021-08-03',
         field: 'createdAt',
         fieldType: 'TIMESTAMP',
         isArray: false,
@@ -533,14 +533,14 @@ test('AND advanced with TIMESTAMP test', () => {
   });
 });
 
-test('AND advanced with TIMESTAMP with OR conjunction test', () => {
+test('AND advanced with TIMESTAMP with OR joinOperator test', () => {
   expect(
     stringParser(
-      "category = 'application' OR (image ~ 'a' AND image ~ 'b' AND image ~ 'c') OR createdAt > '03/08/2021'",
+      "category = 'application' OR (image ~ 'a' AND image ~ 'b' AND image ~ 'c') OR createdAt > '2021-08-03'",
       groupFieldOptions,
     ),
   ).toStrictEqual({
-    conjunction: 'OR',
+    joinOperator: 'OR',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {
@@ -591,7 +591,7 @@ test('AND advanced with TIMESTAMP with OR conjunction test', () => {
       },
       {
         type: 'value',
-        value: '03/08/2021',
+        value: '2021-08-03',
         field: 'createdAt',
         fieldType: 'TIMESTAMP',
         isArray: false,
@@ -608,7 +608,7 @@ test('value contain OR', () => {
       groupFieldOptions,
     ),
   ).toStrictEqual({
-    conjunction: 'AND',
+    joinOperator: 'AND',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {
@@ -650,7 +650,7 @@ test('value contain OR', () => {
 
 // test('incomplete query with field and operator', () => {
 //   const expected = {
-//     conjunction: 'AND',
+//     joinOperator: 'AND',
 //     expressions: [
 //       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
 //       {
@@ -672,18 +672,18 @@ test('value contain OR', () => {
 
 // test('incomplete query with only field', () => {
 //   expect(stringParser('category', groupFieldOptions)).toStrictEqual({
-//     conjunction: 'AND',
+//     joinOperator: 'AND',
 //     expressions: [
 //       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
 //     ],
 //   });
 // });
 
-// test('incomplete query with conjunction', () => {
+// test('incomplete query with joinOperator', () => {
 //   expect(
 //     stringParser("category ~ 'application' AND onSale =", groupFieldOptions),
 //   ).toStrictEqual({
-//     conjunction: 'AND',
+//     joinOperator: 'AND',
 //     expressions: [
 //       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
 //       {
@@ -728,7 +728,7 @@ test('is Array', () => {
       groupFieldOptions,
     ),
   ).toStrictEqual({
-    conjunction: 'AND',
+    joinOperator: 'AND',
     expressions: [
       {
         type: 'field',
@@ -778,7 +778,7 @@ test('is Array', () => {
 
 test('without spacing', () => {
   const expected = {
-    conjunction: 'AND',
+    joinOperator: 'AND',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {
@@ -810,11 +810,11 @@ test('without spacing', () => {
   ).toStrictEqual(expected);
 });
 
-// test('without spacing has conjunction', () => {
+// test('without spacing has joinOperator', () => {
 //   const expected = {
-//     conjunction: 'OR',
+//     joinOperator: 'OR',
 //     expressions: {
-//       conjunction: 'AND',
+//       joinOperator: 'AND',
 //       expressions: [
 //         {
 //           type: 'field',
@@ -861,9 +861,9 @@ test('without spacing', () => {
 //   ).toStrictEqual(expected);
 // });
 
-test('without spacing has conjunction contain OR', () => {
+test('without spacing has joinOperator contain OR', () => {
   const expected = {
-    conjunction: 'AND',
+    joinOperator: 'AND',
     expressions: [
       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
       {

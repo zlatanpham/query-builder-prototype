@@ -1,6 +1,12 @@
-import { Item, numberTypes, Operator } from '../shared';
+import {
+  advancedOperatorMapping,
+  Item,
+  numberTypes,
+  Operator,
+  operatorMapping,
+} from '../shared';
 
-export const filterObjectToString = (items: Item[], joinOperator: string) => {
+export function filterObjectToString(items: Item[], joinOperator: string) {
   const result: string[] = [];
   for (let index = 0; index < items.length; index += 3) {
     const fieldItem: Item | undefined = items[index];
@@ -29,4 +35,35 @@ export const filterObjectToString = (items: Item[], joinOperator: string) => {
     }
   }
   return result.join(` ${joinOperator} `).trim();
-};
+}
+
+export function getExpression(items: Item[], index: number) {
+  const field = items[index - 1];
+  const operator = items[index];
+  const value = items[index + 1];
+
+  if (
+    operator.type === 'operator' &&
+    operator.isAdvanced &&
+    Array.isArray(value.value)
+  ) {
+    const operatorText =
+      advancedOperatorMapping[
+        `${operator.value}${operator.advancedJoinOperator}`
+      ];
+
+    if (value.value.length === 0) {
+      return `${field.value} ${operatorText} `;
+    }
+
+    return `${field.value} ${operatorText} ${value.value
+      .map((v) => `'${v}'`)
+      .join(', ')}`;
+  }
+
+  return `${field.value} ${
+    operatorMapping[operator.value as keyof typeof operatorMapping]
+  } ${
+    numberTypes.includes(field.fieldType) ? value.value : `'${value.value}'`
+  }`;
+}

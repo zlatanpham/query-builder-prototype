@@ -1,5 +1,4 @@
-import { JoinOperator } from '../ContextProvider';
-import { Item } from '../shared';
+import { Item, JoinOperator } from '../shared';
 import { filterObjectToString } from './filterObjectToString';
 
 test.each<[Item[], JoinOperator, string]>([

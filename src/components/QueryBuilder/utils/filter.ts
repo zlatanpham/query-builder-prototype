@@ -1,7 +1,5 @@
 import { Item } from '../shared';
 
-// Getting this function right with TypeScript is complicated
-// Cannot infer because the type of the suggestions is different from the type of items
 export const getFilteredSuggestions = (
   items: any[],
   inputValue: string,

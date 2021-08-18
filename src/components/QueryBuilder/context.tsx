@@ -1,8 +1,6 @@
 import { useCallback, useState } from 'react';
-import { Item, defaultItems } from './shared';
+import { Item, defaultItems, JoinOperator } from './shared';
 import { createContext } from './utils/react-helpers';
-
-export type JoinOperator = 'OR' | 'AND';
 
 interface QueryBuilderContextValues {
   items: Item[];

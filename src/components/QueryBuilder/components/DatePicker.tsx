@@ -9,14 +9,12 @@ interface DatePickerProps {
   onChange: (date: Date) => void;
 }
 
-export const DatePicker = ({ inputValue, onChange }: DatePickerProps) => {
-  return (
-    <Box onClick={(e) => e.stopPropagation()}>
-      <Calendar
-        date={toDate(inputValue)}
-        onChange={onChange}
-        showDateDisplay={false}
-      />
-    </Box>
-  );
-};
+export const DatePicker = ({ inputValue, onChange }: DatePickerProps) => (
+  <Box onClick={(e) => e.stopPropagation()}>
+    <Calendar
+      date={toDate(inputValue)}
+      onChange={onChange}
+      showDateDisplay={false}
+    />
+  </Box>
+);
