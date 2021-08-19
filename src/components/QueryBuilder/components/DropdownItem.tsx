@@ -28,6 +28,7 @@ export const DropdownItem = ({
       justifyContent="justify-between"
       alignItems="items-center"
       as="li"
+      data-index={index}
       padding={['px-3', 'py-1']}
       borderRadius="rounded-md"
       backgroundColor={highlightedIndex === index ? 'bg-blue-500' : 'bg-white'}

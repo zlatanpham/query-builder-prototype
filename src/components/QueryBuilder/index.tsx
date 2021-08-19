@@ -56,6 +56,7 @@ export function Inner() {
   const lastItem: Item | undefined = items[items.length - 1];
   const [inputFocus, setInputFocus] = useState(false);
   const previousLength = useRef(items.length);
+  const dropdownRef = useRef<HTMLUListElement | null>(null);
   const showDateContainer =
     lastItem?.type === 'operator' && lastItem?.fieldType === 'TIMESTAMP';
 
@@ -101,8 +102,6 @@ export function Inner() {
         setJoinOperator(joinOperator);
         setTransformError('');
       } catch (error) {
-        console.error(error);
-        console.log(error.message);
         setTransformError(error.message);
       }
     }
@@ -235,6 +234,28 @@ export function Inner() {
 
   const isNumberInput =
     numberTypes.includes(lastItem?.fieldType) && lastItem.type === 'operator';
+
+  useEffect(() => {
+    if (dropdownRef.current) {
+      const dropdownNode = dropdownRef.current;
+      const item = dropdownNode.querySelector(
+        `[data-index="${highlightedIndex}"]`,
+      );
+      const dropdownHeight = dropdownNode.clientHeight || 0;
+      const itemHeight = item?.clientHeight || 0;
+      const dropdownClientBottom = dropdownNode.getBoundingClientRect().bottom;
+      const itemClientBottom = item?.getBoundingClientRect().bottom || 0;
+      const diff = itemClientBottom - dropdownClientBottom;
+
+      if (diff > 0) {
+        dropdownNode.scrollTo({ top: diff + dropdownNode.scrollTop });
+      } else if (dropdownHeight + diff < itemHeight) {
+        dropdownNode.scrollTo({
+          top: dropdownNode.scrollTop + dropdownHeight + diff - itemHeight,
+        });
+      }
+    }
+  }, [highlightedIndex]);
 
   return (
     <>
@@ -485,7 +506,11 @@ export function Inner() {
               <Portal>
                 <Box
                   style={popper.style}
-                  ref={popper.ref}
+                  ref={(ref) => {
+                    dropdownRef.current = ref as HTMLUListElement;
+                    // @ts-ignore
+                    popper.ref.current = ref;
+                  }}
                   display={
                     isOpen && filteredSuggestions.length > 0
                       ? undefined
@@ -499,8 +524,8 @@ export function Inner() {
                   width="w-52"
                   borderColor="border-gray-200"
                   boxShadow="shadow-menu"
-                  as="ul"
                   maxHeight="max-h-96"
+                  as="ul"
                   overflow="overflow-y-auto"
                 >
                   <Box {...getMenuProps()}>
