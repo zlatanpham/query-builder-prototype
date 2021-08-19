@@ -16,8 +16,8 @@ export const getFilteredSuggestions = (
   };
 
   const filterFunc = (item) =>
-    (item?.text?.toLowerCase().startsWith(inputValue.toLowerCase()) ||
-      item?.value?.toLowerCase().startsWith(inputValue.toLowerCase())) &&
+    (item?.text?.toLowerCase().includes(inputValue.toLowerCase()) ||
+      item?.value?.toLowerCase().includes(inputValue.toLowerCase())) &&
     (activeItem?.type !== 'field' ||
       (activeItem?.type === 'field' &&
         'types' in item &&

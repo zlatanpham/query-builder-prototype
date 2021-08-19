@@ -164,6 +164,12 @@ test.each<[any[], string, Item | undefined, any[]]>([
             types: ['STRING'],
             supportIsArray: true,
           },
+          {
+            value: '!~',
+            text: 'does not contain',
+            types: ['STRING'],
+            supportIsArray: true,
+          },
         ],
       },
       {
@@ -211,6 +217,18 @@ test.each<[any[], string, Item | undefined, any[]]>([
             value: '!=',
             text: 'is not',
             types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
+          },
+        ],
+      },
+      {
+        title: 'Advanced',
+        items: [
+          {
+            value: '!=',
+            text: 'missing all of',
+            types: ['STRING'],
+            isAdvanced: true,
+            advancedJoinOperator: 'AND',
           },
         ],
       },
@@ -342,6 +360,7 @@ test.each<[any[], string, Item | undefined, any[]]>([
             isArray: false,
             type: 'STRING',
           },
+          { text: 'price', value: 'price', isArray: false, type: 'FLOAT' },
           {
             text: 'createdAt',
             value: 'createdAt',
