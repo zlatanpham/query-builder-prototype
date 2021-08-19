@@ -37,7 +37,7 @@ export const QueryBuilderContextProvider: React.FC<{
       {
         title: 'Params',
         items: [
-          { text: 'q', value: 'q', isArray: false, type: 'STRING' },
+          { text: 'Search Query', value: 'q', isArray: false, type: 'STRING' },
           { text: 'page', value: 'page', isArray: false, type: 'INTEGER' },
         ],
       },

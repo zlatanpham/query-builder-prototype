@@ -108,7 +108,7 @@ export const DropdownItem = ({
         },
       })}
     >
-      {lastItem?.type === 'field' ? (
+      {item.value !== item.text ? (
         <Box as="span" truncate="truncate">
           {item.value}
         </Box>
@@ -116,7 +116,7 @@ export const DropdownItem = ({
       <Box
         as="span"
         truncate="truncate"
-        fontSize={lastItem?.type === 'field' ? 'text-sm' : 'text-base'}
+        fontSize={item.value !== item.text ? 'text-sm' : 'text-base'}
       >
         {item.text}
       </Box>

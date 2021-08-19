@@ -30,7 +30,7 @@ const toBlock = (
   const a = groupFieldOptions
     .map((group) => group.items)
     .flat()
-    .find((field) => temp.startsWith(field.text))?.text;
+    .find((field) => temp.startsWith(field.value))?.value;
   if (!a) return;
   temp = temp.slice(a.length).trim();
   const b =
@@ -121,7 +121,7 @@ export const stringParser = (
     } = groupFieldOptions
       .map((group) => group.items)
       .flat()
-      .find((field) => field.text === f) || {};
+      .find((field) => field.value === f) || {};
     const isBooleanSelect = fieldType === 'BOOLEAN';
     // check field
     if (
