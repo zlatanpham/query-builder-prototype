@@ -134,7 +134,10 @@ export const stringParser = (
       break;
     }
     // check operator
-    if (!operatorMapping[o] && !advancedOperatorMapping[o]) {
+    if (
+      !operatorMapping[o as keyof typeof operatorMapping] &&
+      !advancedOperatorMapping[o as keyof typeof advancedOperatorMapping]
+    ) {
       isError = true;
       error = `Operator '${o}' is not found`;
       break;

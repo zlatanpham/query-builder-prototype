@@ -257,6 +257,7 @@ export const Pill = ({ index, item, onScrollEnd, onFocusLast }: Props) => {
             setSelectedItem(null);
           }}
           as="input"
+          data-id="query-builder-input"
           type={isNumber ? 'number' : 'text'}
           textColor="text-gray-600"
           outline="outline-none"
