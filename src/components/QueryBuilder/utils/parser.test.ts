@@ -920,3 +920,255 @@ test('without spacing has joinOperator contain OR', () => {
     ),
   ).toStrictEqual(expected);
 });
+
+test('malicious symbols ()', () => {
+  expect(
+    stringParser("category = 'application()'", groupFieldOptions),
+  ).toStrictEqual({
+    joinOperator: 'AND',
+    expressions: [
+      { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+      {
+        type: 'operator',
+        value: '=',
+        field: 'category',
+        fieldType: 'STRING',
+        isArray: false,
+      },
+      {
+        type: 'value',
+        value: 'application()',
+        field: 'category',
+        fieldType: 'STRING',
+        isArray: false,
+        component: 'text',
+      },
+    ],
+  });
+  expect(
+    stringParser("category = '(application)'", groupFieldOptions),
+  ).toStrictEqual({
+    joinOperator: 'AND',
+    expressions: [
+      { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+      {
+        type: 'operator',
+        value: '=',
+        field: 'category',
+        fieldType: 'STRING',
+        isArray: false,
+      },
+      {
+        type: 'value',
+        value: '(application)',
+        field: 'category',
+        fieldType: 'STRING',
+        isArray: false,
+        component: 'text',
+      },
+    ],
+  });
+  expect(stringParser("category = '()'", groupFieldOptions)).toStrictEqual({
+    joinOperator: 'AND',
+    expressions: [
+      { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+      {
+        type: 'operator',
+        value: '=',
+        field: 'category',
+        fieldType: 'STRING',
+        isArray: false,
+      },
+      {
+        type: 'value',
+        value: '()',
+        field: 'category',
+        fieldType: 'STRING',
+        isArray: false,
+        component: 'text',
+      },
+    ],
+  });
+});
+
+// test('Unfinished statement', () => {
+//   expect(stringParser('category =', groupFieldOptions)).toStrictEqual({
+//     joinOperator: 'AND',
+//     expressions: [
+//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+//       {
+//         type: 'operator',
+//         value: '=',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//       },
+//     ],
+//   });
+
+//   expect(stringParser('category', groupFieldOptions)).toStrictEqual({
+//     joinOperator: 'AND',
+//     expressions: [
+//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+//     ],
+//   });
+
+//   expect(
+//     stringParser("category = 'application' OR category", groupFieldOptions),
+//   ).toStrictEqual({
+//     joinOperator: 'OR',
+//     expressions: [
+//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+//       {
+//         type: 'operator',
+//         value: '=',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//       },
+//       {
+//         type: 'value',
+//         value: 'application',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//         component: 'text',
+//       },
+//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+//     ],
+//   });
+
+//   expect(
+//     stringParser("category = 'application' OR category !=", groupFieldOptions),
+//   ).toStrictEqual({
+//     joinOperator: 'OR',
+//     expressions: [
+//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+//       {
+//         type: 'operator',
+//         value: '=',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//       },
+//       {
+//         type: 'value',
+//         value: 'application',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//         component: 'text',
+//       },
+//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+//       {
+//         type: 'operator',
+//         value: '!=',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//       },
+//     ],
+//   });
+// });
+
+// test('malicious symbols []', () => {
+//   expect(
+//     stringParser(
+//       "category = 'application' AND (image ~ '[a]' OR image ~ '(b)' OR image ~ ' OR ')",
+//       groupFieldOptions,
+//     ),
+//   ).toStrictEqual({
+//     joinOperator: 'AND',
+//     expressions: [
+//       { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+//       {
+//         type: 'operator',
+//         value: '=',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//       },
+//       {
+//         type: 'value',
+//         value: 'application',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//         component: 'text',
+//       },
+//       { type: 'field', value: 'image', fieldType: 'STRING', isArray: false },
+//       {
+//         type: 'operator',
+//         value: '~',
+//         field: 'image',
+//         fieldType: 'STRING',
+//         isArray: false,
+//         isAdvanced: true,
+//         advancedJoinOperator: 'OR',
+//       },
+//       {
+//         type: 'value',
+//         value: ['[a]', '(b)', ' OR '],
+//         field: 'image',
+//         fieldType: 'STRING',
+//         isArray: false,
+//         component: 'tags',
+//       },
+//     ],
+//   });
+// });
+
+// test('malicious symbols - []', () => {
+//   expect(
+//     stringParser(
+//       "category = '[(application)]' AND brand ~ ['(red)']",
+//       groupFieldOptions,
+//     ),
+//   ).toStrictEqual({
+//     joinOperator: 'AND',
+//     expressions: [
+//       {
+//         type: 'field',
+//         value: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//       },
+//       {
+//         type: 'operator',
+//         value: '=',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         isArray: false,
+//       },
+//       {
+//         type: 'value',
+//         value: '[(application)]',
+//         field: 'category',
+//         fieldType: 'STRING',
+//         component: 'text',
+//         isArray: false,
+//       },
+//       {
+//         type: 'field',
+//         value: 'brand',
+//         fieldType: 'STRING',
+//         isArray: true,
+//       },
+//       {
+//         type: 'operator',
+//         value: '~',
+//         field: 'brand',
+//         fieldType: 'STRING',
+//         isArray: true,
+//       },
+//       {
+//         type: 'value',
+//         value: '(red)',
+//         field: 'brand',
+//         fieldType: 'STRING',
+//         component: 'text',
+//         isArray: true,
+//       },
+//     ],
+//   });
+// });
