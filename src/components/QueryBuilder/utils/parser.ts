@@ -8,6 +8,7 @@ import {
   groupOperatorOptions,
   Item,
   JoinOperator,
+  numberTypes,
   Operator,
   operatorMapping,
   Value,
@@ -28,7 +29,7 @@ const getField = (
     : {
         itemValue: '',
         isError: true,
-        error: `field error at ${expressionString}`,
+        error: `Field error at ${expressionString}`,
       };
 };
 
@@ -45,12 +46,16 @@ const getOperator = (expressionString: string) => {
     : {
         itemValue: '',
         isError: true,
-        error: `operator error at ${expressionString}`,
+        error: `Operator error at ${expressionString}`,
       };
 };
 
 const getValue = (expressionString: string) => {
-  const valueWrapper = expressionString.startsWith('[') ? ']' : "'";
+  const valueWrapper = expressionString.startsWith('[')
+    ? ']'
+    : expressionString.startsWith("'")
+    ? "'"
+    : '';
   const value = expressionString.slice(
     0,
     expressionString.indexOf(valueWrapper, 1) + 1,
@@ -60,7 +65,7 @@ const getValue = (expressionString: string) => {
     : {
         itemValue: '',
         isError: true,
-        error: `value error at ${expressionString}`,
+        error: `Value error at ${expressionString}`,
       };
 };
 
@@ -85,7 +90,7 @@ const handleBracketExpression = (
   let index = 0;
   let isError = false;
   let error = '';
-  let conjunction = '';
+  let joinOperator = '';
   while (temp) {
     const handler = {
       0: () => getField(temp, groupFieldOptions),
@@ -107,7 +112,7 @@ const handleBracketExpression = (
         field = itemValue;
       } else if (field !== itemValue) {
         isError = true;
-        error = `field ${field} not matched at ${expressionString}`;
+        error = `Field ${field} not matched at ${expressionString}`;
         break;
       }
     } else if (index % 3 === 1) {
@@ -115,31 +120,31 @@ const handleBracketExpression = (
         operator = itemValue;
       } else if (operator !== itemValue) {
         isError = true;
-        error = `operator ${operator} not matched at ${expressionString}`;
+        error = `Operator ${operator} not matched at ${expressionString}`;
         break;
       }
     } else {
       value.push(convertValue(itemValue));
       if (index === 2) {
-        conjunction = temp.startsWith('AND')
+        joinOperator = temp.startsWith('AND')
           ? 'AND'
           : temp.startsWith('OR')
           ? 'OR'
           : '';
-      } else if (!conjunction) {
+      } else if (!joinOperator) {
         isError = true;
-        error = 'conjunction not found';
+        error = 'joinOperator not found';
         break;
-      } else if (temp && !temp.startsWith(conjunction)) {
+      } else if (temp && !temp.startsWith(joinOperator)) {
         isError = true;
-        error = `conjunction ${conjunction} not matched at ${temp}`;
+        error = `joinOperator ${joinOperator} not matched at ${temp}`;
         break;
       }
-      temp = temp.replace(conjunction, '').trimStart();
+      temp = temp.replace(joinOperator, '').trimStart();
     }
     index += 1;
   }
-  return { field, operator: operator + conjunction, value, isError, error };
+  return { field, operator: operator + joinOperator, value, isError, error };
 };
 
 const findClosingBracket = (str: string) => {
@@ -168,13 +173,13 @@ const toArray = (
   let index = 0;
   let isError = false;
   let error = '';
-  let conjunction = '';
+  let joinOperator = '';
   while (temp) {
     if (temp.startsWith('(')) {
       const toIndex = findClosingBracket(temp);
       if (!toIndex) {
         isError = true;
-        error = `closing bracket not found at ${temp}`;
+        error = `Closing bracket not found at ${temp}`;
         break;
       }
       const bracketExpression = temp.slice(1, toIndex);
@@ -219,26 +224,26 @@ const toArray = (
     }
     if (index % 3 === 2) {
       if (index === 2) {
-        conjunction = temp.startsWith('AND')
+        joinOperator = temp.startsWith('AND')
           ? 'AND'
           : temp.startsWith('OR')
           ? 'OR'
           : '';
-      } else if (!conjunction) {
+      } else if (!joinOperator) {
         isError = true;
-        error = 'conjunction not found';
+        error = 'joinOperator not found';
         break;
-      } else if (temp && !temp.startsWith(conjunction)) {
+      } else if (temp && !temp.startsWith(joinOperator)) {
         isError = true;
-        error = 'conjunction not matched';
+        error = 'joinOperator not matched';
         break;
       }
-      temp = temp.replace(conjunction, '').trimStart();
+      temp = temp.replace(joinOperator, '').trimStart();
     }
     index += 1;
   }
 
-  return { conjunction, result, isError, error };
+  return { joinOperator, result, isError, error };
 };
 
 export const stringParser = (
@@ -250,7 +255,7 @@ export const stringParser = (
   const expressions: Item[] = [];
 
   const {
-    conjunction,
+    joinOperator,
     result,
     isError: isArrayError,
     error: arrayError,
@@ -275,6 +280,7 @@ export const stringParser = (
 
   for (let index = 0; index < blockList.length; index += 1) {
     const [f, o, v] = blockList[index] || [];
+    let internalValue: number | string | string[] | undefined = v;
     if (!blockList[index] || !f) {
       isError = true;
       error = 'undefined';
@@ -289,6 +295,7 @@ export const stringParser = (
       .flat()
       .find((field) => field.value === f) || {};
     const isBooleanSelect = fieldType === 'BOOLEAN';
+    const isNumberSelect = numberTypes.includes(fieldType as SchemaFieldType);
     // check field
     if (
       name === undefined ||
@@ -296,14 +303,14 @@ export const stringParser = (
       fieldType === undefined
     ) {
       isError = true;
-      error = `field ${f} is not found`;
+      error = `Field '${f}' is not found`;
       break;
     }
     // check operator
     if (o) {
       if (!operatorMapping[o] && !advancedOperatorMapping[o]) {
         isError = true;
-        error = `operator ${o} is not found`;
+        error = `Operator '${o}' is not found`;
         break;
       }
       const availableTypes = groupOperatorOptions
@@ -316,7 +323,7 @@ export const stringParser = (
         )?.types;
       if (!availableTypes?.includes(fieldType)) {
         isError = true;
-        error = `operator ${o} is only able to use with type ${availableTypes}`;
+        error = `Operator '${o}' must use with type ${availableTypes}`;
         break;
       }
     }
@@ -324,8 +331,18 @@ export const stringParser = (
     if (v) {
       if (isBooleanSelect && v !== 'TRUE' && v !== 'FALSE') {
         isError = true;
-        error = `value ${v} is only able to be TRUE or FALSE`;
+        error = `Value '${v}' must be TRUE or FALSE`;
         break;
+      }
+
+      if (isNumberSelect) {
+        if (isNaN(Number(v))) {
+          isError = true;
+          error = `Value '${v}' must be a number`;
+          break;
+        } else {
+          internalValue = Number(v);
+        }
       }
     }
 
@@ -355,12 +372,12 @@ export const stringParser = (
           isArray,
         };
 
-    const value: Value | undefined = !v
+    const value: Value | undefined = !internalValue
       ? undefined
-      : Array.isArray(v)
+      : Array.isArray(internalValue)
       ? {
           type: 'value',
-          value: v,
+          value: internalValue,
           field: f,
           fieldType: fieldType as SchemaFieldType,
           component: 'tags',
@@ -368,7 +385,7 @@ export const stringParser = (
         }
       : {
           type: 'value',
-          value: v,
+          value: internalValue,
           field: f,
           fieldType: fieldType as SchemaFieldType,
           component: isBooleanSelect ? 'boolean' : 'text',
@@ -386,5 +403,5 @@ export const stringParser = (
     throw new Error(error);
   }
 
-  return { expressions, joinOperator: (conjunction || 'AND') as JoinOperator };
+  return { expressions, joinOperator: (joinOperator || 'AND') as JoinOperator };
 };

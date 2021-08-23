@@ -26,7 +26,7 @@ export const TagContainer = ({
 }: TagContainerProps) => {
   const { value = [] } = item || {};
   const [tags, setTags] = useState<string[]>(
-    Array.isArray(value) ? value : [value],
+    Array.isArray(value) ? value : [String(value)],
   );
   const ref: React.RefObject<HTMLInputElement> = React.createRef();
   const { items, replaceItem, setSelectedItem } = useQueryBuilderContext();

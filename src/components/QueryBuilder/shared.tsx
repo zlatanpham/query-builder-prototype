@@ -49,7 +49,7 @@ export interface Operator {
 export type Value =
   | {
       type: 'value';
-      value: string;
+      value: string | number;
       component: 'text' | 'boolean' | 'tags';
       field: string;
       fieldType: FieldOption['type'];

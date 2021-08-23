@@ -1,7 +1,7 @@
 import { stringParser } from './parser';
 import { groupFieldOptions } from './__stubs__';
 
-test('AND joinOperator test', () => {
+test('AND joinOperator', () => {
   expect(
     stringParser(
       "category ~ 'application' AND onSale = 'TRUE'",
@@ -46,7 +46,7 @@ test('AND joinOperator test', () => {
   });
 });
 
-test('OR joinOperator test', () => {
+test('OR joinOperator', () => {
   expect(
     stringParser(
       "category ~ 'application' OR onSale = 'TRUE'",
@@ -91,7 +91,7 @@ test('OR joinOperator test', () => {
   });
 });
 
-test('OR advanced test', () => {
+test('OR advanced', () => {
   expect(
     stringParser(
       "category = 'application' AND (image ~ 'a' OR image ~ 'b' OR image ~ 'c')",
@@ -138,7 +138,7 @@ test('OR advanced test', () => {
   });
 });
 
-test('OR advanced with OR joinOperator test', () => {
+test('OR advanced with OR joinOperator', () => {
   expect(
     stringParser(
       "category = 'application' OR (image ~ 'a' OR image ~ 'b' OR image ~ 'c')",
@@ -185,7 +185,7 @@ test('OR advanced with OR joinOperator test', () => {
   });
 });
 
-test('AND advanced test', () => {
+test('AND advanced', () => {
   expect(
     stringParser(
       "category = 'application' AND (image ~ 'a' AND image ~ 'b' AND image ~ 'c')",
@@ -232,7 +232,7 @@ test('AND advanced test', () => {
   });
 });
 
-test('AND advanced with OR joinOperator test', () => {
+test('AND advanced with OR joinOperator', () => {
   expect(
     stringParser(
       "category = 'application' OR (image ~ 'a' AND image ~ 'b' AND image ~ 'c')",
@@ -279,7 +279,31 @@ test('AND advanced with OR joinOperator test', () => {
   });
 });
 
-test('TIMESTAMP test', () => {
+test('number', () => {
+  expect(stringParser('page = 12', groupFieldOptions)).toStrictEqual({
+    joinOperator: 'AND',
+    expressions: [
+      { type: 'field', value: 'page', fieldType: 'INTEGER', isArray: false },
+      {
+        type: 'operator',
+        value: '=',
+        field: 'page',
+        fieldType: 'INTEGER',
+        isArray: false,
+      },
+      {
+        type: 'value',
+        value: 12,
+        field: 'page',
+        fieldType: 'INTEGER',
+        isArray: false,
+        component: 'text',
+      },
+    ],
+  });
+});
+
+test('TIMESTAMP', () => {
   expect(
     stringParser(
       "category = 'application' AND createdAt > '2021-08-03'",
@@ -329,7 +353,7 @@ test('TIMESTAMP test', () => {
   });
 });
 
-test('OR advanced with TIMESTAMP test', () => {
+test('OR advanced with TIMESTAMP', () => {
   expect(
     stringParser(
       "category = 'application' AND (image ~ 'a' OR image ~ 'b' OR image ~ 'c') AND createdAt > '2021-08-03'",
@@ -397,7 +421,7 @@ test('OR advanced with TIMESTAMP test', () => {
   });
 });
 
-test('OR advanced with TIMESTAMP and OR joinOperator test', () => {
+test('OR advanced with TIMESTAMP and OR joinOperator', () => {
   expect(
     stringParser(
       "category = 'application' OR (image ~ 'a' OR image ~ 'b' OR image ~ 'c') OR createdAt > '2021-08-03'",
@@ -465,7 +489,7 @@ test('OR advanced with TIMESTAMP and OR joinOperator test', () => {
   });
 });
 
-test('AND advanced with TIMESTAMP test', () => {
+test('AND advanced with TIMESTAMP', () => {
   expect(
     stringParser(
       "category = 'application' AND (image ~ 'a' AND image ~ 'b' AND image ~ 'c') AND createdAt > '2021-08-03'",
@@ -533,7 +557,7 @@ test('AND advanced with TIMESTAMP test', () => {
   });
 });
 
-test('AND advanced with TIMESTAMP with OR joinOperator test', () => {
+test('AND advanced with TIMESTAMP with OR joinOperator', () => {
   expect(
     stringParser(
       "category = 'application' OR (image ~ 'a' AND image ~ 'b' AND image ~ 'c') OR createdAt > '2021-08-03'",
@@ -794,9 +818,11 @@ test('without spacing', () => {
   expect(
     stringParser("category~'application'", groupFieldOptions),
   ).toStrictEqual(expected);
+
   expect(
     stringParser("category~ 'application'", groupFieldOptions),
   ).toStrictEqual(expected);
+
   expect(
     stringParser("category ~'application'", groupFieldOptions),
   ).toStrictEqual(expected);
@@ -857,12 +883,14 @@ test('without spacing has joinOperator', () => {
       groupFieldOptions,
     ),
   ).toStrictEqual(expected);
+
   expect(
     stringParser(
       "category='application' AND brand ~ ['red']",
       groupFieldOptions,
     ),
   ).toStrictEqual(expected);
+
   expect(
     stringParser(
       "category ='application' AND brand~ ['red']",

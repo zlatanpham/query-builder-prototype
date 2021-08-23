@@ -263,8 +263,6 @@ export function Inner() {
     }
   }, [highlightedIndex]);
 
-  console.log({ transformError });
-
   return (
     <Box
       position="relative"
