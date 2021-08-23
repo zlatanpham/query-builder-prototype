@@ -37,8 +37,8 @@ export const TagContainer = ({
       return () => {};
     }
 
-    const listener = (event) => {
-      if (!ref.current || ref.current.contains(event.target)) {
+    const listener = (event: MouseEvent | TouchEvent) => {
+      if (!ref.current || ref.current.contains(event.target as Node)) {
         return;
       }
       replaceItem(index, { ...item, value: tags } as Value);

@@ -56,10 +56,9 @@ const getValue = (expressionString: string) => {
     : expressionString.startsWith("'")
     ? "'"
     : '';
-  const value = expressionString.slice(
-    0,
-    expressionString.indexOf(valueWrapper, 1) + 1,
-  );
+  const value = valueWrapper
+    ? expressionString.slice(0, expressionString.indexOf(valueWrapper, 1) + 1)
+    : expressionString;
   return value
     ? { itemValue: value, isError: false, error: '' }
     : {
@@ -308,7 +307,10 @@ export const stringParser = (
     }
     // check operator
     if (o) {
-      if (!operatorMapping[o] && !advancedOperatorMapping[o]) {
+      if (
+        !operatorMapping[o as keyof typeof operatorMapping] &&
+        !advancedOperatorMapping[o as keyof typeof advancedOperatorMapping]
+      ) {
         isError = true;
         error = `Operator '${o}' is not found`;
         break;

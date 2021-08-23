@@ -280,7 +280,7 @@ test('AND advanced with OR joinOperator', () => {
 });
 
 test('number', () => {
-  expect(stringParser('page = 12', groupFieldOptions)).toStrictEqual({
+  expect(stringParser('page = 99999', groupFieldOptions)).toStrictEqual({
     joinOperator: 'AND',
     expressions: [
       { type: 'field', value: 'page', fieldType: 'INTEGER', isArray: false },
@@ -293,7 +293,7 @@ test('number', () => {
       },
       {
         type: 'value',
-        value: 12,
+        value: 99999,
         field: 'page',
         fieldType: 'INTEGER',
         isArray: false,
