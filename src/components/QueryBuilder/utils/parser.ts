@@ -1,4 +1,3 @@
-/* eslint-disable no-loop-func */
 import { SchemaFieldType } from '../../../schema';
 import {
   advancedOperatorMapping,
@@ -58,7 +57,12 @@ const getValue = (expressionString: string) => {
     : '';
   const value = valueWrapper
     ? expressionString.slice(0, expressionString.indexOf(valueWrapper, 1) + 1)
-    : expressionString;
+    : expressionString.slice(
+        0,
+        expressionString.indexOf(' ', 1) > -1
+          ? expressionString.indexOf(' ', 1)
+          : undefined,
+      );
   return value
     ? { itemValue: value, isError: false, error: '' }
     : {
