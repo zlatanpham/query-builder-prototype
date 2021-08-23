@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 import { SchemaFieldType } from '../../../schema';
 import {
   advancedOperatorMapping,
@@ -21,7 +22,7 @@ const getField = (
   const field = groupFieldOptions
     .map((group) => group.items)
     .flat()
-    .find((field) => expressionString.startsWith(field.text))?.text;
+    .find((field) => expressionString.startsWith(field.value))?.value;
   return field
     ? { itemValue: field, isError: false, error: '' }
     : {
@@ -162,7 +163,7 @@ const toArray = (
   expressionString: string,
   groupFieldOptions: GroupMenu<FieldOption>[],
 ) => {
-  const result: string[] = [];
+  const result: (string | string[])[] = [];
   let temp = expressionString.trim();
   let index = 0;
   let isError = false;
@@ -189,9 +190,9 @@ const toArray = (
       if (isError) {
         break;
       }
-      // FIXME:
-      // @ts-ignore
-      result.push(field, operator, value);
+      [field, operator, value].forEach((itemValue) => {
+        result.push(itemValue);
+      });
       temp = temp
         .replace('(', '')
         .replace(bracketExpression, '')
@@ -286,7 +287,7 @@ export const stringParser = (
     } = groupFieldOptions
       .map((group) => group.items)
       .flat()
-      .find((field) => field.text === f) || {};
+      .find((field) => field.value === f) || {};
     const isBooleanSelect = fieldType === 'BOOLEAN';
     // check field
     if (
