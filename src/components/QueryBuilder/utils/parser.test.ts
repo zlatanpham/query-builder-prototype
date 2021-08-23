@@ -301,6 +301,49 @@ test('number', () => {
       },
     ],
   });
+
+  expect(
+    stringParser(
+      "page = 12345 AND category = 'application'",
+      groupFieldOptions,
+    ),
+  ).toStrictEqual({
+    joinOperator: 'AND',
+    expressions: [
+      { type: 'field', value: 'page', fieldType: 'INTEGER', isArray: false },
+      {
+        type: 'operator',
+        value: '=',
+        field: 'page',
+        fieldType: 'INTEGER',
+        isArray: false,
+      },
+      {
+        type: 'value',
+        value: 12345,
+        field: 'page',
+        fieldType: 'INTEGER',
+        isArray: false,
+        component: 'text',
+      },
+      { type: 'field', value: 'category', fieldType: 'STRING', isArray: false },
+      {
+        type: 'operator',
+        value: '=',
+        field: 'category',
+        fieldType: 'STRING',
+        isArray: false,
+      },
+      {
+        type: 'value',
+        value: 'application',
+        field: 'category',
+        fieldType: 'STRING',
+        isArray: false,
+        component: 'text',
+      },
+    ],
+  });
 });
 
 test('TIMESTAMP', () => {
