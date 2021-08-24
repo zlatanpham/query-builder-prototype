@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SchemaField } from '../../schema';
 import { Item, JoinOperator, GroupMenu, FieldOption } from './shared';
 import {
@@ -38,7 +38,15 @@ export const QueryBuilderContextProvider: React.FC<{
   schema: SchemaField[];
   value: string;
   onChange: (value: string) => void;
+  condensed?: boolean;
 }> = ({ children, onChange, value, schema }) => {
+  const [internalValue, setInternalValueState] = useState(value);
+  const prevValue = useRef(value);
+  const setInternalValue = useCallback((value: string) => {
+    setInternalValueState(value);
+    prevValue.current = value;
+  }, []);
+
   const groupFieldOptions: GroupMenu<FieldOption>[] = useMemo(() => {
     return [
       {
@@ -60,7 +68,7 @@ export const QueryBuilderContextProvider: React.FC<{
     expressions: defaultItems,
   }: ReturnType<typeof stringParser> = useMemo(() => {
     try {
-      return stringParser(value, groupFieldOptions);
+      return stringParser(internalValue, groupFieldOptions);
     } catch (e) {
       return { joinOperator: 'AND', expressions: [] };
     }
@@ -69,7 +77,7 @@ export const QueryBuilderContextProvider: React.FC<{
   }, [groupFieldOptions]);
 
   const isDefaultVisualMode =
-    value === '' || (value !== '' && defaultItems.length > 0);
+    internalValue === '' || (internalValue !== '' && defaultItems.length > 0);
 
   const [mode, setMode] = useState<'visual' | 'text'>(
     isDefaultVisualMode ? 'visual' : 'text',
@@ -118,6 +126,10 @@ export const QueryBuilderContextProvider: React.FC<{
   }, []);
 
   useEffect(() => {
+    onChange(internalValue);
+  }, [internalValue, onChange]);
+
+  useEffect(() => {
     if (mode === 'visual') {
       onChange(filterObjectToString(items, joinOperator));
     }
@@ -127,7 +139,7 @@ export const QueryBuilderContextProvider: React.FC<{
     if (mode === 'text') {
       try {
         const { joinOperator, expressions } = stringParser(
-          value,
+          internalValue,
           groupFieldOptions,
         );
         setItems(expressions);
@@ -137,7 +149,7 @@ export const QueryBuilderContextProvider: React.FC<{
         setTransformError(error.message);
       }
     }
-  }, [value, mode, setItems, setJoinOperator, groupFieldOptions]);
+  }, [internalValue, mode, setItems, setJoinOperator, groupFieldOptions]);
 
   return (
     <Provider
@@ -155,8 +167,8 @@ export const QueryBuilderContextProvider: React.FC<{
         joinOperator,
         setJoinOperator,
         groupFieldOptions,
-        value,
-        onChange,
+        value: internalValue,
+        onChange: setInternalValue,
         mode,
         setMode,
         transformError,

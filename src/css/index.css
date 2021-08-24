@@ -1,1 +1,6 @@
 @import '@sajari-ui/core';
+
+html,
+body {
+  background-color: #fdfdfd;
+}

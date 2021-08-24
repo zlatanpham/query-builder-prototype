@@ -30,11 +30,13 @@ import {
 import { QueryBuilderContextProvider, useQueryBuilderContext } from './context';
 import './index.css';
 import { SchemaField } from '../../schema';
+import { CondensedWrapper } from './components/CondensedWrapper';
 
-interface QueryBuilderProps {
+export interface QueryBuilderProps {
   schema: SchemaField[];
   value: string;
   onChange: (value: string) => void;
+  condensed?: boolean;
 }
 
 export function Inner() {
@@ -614,7 +616,13 @@ export function Inner() {
 export const QueryBuilder = React.memo((props: QueryBuilderProps) => {
   return (
     <QueryBuilderContextProvider {...props}>
-      <Inner />
+      {props.condensed ? (
+        <CondensedWrapper {...props}>
+          <Inner />
+        </CondensedWrapper>
+      ) : (
+        <Inner />
+      )}
     </QueryBuilderContextProvider>
   );
 });
