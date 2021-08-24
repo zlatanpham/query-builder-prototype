@@ -347,6 +347,7 @@ export function Inner() {
                 <Select
                   borderRadius="rounded-none"
                   width="w-20"
+                  fontSize="text-sm"
                   flex="flex-none"
                   borderWidth="border-0"
                   padding={['p-0', 'pl-3']}

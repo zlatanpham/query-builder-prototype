@@ -294,6 +294,7 @@ export const Pill = ({ index, item, onScrollEnd, onFocusLast }: Props) => {
   const renderPill = (
     <Box
       height="h-8"
+      lineHeight="leading-none"
       cursor="cursor-pointer"
       key={`selected-item-${index}`}
       onClick={() => {
