@@ -21,7 +21,7 @@ const Result = ({ textExpression }: { textExpression: string }) => {
 
 const App = () => {
   const [query, setQuery] = useState('');
-  const [condensed, setConsdensed] = useState(true);
+  const [condensed, setConsdensed] = useState(false);
 
   return (
     <Flex flexDirection="flex-col">

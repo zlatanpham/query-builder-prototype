@@ -132,6 +132,24 @@ export const QueryBuilderContextProvider: React.FC<{
   }, [internalValue, onChange, condensed]);
 
   useEffect(() => {
+    if (value !== prevValue.current) {
+      const { joinOperator, expressions } = (() => {
+        try {
+          return stringParser(value, groupFieldOptions);
+        } catch (e) {
+          return { joinOperator: 'AND', expressions: [] };
+        }
+      })();
+      setJoinOperator(joinOperator as JoinOperator);
+      setItems(expressions);
+      setInternalValue(value);
+      if (value !== '' && expressions.length === 0) {
+        setMode('text');
+      }
+    }
+  }, [value, setInternalValue, groupFieldOptions]);
+
+  useEffect(() => {
     if (mode === 'visual') {
       setInternalValue(filterObjectToString(items, joinOperator));
     }
