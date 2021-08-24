@@ -39,7 +39,7 @@ export const QueryBuilderContextProvider: React.FC<{
   value: string;
   onChange: (value: string) => void;
   condensed?: boolean;
-}> = ({ children, onChange, value, schema }) => {
+}> = ({ children, onChange, value, schema, condensed }) => {
   const [internalValue, setInternalValueState] = useState(value);
   const prevValue = useRef(value);
   const setInternalValue = useCallback((value: string) => {
@@ -126,14 +126,16 @@ export const QueryBuilderContextProvider: React.FC<{
   }, []);
 
   useEffect(() => {
-    onChange(internalValue);
-  }, [internalValue, onChange]);
+    if (!condensed) {
+      onChange(internalValue);
+    }
+  }, [internalValue, onChange, condensed]);
 
   useEffect(() => {
     if (mode === 'visual') {
-      onChange(filterObjectToString(items, joinOperator));
+      setInternalValue(filterObjectToString(items, joinOperator));
     }
-  }, [items, joinOperator, mode, onChange]);
+  }, [items, joinOperator, mode, setInternalValue]);
 
   useEffect(() => {
     if (mode === 'text') {

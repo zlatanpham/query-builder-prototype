@@ -37,6 +37,7 @@ export interface QueryBuilderProps {
   value: string;
   onChange: (value: string) => void;
   condensed?: boolean;
+  condensedPlaceholder?: string;
 }
 
 export function Inner() {

@@ -15,13 +15,15 @@ import {
 } from '@sajari-ui/core';
 
 import { QueryBuilderProps } from '..';
+import { useQueryBuilderContext } from '../context';
 
 interface Props extends QueryBuilderProps {
   children: React.ReactNode;
 }
 
 export const CondensedWrapper = (props: Props) => {
-  const { children, value } = props;
+  const { children, value, onChange, condensedPlaceholder } = props;
+  const { value: internalValue } = useQueryBuilderContext();
   const { open, onOpen, onClose } = useDisclosure();
   return (
     <>
@@ -29,17 +31,31 @@ export const CondensedWrapper = (props: Props) => {
         borderWidth="border"
         borderColor="border-gray-200"
         borderRadius="rounded-md"
-        textColor="text-gray-500"
-        padding={['pl-2', 'pr-1', 'py-1']}
+        padding={['pl-3', 'pr-1', 'py-1']}
         height="h-10"
         justifyContent="justify-between"
         alignItems="items-center"
         onClick={onOpen}
+        role="button"
+        tabIndex={1}
+        onKeyDown={(e) => {
+          if (e.code === 'Enter' || e.code === 'Space') {
+            e.preventDefault();
+            onOpen();
+          }
+        }}
+        cursor="cursor-pointer"
       >
-        <Box truncate="truncate" padding="pr-2">
-          {value}
+        <Box
+          truncate="truncate"
+          padding="pr-2"
+          textColor={value ? 'text-gray-500' : 'text-gray-400'}
+        >
+          {value ? value : condensedPlaceholder}
         </Box>
         <Flex
+          textColor="text-gray-500"
+          flex="flex-none"
           width="w-8"
           height="h-8"
           alignItems="items-center"
@@ -64,7 +80,13 @@ export const CondensedWrapper = (props: Props) => {
           </ModalHeader>
           <ModalBody>{children}</ModalBody>
           <ModalFooter>
-            <Button onClick={onClose} appearance="primary">
+            <Button
+              onClick={() => {
+                onClose();
+                onChange(internalValue);
+              }}
+              appearance="primary"
+            >
               Save
             </Button>
             <Button onClick={onClose}>Close</Button>

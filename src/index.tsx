@@ -21,7 +21,7 @@ const Result = ({ textExpression }: { textExpression: string }) => {
 
 const App = () => {
   const [query, setQuery] = useState('');
-  const [condensed, setConsdensed] = useState(false);
+  const [condensed, setConsdensed] = useState(true);
 
   return (
     <Flex flexDirection="flex-col">
@@ -64,6 +64,7 @@ const App = () => {
               value={query}
               onChange={setQuery}
               condensed
+              condensedPlaceholder="Click to edit"
             />
           </Box>
         </Flex>
