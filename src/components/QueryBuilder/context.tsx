@@ -1,9 +1,14 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SchemaField } from '../../schema';
 import { Item, JoinOperator, GroupMenu, FieldOption } from './shared';
-import { schemaToFieldOptions } from './utils/filterObjectToString';
+import {
+  filterObjectToString,
+  schemaToFieldOptions,
+} from './utils/filterObjectToString';
 import { stringParser } from './utils/parser';
 import { createContext } from './utils/react-helpers';
+
+type EditorMode = 'visual' | 'text';
 
 interface QueryBuilderContextValues {
   items: Item[];
@@ -21,7 +26,9 @@ interface QueryBuilderContextValues {
   groupFieldOptions: GroupMenu<FieldOption>[];
   onChange: (value: string) => void;
   value: string;
-  isDefaultVisualMode: boolean;
+  mode?: EditorMode;
+  setMode: (mode: EditorMode) => void;
+  transformError?: string;
 }
 
 const [Provider, useQueryBuilderContext] =
@@ -64,11 +71,16 @@ export const QueryBuilderContextProvider: React.FC<{
   const isDefaultVisualMode =
     value === '' || (value !== '' && defaultItems.length > 0);
 
+  const [mode, setMode] = useState<'visual' | 'text'>(
+    isDefaultVisualMode ? 'visual' : 'text',
+  );
+
   const [items, setItems] = useState<Item[]>(defaultItems);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [hoverIndexes, setHoverIndexes] = useState<number[]>([]);
   const [joinOperator, setJoinOperator] =
     useState<JoinOperator>(defaultJoinOperator);
+  const [transformError, setTransformError] = useState('');
 
   const removeBlock = useCallback((index: number) => {
     setItems((prev) => {
@@ -105,6 +117,28 @@ export const QueryBuilderContextProvider: React.FC<{
     });
   }, []);
 
+  useEffect(() => {
+    if (mode === 'visual') {
+      onChange(filterObjectToString(items, joinOperator));
+    }
+  }, [items, joinOperator, mode, onChange]);
+
+  useEffect(() => {
+    if (mode === 'text') {
+      try {
+        const { joinOperator, expressions } = stringParser(
+          value,
+          groupFieldOptions,
+        );
+        setItems(expressions);
+        setJoinOperator(joinOperator);
+        setTransformError('');
+      } catch (error) {
+        setTransformError(error.message);
+      }
+    }
+  }, [value, mode, setItems, setJoinOperator, groupFieldOptions]);
+
   return (
     <Provider
       value={{
@@ -123,7 +157,9 @@ export const QueryBuilderContextProvider: React.FC<{
         groupFieldOptions,
         value,
         onChange,
-        isDefaultVisualMode,
+        mode,
+        setMode,
+        transformError,
       }}
     >
       {children}

@@ -16,8 +16,6 @@ import {
 import { Pill, DropdownItem } from './components';
 import { DatePicker } from './components/DatePicker';
 import { formatDate } from './utils/datetime';
-import { filterObjectToString } from './utils/filterObjectToString';
-import { stringParser } from './utils/parser';
 import { flattenSuggestions, getFilteredSuggestions } from './utils/filter';
 import {
   booleanOptions,
@@ -52,7 +50,9 @@ export function Inner() {
     groupFieldOptions,
     value: textExpression,
     onChange: setTextExpression,
-    isDefaultVisualMode,
+    mode,
+    setMode,
+    transformError,
   } = useQueryBuilderContext();
   const lastItem: Item | undefined = items[items.length - 1];
   const [inputFocus, setInputFocus] = useState(false);
@@ -60,10 +60,6 @@ export function Inner() {
   const dropdownRef = useRef<HTMLUListElement | null>(null);
   const showDateContainer =
     lastItem?.type === 'operator' && lastItem?.fieldType === 'TIMESTAMP';
-
-  const [mode, setMode] = useState<'visual' | 'text'>(
-    isDefaultVisualMode ? 'visual' : 'text',
-  );
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -83,30 +79,6 @@ export function Inner() {
     inputValue,
     lastItem,
   );
-
-  useEffect(() => {
-    if (mode === 'visual') {
-      setTextExpression(filterObjectToString(items, joinOperator));
-    }
-  }, [items, joinOperator, mode, setTextExpression]);
-
-  const [transformError, setTransformError] = useState('');
-
-  useEffect(() => {
-    if (mode === 'text') {
-      try {
-        const { joinOperator, expressions } = stringParser(
-          textExpression,
-          groupFieldOptions,
-        );
-        setItems(expressions);
-        setJoinOperator(joinOperator);
-        setTransformError('');
-      } catch (error) {
-        setTransformError(error.message);
-      }
-    }
-  }, [textExpression, mode, setItems, setJoinOperator, groupFieldOptions]);
 
   const flatSuggestions = flattenSuggestions(filteredSuggestions);
 
@@ -276,7 +248,7 @@ export function Inner() {
       flexWrap="flex-no-wrap"
       boxShadow={inputFocus ? 'shadow-outline-blue' : undefined}
     >
-      {transformError ? (
+      {transformError && mode === 'text' ? (
         <Tooltip
           label={
             transformError === 'undefined'
@@ -453,6 +425,10 @@ export function Inner() {
                     setInputFocus(false);
                   },
                   onKeyDown: (e) => {
+                    // In case the component is inside a form, prevent it from inteferring with form submit event
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                    }
                     if (e.key === 'Backspace' && inputValue === '') {
                       removeLast();
                     }
@@ -512,6 +488,7 @@ export function Inner() {
                       }
                       setInputValue('');
                     }
+                    return;
                   },
                 })}
               />
