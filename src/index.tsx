@@ -3,7 +3,7 @@ import { QueryBuilder } from './components/QueryBuilder';
 import { schema } from './schema';
 import './index.css';
 import { useState } from 'react';
-import { Box, Button, ButtonGroup, Code, Flex } from '@sajari-ui/core';
+import { Box, Button, ButtonGroup, Code, Flex, Heading } from '@sajari-ui/core';
 
 const Result = ({ textExpression }: { textExpression: string }) => {
   return (
@@ -59,12 +59,15 @@ const App = () => {
             borderColor="border-gray-200"
             backgroundColor="bg-white"
           >
+            <Heading as="h6" margin="mb-1">
+              Promotion query
+            </Heading>
             <QueryBuilder
               schema={schema}
               value={query}
               onChange={setQuery}
               condensed
-              condensedPlaceholder="Click to edit"
+              condensedPlaceholder="Click to edit..."
             />
           </Box>
         </Flex>

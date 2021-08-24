@@ -35,12 +35,13 @@ export const CondensedWrapper = (props: Props) => {
         height="h-10"
         justifyContent="justify-between"
         alignItems="items-center"
+        backgroundColor="bg-white"
         onClick={onOpen}
         role="button"
         tabIndex={1}
+        aria-label="Edit query"
         onKeyDown={(e) => {
           if (e.code === 'Enter' || e.code === 'Space') {
-            e.preventDefault();
             onOpen();
           }
         }}
@@ -49,6 +50,7 @@ export const CondensedWrapper = (props: Props) => {
         <Box
           truncate="truncate"
           padding="pr-2"
+          aria-hidden
           textColor={value ? 'text-gray-500' : 'text-gray-400'}
         >
           {value ? value : condensedPlaceholder}
@@ -60,6 +62,7 @@ export const CondensedWrapper = (props: Props) => {
           height="h-8"
           alignItems="items-center"
           justifyContent="justify-center"
+          aria-hidden
         >
           <Icon name="pencil" />
         </Flex>
