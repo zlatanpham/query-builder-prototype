@@ -76,7 +76,9 @@ export const operatorMapping = {
   $: 'ends with',
   '^': 'begins with',
   '>': 'greater than',
+  '>=': 'greater than and equal',
   '<': 'less than',
+  '<=': 'less than and equal',
 };
 
 export const advancedOperatorMapping = {
@@ -129,8 +131,18 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
         types: ['FLOAT', 'INTEGER', 'DOUBLE', 'TIMESTAMP'],
       },
       {
+        value: '>=',
+        text: 'greater than and equal',
+        types: ['FLOAT', 'INTEGER', 'DOUBLE', 'TIMESTAMP'],
+      },
+      {
         value: '<',
         text: 'less than',
+        types: ['FLOAT', 'INTEGER', 'DOUBLE', 'TIMESTAMP'],
+      },
+      {
+        value: '<=',
+        text: 'less than and equal',
         types: ['FLOAT', 'INTEGER', 'DOUBLE', 'TIMESTAMP'],
       },
     ],

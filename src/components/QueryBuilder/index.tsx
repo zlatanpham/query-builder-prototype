@@ -515,7 +515,7 @@ export function Inner() {
                 padding="p-2"
                 zIndex="z-50"
                 borderWidth="border"
-                width="w-52"
+                width={lastItem?.type === 'field' ? 'w-60' : 'w-52'}
                 borderColor="border-gray-200"
                 boxShadow="shadow-menu"
                 maxHeight="max-h-96"

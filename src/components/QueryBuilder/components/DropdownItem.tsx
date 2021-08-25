@@ -22,6 +22,7 @@ export const DropdownItem = ({
 }: DropdownItemProps) => {
   const { items, addItem, setSelectedItem } = useQueryBuilderContext();
   const lastItem = items[items.length - 1];
+  const operatorItem = item as unknown as Operator;
 
   return (
     <Flex
@@ -50,7 +51,6 @@ export const DropdownItem = ({
               });
               openMenu();
             } else if (lastItem?.type === 'field') {
-              const operatorItem = item as unknown as Operator;
               addItem({
                 type: 'operator',
                 value: item.value,
@@ -111,6 +111,11 @@ export const DropdownItem = ({
       {item.value !== item.text ? (
         <Box as="span" truncate="truncate">
           {item.value}
+          {operatorItem?.advancedJoinOperator ? (
+            <Box as="span" margin="ml-2" fontSize="text-xs">
+              ({operatorItem?.advancedJoinOperator})
+            </Box>
+          ) : null}
         </Box>
       ) : null}
       <Box
