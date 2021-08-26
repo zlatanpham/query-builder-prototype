@@ -519,10 +519,9 @@ export function Inner() {
                 borderColor="border-gray-200"
                 boxShadow="shadow-menu"
                 maxHeight="max-h-96"
-                as="ul"
                 overflow="overflow-y-auto"
               >
-                <Box {...getMenuProps()}>
+                <Box {...getMenuProps()} as="ul">
                   {filteredSuggestions[0]?.title
                     ? (filteredSuggestions as GroupMenu<FieldOption>[]).reduce(
                         (result, section, sectionIndex) => {
