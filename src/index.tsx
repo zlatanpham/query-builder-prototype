@@ -75,7 +75,7 @@ const App = () => {
         <Box
           padding={['p-10', 'pt-20']}
           maxWidth="max-w-7xl"
-          margin={['mx-auto', 'mt-96']}
+          margin={['mx-auto']}
           width="w-full"
         >
           <QueryBuilder schema={schema} value={query} onChange={setQuery} />
