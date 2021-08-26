@@ -211,7 +211,7 @@ export function Inner() {
   useEffect(() => {
     setHighlightedIndex(-1);
     update();
-  }, [isOpen, update, setHighlightedIndex, items.length]);
+  }, [isOpen, update, setHighlightedIndex, items.length, inputValue]);
 
   const isNumberInput =
     numberTypes.includes(lastItem?.fieldType) && lastItem.type === 'operator';
@@ -237,6 +237,12 @@ export function Inner() {
       }
     }
   }, [highlightedIndex]);
+
+  useEffect(() => {
+    if (isOpen) {
+      dropdownRef.current?.scrollTo({ top: 0 });
+    }
+  }, [isOpen]);
 
   return (
     <Box
@@ -432,6 +438,9 @@ export function Inner() {
                     // In case the component is inside a form, prevent it from inteferring with form submit event
                     if (e.key === 'Enter') {
                       e.preventDefault();
+                      if (inputValue === '' && highlightedIndex === -1) {
+                        closeMenu();
+                      }
                     }
                     if (e.key === 'Backspace' && inputValue === '') {
                       removeLast();
