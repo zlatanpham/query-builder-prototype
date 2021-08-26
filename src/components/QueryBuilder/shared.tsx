@@ -101,7 +101,7 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
       {
         value: '~',
         text: 'contains',
-        types: ['STRING'],
+        types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
         supportIsArray: true,
       },
       {
@@ -112,7 +112,7 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
       {
         value: '!~',
         text: 'does not contain',
-        types: ['STRING'],
+        types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
         supportIsArray: true,
       },
       {

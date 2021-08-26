@@ -82,7 +82,7 @@ test.each<[any[], string, Item | undefined, any[]]>([
           {
             value: '~',
             text: 'contains',
-            types: ['STRING'],
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
             supportIsArray: true,
           },
           {
@@ -93,7 +93,7 @@ test.each<[any[], string, Item | undefined, any[]]>([
           {
             value: '!~',
             text: 'does not contain',
-            types: ['STRING'],
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
             supportIsArray: true,
           },
           {
@@ -161,13 +161,13 @@ test.each<[any[], string, Item | undefined, any[]]>([
           {
             value: '~',
             text: 'contains',
-            types: ['STRING'],
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
             supportIsArray: true,
           },
           {
             value: '!~',
             text: 'does not contain',
-            types: ['STRING'],
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
             supportIsArray: true,
           },
         ],
@@ -248,9 +248,21 @@ test.each<[any[], string, Item | undefined, any[]]>([
             types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
           },
           {
+            value: '~',
+            text: 'contains',
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
+            supportIsArray: true,
+          },
+          {
             value: '!=',
             text: 'is not',
             types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
+          },
+          {
+            value: '!~',
+            text: 'does not contain',
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
+            supportIsArray: true,
           },
           {
             value: '>',
@@ -258,8 +270,18 @@ test.each<[any[], string, Item | undefined, any[]]>([
             types: ['FLOAT', 'INTEGER', 'DOUBLE', 'TIMESTAMP'],
           },
           {
+            value: '>=',
+            text: 'greater than and equal',
+            types: ['FLOAT', 'INTEGER', 'DOUBLE', 'TIMESTAMP'],
+          },
+          {
             value: '<',
             text: 'less than',
+            types: ['FLOAT', 'INTEGER', 'DOUBLE', 'TIMESTAMP'],
+          },
+          {
+            value: '<=',
+            text: 'less than and equal',
             types: ['FLOAT', 'INTEGER', 'DOUBLE', 'TIMESTAMP'],
           },
         ],
@@ -278,6 +300,12 @@ test.each<[any[], string, Item | undefined, any[]]>([
             value: '!=',
             text: 'is not',
             types: ['STRING', 'BOOLEAN', 'FLOAT', 'INTEGER', 'DOUBLE'],
+          },
+          {
+            value: '!~',
+            text: 'does not contain',
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
+            supportIsArray: true,
           },
         ],
       },
