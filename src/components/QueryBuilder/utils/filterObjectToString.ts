@@ -16,9 +16,17 @@ export function filterObjectToString(items: Item[], joinOperator: string) {
     const valueItem: Item | undefined = items[index + 2];
     if (valueItem && Array.isArray(valueItem.value)) {
       const exp = valueItem.value
-        .map((value) =>
-          [fieldItem?.value, operatorItem?.value, `'${value}'`].join(' '),
-        )
+        .map((value) => {
+          let v = numberTypes.includes(fieldItem.fieldType)
+            ? value
+            : `'${value}'`;
+
+          if (fieldItem.isArray) {
+            v = `[${v}]`;
+          }
+
+          return [fieldItem?.value, operatorItem?.value, v].join(' ');
+        })
         .join(` ${operatorItem.advancedJoinOperator} `);
       result.push(`(${exp})`);
     } else {

@@ -1,6 +1,12 @@
 import { SchemaFieldType } from '../../schema';
 export type JoinOperator = 'OR' | 'AND';
 
+export interface SchemaField {
+  name: string;
+  isArray: boolean;
+  isIndexed: boolean;
+  type: SchemaFieldType;
+}
 export interface FieldOption {
   text: string;
   value: string;
@@ -153,23 +159,26 @@ export const groupOperatorOptions: GroupMenu<OperatorOption>[] = [
       {
         value: '~',
         text: 'contains all',
-        types: ['STRING'],
+        types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
         isAdvanced: true,
+        supportIsArray: true,
         advancedJoinOperator: 'AND',
       },
       {
         value: '~',
         text: 'contains any',
-        types: ['STRING'],
+        types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
         isAdvanced: true,
         advancedJoinOperator: 'OR',
+        supportIsArray: true,
       },
       {
         value: '!~',
         text: 'contains none of',
-        types: ['STRING'],
+        types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
         isAdvanced: true,
         advancedJoinOperator: 'OR',
+        supportIsArray: true,
       },
       {
         value: '=',

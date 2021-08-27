@@ -114,23 +114,26 @@ test.each<[any[], string, Item | undefined, any[]]>([
           {
             value: '~',
             text: 'contains all',
-            types: ['STRING'],
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
             isAdvanced: true,
+            supportIsArray: true,
             advancedJoinOperator: 'AND',
           },
           {
             value: '~',
             text: 'contains any',
-            types: ['STRING'],
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
             isAdvanced: true,
             advancedJoinOperator: 'OR',
+            supportIsArray: true,
           },
           {
             value: '!~',
             text: 'contains none of',
-            types: ['STRING'],
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
             isAdvanced: true,
             advancedJoinOperator: 'OR',
+            supportIsArray: true,
           },
           {
             value: '=',
@@ -178,22 +181,25 @@ test.each<[any[], string, Item | undefined, any[]]>([
           {
             value: '~',
             text: 'contains all',
-            types: ['STRING'],
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
             isAdvanced: true,
+            supportIsArray: true,
             advancedJoinOperator: 'AND',
           },
           {
             value: '~',
             text: 'contains any',
-            types: ['STRING'],
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
             isAdvanced: true,
+            supportIsArray: true,
             advancedJoinOperator: 'OR',
           },
           {
             value: '!~',
             text: 'contains none of',
-            types: ['STRING'],
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
             isAdvanced: true,
+            supportIsArray: true,
             advancedJoinOperator: 'OR',
           },
         ],
@@ -286,6 +292,35 @@ test.each<[any[], string, Item | undefined, any[]]>([
           },
         ],
       },
+      {
+        title: 'Advanced',
+        items: [
+          {
+            value: '~',
+            text: 'contains all',
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
+            isAdvanced: true,
+            supportIsArray: true,
+            advancedJoinOperator: 'AND',
+          },
+          {
+            value: '~',
+            text: 'contains any',
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
+            isAdvanced: true,
+            advancedJoinOperator: 'OR',
+            supportIsArray: true,
+          },
+          {
+            value: '!~',
+            text: 'contains none of',
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
+            isAdvanced: true,
+            advancedJoinOperator: 'OR',
+            supportIsArray: true,
+          },
+        ],
+      },
     ],
   ],
   [
@@ -305,6 +340,19 @@ test.each<[any[], string, Item | undefined, any[]]>([
             value: '!~',
             text: 'does not contain',
             types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
+            supportIsArray: true,
+          },
+        ],
+      },
+      {
+        title: 'Advanced',
+        items: [
+          {
+            value: '!~',
+            text: 'contains none of',
+            types: ['STRING', 'FLOAT', 'INTEGER', 'DOUBLE'],
+            isAdvanced: true,
+            advancedJoinOperator: 'OR',
             supportIsArray: true,
           },
         ],
@@ -414,7 +462,7 @@ test.each<[any[], string, Item | undefined, any[]]>([
     ],
   ],
 ])(
-  'getFilteredSuggestions(%o, %s, $o)',
+  'getFilteredSuggestions(%s, %s, %s)',
   (options, inputValue, activeItem, expected) => {
     expect(
       getFilteredSuggestions(options, inputValue, activeItem),
