@@ -1253,3 +1253,69 @@ test('malicious symbols - []', () => {
     ],
   });
 });
+
+test('isArray and advanced operator', () => {
+  expect(
+    stringParser(
+      '(collection_ids ~ [12.2] AND collection_ids ~ [23])',
+      groupFieldOptions,
+    ),
+  ).toStrictEqual({
+    joinOperator: 'AND',
+    expressions: [
+      {
+        type: 'field',
+        value: 'collection_ids',
+        fieldType: 'FLOAT',
+        isArray: true,
+      },
+      {
+        type: 'operator',
+        value: '~',
+        field: 'collection_ids',
+        fieldType: 'FLOAT',
+        isArray: true,
+      },
+      {
+        type: 'value',
+        value: [12.2, 23],
+        field: 'collection_ids',
+        component: 'tags',
+        fieldType: 'FLOAT',
+        isArray: true,
+      },
+    ],
+  });
+
+  expect(
+    stringParser(
+      "(collection_titles !~ ['12'] AND collection_titles !~ ['(t)'])",
+      groupFieldOptions,
+    ),
+  ).toStrictEqual({
+    joinOperator: 'AND',
+    expressions: [
+      {
+        type: 'field',
+        value: 'collection_titles',
+        fieldType: 'FLOAT',
+        isArray: true,
+      },
+      {
+        type: 'operator',
+        value: '!~',
+        field: 'collection_titles',
+        fieldType: 'FLOAT',
+        isArray: true,
+      },
+      {
+        type: 'value',
+        value: ['12', '(t)'],
+        field: 'collection_titles',
+        component: 'tags',
+        fieldType: 'FLOAT',
+        isArray: true,
+      },
+    ],
+  });
+});

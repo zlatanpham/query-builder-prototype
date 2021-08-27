@@ -14,6 +14,18 @@ test.each([
       { text: 'price', value: 'price', isArray: false, type: 'FLOAT' },
       { text: 'onSale', value: 'onSale', isArray: false, type: 'BOOLEAN' },
       {
+        text: 'collection_ids',
+        value: 'collection_ids',
+        isArray: true,
+        type: 'FLOAT',
+      },
+      {
+        text: 'collection_titles',
+        value: 'collection_titles',
+        isArray: true,
+        type: 'STRING',
+      },
+      {
         text: 'createdAt',
         value: 'createdAt',
         isArray: false,
@@ -413,6 +425,18 @@ test.each<[any[], string, Item | undefined, any[]]>([
           { text: 'price', value: 'price', isArray: false, type: 'FLOAT' },
           { text: 'onSale', value: 'onSale', isArray: false, type: 'BOOLEAN' },
           {
+            text: 'collection_ids',
+            value: 'collection_ids',
+            isArray: true,
+            type: 'FLOAT',
+          },
+          {
+            text: 'collection_titles',
+            value: 'collection_titles',
+            isArray: true,
+            type: 'STRING',
+          },
+          {
             text: 'createdAt',
             value: 'createdAt',
             isArray: false,
@@ -437,6 +461,18 @@ test.each<[any[], string, Item | undefined, any[]]>([
             type: 'STRING',
           },
           { text: 'price', value: 'price', isArray: false, type: 'FLOAT' },
+          {
+            text: 'collection_ids',
+            value: 'collection_ids',
+            isArray: true,
+            type: 'FLOAT',
+          },
+          {
+            text: 'collection_titles',
+            value: 'collection_titles',
+            isArray: true,
+            type: 'STRING',
+          },
           {
             text: 'createdAt',
             value: 'createdAt',
