@@ -63,7 +63,7 @@ export type Value =
     }
   | {
       type: 'value';
-      value: string[];
+      value: string[] | number[];
       component: 'tags';
       field: string;
       fieldType: FieldOption['type'];

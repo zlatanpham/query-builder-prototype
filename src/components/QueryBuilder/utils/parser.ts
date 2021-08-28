@@ -284,7 +284,7 @@ export const stringParser = (
 
   for (let index = 0; index < blockList.length; index += 1) {
     const [f, o, v] = blockList[index] || [];
-    let internalValue: number | string | string[] | undefined = v;
+    let internalValue: number | number[] | string | string[] | undefined = v;
     if (!blockList[index] || !f) {
       isError = true;
       error = 'undefined';
@@ -343,12 +343,22 @@ export const stringParser = (
       }
 
       if (isNumberSelect) {
-        if (isNaN(Number(v))) {
-          isError = true;
-          error = `Value '${v}' must be a number`;
-          break;
+        if (Array.isArray(v)) {
+          if (v.some((each) => isNaN(Number(each)))) {
+            isError = true;
+            error = `Value '${v}' must be an array of numbers`;
+            break;
+          } else {
+            internalValue = v.map((each) => Number(each));
+          }
         } else {
-          internalValue = Number(v);
+          if (isNaN(Number(v))) {
+            isError = true;
+            error = `Value '${v}' must be a number`;
+            break;
+          } else {
+            internalValue = Number(v);
+          }
         }
       }
     }

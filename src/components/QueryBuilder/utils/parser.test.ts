@@ -1272,6 +1272,8 @@ test('isArray and advanced operator', () => {
       {
         type: 'operator',
         value: '~',
+        advancedJoinOperator: 'AND',
+        isAdvanced: true,
         field: 'collection_ids',
         fieldType: 'FLOAT',
         isArray: true,
@@ -1289,7 +1291,7 @@ test('isArray and advanced operator', () => {
 
   expect(
     stringParser(
-      "(collection_titles !~ ['12'] AND collection_titles !~ ['(t)'])",
+      "(collection_titles !~ ['12'] OR collection_titles !~ ['(t)'])",
       groupFieldOptions,
     ),
   ).toStrictEqual({
@@ -1298,14 +1300,16 @@ test('isArray and advanced operator', () => {
       {
         type: 'field',
         value: 'collection_titles',
-        fieldType: 'FLOAT',
+        fieldType: 'STRING',
         isArray: true,
       },
       {
         type: 'operator',
         value: '!~',
+        advancedJoinOperator: 'OR',
+        isAdvanced: true,
         field: 'collection_titles',
-        fieldType: 'FLOAT',
+        fieldType: 'STRING',
         isArray: true,
       },
       {
@@ -1313,7 +1317,7 @@ test('isArray and advanced operator', () => {
         value: ['12', '(t)'],
         field: 'collection_titles',
         component: 'tags',
-        fieldType: 'FLOAT',
+        fieldType: 'STRING',
         isArray: true,
       },
     ],
