@@ -67,7 +67,7 @@ export function getExpression(items: Item[], index: number) {
     }
 
     return `${field.value} ${operatorText} ${value.value
-      .map((v) => `'${v}'`)
+      .map((v) => (numberTypes.includes(field.fieldType) ? v : `'${v}'`))
       .join(', ')}`;
   }
 

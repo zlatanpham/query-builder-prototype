@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Flex, FlexProps, IconButton, TagInput } from '@sajari-ui/core';
-import { Item, Value } from '../shared';
+import { Item, numberTypes, Value } from '../shared';
 import { useEffect } from 'react';
 import { useQueryBuilderContext } from '../context';
 
@@ -25,7 +25,7 @@ export const TagContainer = ({
   onScrollEnd,
 }: TagContainerProps) => {
   const { value = [] } = item || {};
-  const [tags, setTags] = useState<string[]>(
+  const [tags, setTags] = useState<string[] | number[]>(
     Array.isArray(value) ? value : [String(value)],
   );
   const ref: React.RefObject<HTMLInputElement> = React.createRef();
@@ -52,6 +52,8 @@ export const TagContainer = ({
     };
   }, [index, item, ref, replaceItem, setSelectedItem, tags]);
 
+  const isNumberType = item && numberTypes.includes(item?.fieldType);
+
   return (
     <Flex
       backgroundColor={hovered ? 'bg-gray-300' : 'bg-gray-100'}
@@ -64,14 +66,20 @@ export const TagContainer = ({
     >
       <TagInput
         ref={ref}
-        tags={tags}
+        tags={tags.map(String)}
         hasInputWrapper={false}
         onChange={setTags}
         editable={false}
-        style={{ height: 28 }}
+        style={{ height: 28, minWidth: isNumberType ? 250 : undefined }}
+        data-id="query-builder-input"
         padding="pl-2"
+        type={isNumberType ? 'number' : 'text'}
         splitChar=","
-        placeholder="Type and press enter"
+        placeholder={
+          isNumberType
+            ? 'Type a number and press enter'
+            : 'Type and press enter'
+        }
         borderRadius="rounded-l-none"
         tagRender={({ tag, onDelete, index }) => (
           <Box
