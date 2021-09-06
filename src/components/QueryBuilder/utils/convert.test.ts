@@ -1,5 +1,5 @@
 import { Item, JoinOperator } from '../shared';
-import { filterObjectToString } from './filterObjectToString';
+import { filterObjectToString } from './convert';
 
 test.each<[Item[], JoinOperator, string]>([
   [[], 'OR', ''],

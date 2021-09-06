@@ -11,7 +11,7 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useQueryBuilderContext } from '../context';
 import { Item } from '../shared';
 import { formatDate } from '../utils/datetime';
-import { getExpression } from '../utils/filterObjectToString';
+import { getExpression } from '../utils/convert';
 import { DatePicker } from './DatePicker';
 import { TagContainer } from './TagContainer';
 

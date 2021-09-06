@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SchemaField } from '../../schema';
 import { Item, JoinOperator, GroupMenu, FieldOption } from './shared';
-import {
-  filterObjectToString,
-  schemaToFieldOptions,
-} from './utils/filterObjectToString';
+import { filterObjectToString, schemaToFieldOptions } from './utils/convert';
 import { stringParser } from './utils/parser';
 import { createContext } from './utils/react-helpers';
 
